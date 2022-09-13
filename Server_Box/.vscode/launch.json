@@ -11,10 +11,12 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "server_box/server/app:create_app()",
-                "FLASK_ENV": "development",
+                "FLASK_ENV": "production",
             },
             "args": [
                 "run",
+                "--host",
+                "0.0.0.0",
                 "--no-reload",
             ]
         },
