@@ -20,7 +20,35 @@ handlers:
   orchestrator:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/orchestrator.log
+    filename: logs/orchestrator/orchestrator.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  orchestrator_notification:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_notification.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  orchestrator_polling:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_polling.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  orchestrator_requests:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_requests.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  orchestrator_use_situations:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_use_situations.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
@@ -104,9 +132,29 @@ loggers:
       handlers: [api_rest]
       propagate: no
 
-  server.orchestrator:
+  server.orchestrator.service:
     level: INFO
     handlers: [orchestrator]
+    propagate: no
+
+  server.orchestrator.notification:
+    level: INFO
+    handlers: [orchestrator_notification]
+    propagate: no
+
+  server.orchestrator.polling:
+    level: INFO
+    handlers: [orchestrator_polling]
+    propagate: no
+
+  server.orchestrator.requests:
+    level: INFO
+    handlers: [orchestrator_requests]
+    propagate: no
+
+  server.orchestrator.use_situations:
+    level: INFO
+    handlers: [orchestrator_use_situations]
     propagate: no
 
   server.managers.camera_manager:

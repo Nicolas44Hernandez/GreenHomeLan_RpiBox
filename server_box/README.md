@@ -334,9 +334,11 @@ Log files defined in configuration file located in *server_box/server/config/log
 mkdir logs
 mkdir logs/manager
 mkdir logs/interface
-touch logs/app.log logs/orchestrator.log logs/api-rest.log
+mkdir logs/orchestrator
+touch logs/app.log logs/api-rest.log
 touch logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log
 touch logs/interface/mqtt.log logs/interface/thread.log logs/interface/telnet.log
+touch logs/orchestrator/orchestrator.log logs/orchestrator/orchestrator_notification.log logs/orchestrator/orchestrator_polling.log logs/orchestrator/orchestrator_requests.log logs/orchestrator/orchestrator_use_situations.log
 ```
 
 Pour lancer l'application flask, depuis Server_Box

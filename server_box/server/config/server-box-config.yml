@@ -17,6 +17,10 @@ LIVEBOX_PASSWORD: sah
 TELNET_TIMOUT_IN_SECS: 5
 LIVEBOX_TELNET_COMMANDS: server_box/server/config/telnet_commands.yml
 
+# Use situations configuration
+USE_SITUATIONS_CONFIG: server_box/server/config/use_situations.yml
+DEFAULT_USE_SITUATION: PRECENCE_HOME_OFFICE
+
 # Thread configuration
 SUDO_PASSWORD: Nico44
 THREAD_NETWORK_CONFIG: server_box/server/config/thread_network_nodes.yml

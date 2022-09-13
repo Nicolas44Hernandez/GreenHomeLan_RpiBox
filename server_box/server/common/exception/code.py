@@ -22,6 +22,12 @@ class ErrorCode(Enum):
     THREAD_NETWORK_SETUP_ERROR = (12, 500, "Thread network configuration error")
     IP_DISCOVERY_BRODCAST_PING_ERROR = (13, 500, "Error in brodcast ping for ip discovery")
     IP_DISCOVERY_UNKNOWN_STATION = (14, 500, "Error in ip discovery statiopn unknown")
+    USE_SITUATIONS_CONFIG_FILE_ERROR = (
+        15,
+        500,
+        "Error in Use situations configuration load, check file",
+    )
+    INVALID_USE_SITUATION = (15, 400, "Invalid use situation selected")
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):
