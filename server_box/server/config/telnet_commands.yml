@@ -8,11 +8,13 @@ WIFI:
     ON:
         - wl -i wl0 radio on
         - wl -i wl2 radio on
-        - wl -i wl1 radio on
+        - pcb_cli
+        - NeMo.Intf.rad6g0.Enable=1
     OFF:
         - wl -i wl0 radio off
         - wl -i wl2 radio off
-        - wl -i wl1 radio off
+        - pcb_cli
+        - NeMo.Intf.rad6g0.Enable=0
     bands:
         2.4GHz:
             status: wl -i wl2 bss
@@ -26,6 +28,10 @@ WIFI:
             stations: wl -i wl0 assoclist
         6GHz:
             status: wl -i wl1 bss
-            ON: wl -i wl1 radio on
-            OFF: wl -i wl1 radio off
+            ON:
+                - pcb_cli
+                - NeMo.Intf.rad6g0.Enable=1
+            OFF:
+                - pcb_cli
+                - NeMo.Intf.rad6g0.Enable=0
             stations: wl -i wl1 assoclist

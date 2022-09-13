@@ -89,7 +89,9 @@ class OrchestratorNotification:
         # Post wifi status to rpi cloud
         post_url = f"http://{rpi_cloud_ip_addr}:{self.server_cloud_port}/{self.server_cloud_path}"
         try:
-            rpi_cloud_response = requests.post(post_url, json={"status": wifi_status})
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            data = {"status": wifi_status}
+            rpi_cloud_response = requests.post(post_url, data=(data), headers=headers)
             logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
         except (ConnectionError, InvalidURL):
             logger.error(
