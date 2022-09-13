@@ -6,8 +6,8 @@ from timeloop import Timeloop
 from .model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import wifi_bands_manager_service, BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
-from server.managers.thread_manager import thread_manager_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
+from server.orchestrator.requests import orchestrator_requests_service
 
 
 logger = logging.getLogger(__name__)
@@ -42,11 +42,7 @@ class Orchestrator:
             self.schedule_resources_status_polling()
 
             # Run requests reception module
-            self.init_requests_module()
-
-    def init_requests_module(self):
-        """Initialize the requests callbacks for the orchestrator"""
-        thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
+            orchestrator_requests_service.init_requests_module()
 
     def send_relays_command(self, bands_status: Iterable[WifiBandStatus]):
         """Send MQTT command to electrical pannel to represent the wifi bands status"""
@@ -95,27 +91,6 @@ class Orchestrator:
             self.send_relays_command(bands_status=bands_status)
 
         resources_status_timeloop.start(block=False)
-
-    def thread_msg_reception_callback(self, msg: str):
-        """Callback for thread request message reception"""
-
-        # TODO: add message format (BSON)
-        logger.info(f"Thread received message: {msg}")
-
-        try:
-            # Parse received message
-            ressource, band, status = msg.split("-")
-
-            # set wifi status
-            if ressource == "wifi":
-                status = status == "on"
-                if band == "all":
-                    wifi_bands_manager_service.set_wifi_status(status=status)
-                else:
-                    wifi_bands_manager_service.set_band_status(band=band, status=status)
-        except:
-            logger.error(f"Error in message received format")
-            return
 
 
 orchestrator_service: Orchestrator = Orchestrator()
