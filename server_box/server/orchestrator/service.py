@@ -9,15 +9,12 @@ from server.managers.electrical_panel_manager import electrical_panel_manager_se
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.orchestrator.requests import orchestrator_requests_service
 from server.orchestrator.polling import orchestrator_polling_service
+from server.orchestrator.notification import orchestrator_notification_service
 
 
 logger = logging.getLogger(__name__)
 
 resources_status_timeloop = Timeloop()
-
-# TODO: logs
-
-# TODO split orchestrator in notification - requests - polling
 
 
 class Orchestrator:
@@ -34,6 +31,13 @@ class Orchestrator:
         """Initialize Orchestrator"""
         if app is not None:
             logger.info("initializing Orchestrator")
+
+            # Init notification module
+            orchestrator_notification_service.init_notification_module(
+                server_cloud_path=app.config["RPI_CLOUD_PATH"],
+                server_cloud_mac=app.config["RPI_CLOUD_MAC"],
+                server_cloud_port=app.config["RPI_CLOUD_PORT"],
+            )
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(
