@@ -59,6 +59,15 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
+  manager_ip_discovery:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/manager/ip_discovery.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+
+
   interface_mqtt:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -123,6 +132,11 @@ loggers:
   server.managers.wifi_bands_manager:
     level: INFO
     handlers: [manager_wifi_bands]
+    propagate: no
+
+  server.managers.ip_discovery:
+    level: INFO
+    handlers: [manager_ip_discovery]
     propagate: no
 
   server.interfaces.thread_interface:

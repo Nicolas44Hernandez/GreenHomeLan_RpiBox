@@ -20,6 +20,8 @@ class ErrorCode(Enum):
     RELAYS_STATUS_NOT_RECEIVED = (10, 400, "The relays status have not been received yet")
     THREAD_NODE_UNREACHABLE = (11, 500, "Node server is unreachable, check if node is running")
     THREAD_NETWORK_SETUP_ERROR = (12, 500, "Thread network configuration error")
+    IP_DISCOVERY_BRODCAST_PING_ERROR = (13, 500, "Error in brodcast ping for ip discovery")
+    IP_DISCOVERY_UNKNOWN_STATION = (14, 500, "Error in ip discovery statiopn unknown")
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):

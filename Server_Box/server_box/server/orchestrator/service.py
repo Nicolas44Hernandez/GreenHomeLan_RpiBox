@@ -16,6 +16,8 @@ resources_status_timeloop = Timeloop()
 
 # TODO: logs
 
+# TODO split orchestrator in notification - requests - polling
+
 
 class Orchestrator:
     """Orchestrator service"""
@@ -39,11 +41,11 @@ class Orchestrator:
             # Schedule ressources polling
             self.schedule_resources_status_polling()
 
-            # Run notification module
-            self.init_notification_module()
+            # Run requests reception module
+            self.init_requests_module()
 
-    def init_notification_module(self):
-        """Initialize the notification callbacks for the orchestrator"""
+    def init_requests_module(self):
+        """Initialize the requests callbacks for the orchestrator"""
         thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
 
     def send_relays_command(self, bands_status: Iterable[WifiBandStatus]):
@@ -95,7 +97,7 @@ class Orchestrator:
         resources_status_timeloop.start(block=False)
 
     def thread_msg_reception_callback(self, msg: str):
-        """Callback for thread notification message reception"""
+        """Callback for thread request message reception"""
 
         # TODO: add message format (BSON)
         logger.info(f"Thread received message: {msg}")

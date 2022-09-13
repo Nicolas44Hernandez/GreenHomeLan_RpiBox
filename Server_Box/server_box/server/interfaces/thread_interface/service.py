@@ -17,12 +17,14 @@ class ThreadNode:
 
     name: str
     mac: str
-    url: str
+    port: str
+    path: str
 
-    def __init__(self, name: str, mac: str, url: str):
+    def __init__(self, name: str, mac: str, port: int, path: str):
         self.name = name
         self.mac = mac
-        self.url = url
+        self.port = port
+        self.path = path
 
 
 class ThreadBoarderRouter(threading.Thread):
@@ -80,7 +82,12 @@ class ThreadBoarderRouter(threading.Thread):
             try:
                 configuration = yaml.safe_load(stream)
                 self.nodes = [
-                    ThreadNode(name=node["name"], mac=node["mac"], url=node["server_url"])
+                    ThreadNode(
+                        name=node["name"],
+                        mac=node["mac"],
+                        port=node["server_port"],
+                        path=node["server_path"],
+                    )
                     for node in configuration["THREAD"]["NODES"]
                 ]
             except (yaml.YAMLError, KeyError) as exc:

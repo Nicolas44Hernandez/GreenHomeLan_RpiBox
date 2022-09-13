@@ -3,8 +3,7 @@ from typing import Iterable
 from flask import Flask
 import requests
 from requests.exceptions import ConnectionError
-
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.ip_discovery import ip_discovery_service
 from server.interfaces.thread_interface import ThreadInterface, ThreadNode
 from server.common import ServerBoxException, ErrorCode
 
@@ -44,6 +43,13 @@ class ThreadManager:
         """Set message reception callback"""
         self.thread_interface.set_msg_reception_callback(callback)
 
+    def get_node_ip_address(self, mac: str) -> str:
+        """Get node ip address from mac"""
+        try:
+            return ip_discovery_service.get_ip_addr(mac=mac)
+        except ServerBoxException:
+            return None
+
     def send_thread_network_info_to_node(self, node_name: str) -> bool:
         """send thread network config to node return False if error in post"""
 
@@ -58,11 +64,10 @@ class ThreadManager:
             raise ServerBoxException(ErrorCode.THREAD_NODE_NOT_CONFIGURED)
 
         # send network info to node server
-        # TODO: is there a way to get the IP Automatically knowing the MAC?
+        node_ip_addr = self.get_node_ip_address(mac=dest_node.mac)
+        post_url = f"http://{node_ip_addr}:{dest_node.port}/{dest_node.path}"
         try:
-            node_response = requests.post(
-                dest_node.url, json=self.thread_interface.thread_network_setup
-            )
+            node_response = requests.post(post_url, json=self.thread_interface.thread_network_setup)
             logger.info(f"Node server response: {node_response.text}")
             return True
         except ConnectionError:
