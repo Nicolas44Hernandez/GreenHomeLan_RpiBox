@@ -335,7 +335,7 @@ mkdir logs
 mkdir logs/manager
 mkdir logs/interface
 touch logs/app.log logs/orchestrator.log logs/api-rest.log
-touch logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log
+touch logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log
 touch logs/interface/mqtt.log logs/interface/thread.log logs/interface/telnet.log
 ```
 

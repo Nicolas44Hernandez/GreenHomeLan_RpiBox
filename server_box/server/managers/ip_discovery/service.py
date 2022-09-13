@@ -20,9 +20,9 @@ class IpDiscoveryService:
         """Get ip address from mac"""
 
         # ip neighbor | greep -i {mac}
-        cmd1 = subprocess.Popen(["ip", "neighbor"], stdout=subprocess.PIPE)
-        cmd2 = subprocess.check_output(["grep", "-i", "E4:5F:01:1E:0A:34"], stdin=cmd1.stdout)
         try:
+            cmd1 = subprocess.Popen(["ip", "neighbor"], stdout=subprocess.PIPE)
+            cmd2 = subprocess.check_output(["grep", "-i", "E4:5F:01:1E:0A:34"], stdin=cmd1.stdout)
             station_ip = cmd2.decode().split(" ")[0]
         except:
             logger.error(f"Station {mac} not connected")
