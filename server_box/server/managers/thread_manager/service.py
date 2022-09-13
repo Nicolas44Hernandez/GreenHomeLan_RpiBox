@@ -2,7 +2,7 @@ import logging
 from typing import Iterable
 from flask import Flask
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, InvalidURL
 from server.managers.ip_discovery import ip_discovery_service
 from server.interfaces.thread_interface import ThreadInterface, ThreadNode
 from server.common import ServerBoxException, ErrorCode
@@ -24,16 +24,14 @@ class ThreadManager:
         if app is not None:
             logger.info("initializing the ThreadManager")
 
-            # TODO: Veryfy that WIFI is ON before continue otherwise turn it on
+            # TODO: Veryfy i orchestrator that WIFI is ON before continue otherwise turn it on
 
             # setup thread interface
             self.thread_interface = ThreadInterface(
                 sudo_password=app.config["SUDO_PASSWORD"],
                 thread_network_config_file=app.config["THREAD_NETWORK_CONFIG"],
             )
-            # TODO: Verify thread dependency on main thread
             self.thread_interface.start()
-            # self.thread_interface.join()
 
             # Send thread network info to all nodes in config
             if not self.send_thread_network_info_to_all_nodes():
@@ -70,7 +68,7 @@ class ThreadManager:
             node_response = requests.post(post_url, json=self.thread_interface.thread_network_setup)
             logger.info(f"Node server response: {node_response.text}")
             return True
-        except ConnectionError:
+        except (ConnectionError, InvalidURL):
             logger.error(
                 f"Error when posting network info to thread node {dest_node.name}, check if node"
                 " server is running"
