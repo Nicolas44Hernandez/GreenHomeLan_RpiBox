@@ -10,19 +10,24 @@ class IpDiscoveryService:
 
     def reload_tables(self):
         """Make a brodcast ping to reload arp tables"""
-        brodcast_ping = subprocess.run(["nmap", "-sn", "192.168.1.0/24"])
-        if brodcast_ping != 0:
+        brodcast_ping_process = subprocess.Popen(
+            ["nmap", "-sn", "192.168.1.0/24"], stdout=subprocess.PIPE
+        )
+        brodcast_ping_process.wait()
+        if brodcast_ping_process.returncode != 0:
             logger.error(f"Error in brodcast ping")
             raise ServerBoxException(ErrorCode.IP_DISCOVERY_BRODCAST_PING_ERROR)
-        logger.info(f"brodcast ping ok")
+        logger.info(f"Brodcast ping ok")
 
     def get_ip_addr(self, mac: str) -> str:
         """Get ip address from mac"""
 
+        # reload arp tables
+        self.reload_tables()
         # ip neighbor | greep -i {mac}
         try:
             cmd1 = subprocess.Popen(["ip", "neighbor"], stdout=subprocess.PIPE)
-            cmd2 = subprocess.check_output(["grep", "-i", "E4:5F:01:1E:0A:34"], stdin=cmd1.stdout)
+            cmd2 = subprocess.check_output(["grep", "-i", mac], stdin=cmd1.stdout)
             station_ip = cmd2.decode().split(" ")[0]
         except:
             logger.error(f"Station {mac} not connected")
