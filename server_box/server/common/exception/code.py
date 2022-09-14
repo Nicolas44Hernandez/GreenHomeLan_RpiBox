@@ -28,6 +28,7 @@ class ErrorCode(Enum):
         "Error in Use situations configuration load, check file",
     )
     INVALID_USE_SITUATION = (15, 400, "Invalid use situation selected")
+    THREAD_NETWORK_NOT_RUNNING = (16, 500, "Thread network is not running")
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):

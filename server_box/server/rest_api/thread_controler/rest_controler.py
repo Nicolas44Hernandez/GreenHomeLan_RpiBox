@@ -2,7 +2,7 @@
 import logging
 from flask.views import MethodView
 from flask_smorest import Blueprint
-from .rest_model import NodeSchema
+from .rest_model import NodeSchema, ThreadNetworkSetupSchema
 from server.managers.thread_manager import thread_manager_service
 from server.common import ServerBoxException, ErrorCode
 
@@ -27,6 +27,15 @@ class SetupThreadNetworkAllNodes(MethodView):
         if not thread_manager_service.send_thread_network_info_to_all_nodes():
             raise ServerBoxException(ErrorCode.THREAD_NODE_UNREACHABLE)
 
+    @bp.doc(
+        security=[{"tokenAuth": []}],
+        responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
+    )
+    @bp.response(status_code=200, schema=ThreadNetworkSetupSchema)
+    def get(self):
+        """Get Thread network setup parameters"""
+        logger.info(f"GET thread/setup")
+        return thread_manager_service.get_connection_parameters()
 
 @bp.route("/setup/<node>")
 class SetupThreadNetworkSingleNode(MethodView):

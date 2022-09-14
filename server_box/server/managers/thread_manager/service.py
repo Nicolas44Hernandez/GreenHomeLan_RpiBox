@@ -101,6 +101,13 @@ class ThreadManager:
 
         return node_to_find.mac
 
+    def get_connection_parameters(self):
+        """Return thread network setup parameters"""
+        try:
+            return self.thread_interface.thread_network_setup
+        except:
+            raise ServerBoxException(ErrorCode.THREAD_NETWORK_NOT_RUNNING)
+
 
 thread_manager_service: ThreadManager = ThreadManager()
 """ Thread manager service singleton"""
