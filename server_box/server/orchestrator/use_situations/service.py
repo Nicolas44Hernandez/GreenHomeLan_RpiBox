@@ -64,6 +64,14 @@ class OrchestratorUseSituations:
             logger.info(f"Setting wifi band {band} to {band_status}")
             wifi_bands_manager_service.set_band_status(band=band, status=band_status)
 
+    def get_current_use_situation(self):
+        """Get current use situation"""
+        return self.current_use_situation
+
+    def get_use_situation_list(self):
+        """Get available use situation list"""
+        return list(self.use_situations_dict.keys())
+
 
 orchestrator_use_situations_service: OrchestratorUseSituations = OrchestratorUseSituations()
 """ OrchestratorUseSituations service singleton"""
