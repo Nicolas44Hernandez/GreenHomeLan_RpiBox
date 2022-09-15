@@ -15,84 +15,84 @@ handlers:
     formatter: default
     filename: logs/app.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   orchestrator:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/orchestrator/orchestrator.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   orchestrator_notification:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/orchestrator/orchestrator_notification.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   orchestrator_polling:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/orchestrator/orchestrator_polling.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   orchestrator_requests:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/orchestrator/orchestrator_requests.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   orchestrator_use_situations:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/orchestrator/orchestrator_use_situations.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   api_rest:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/api-rest.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   manager_camera:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/manager/camera.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   manager_electrical_panel:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/manager/electrical_panel.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   manager_thread:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/manager/thread.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   manager_wifi_bands:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/manager/wifi_bands.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   manager_ip_discovery:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/manager/ip_discovery.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
 
 
@@ -101,21 +101,21 @@ handlers:
     formatter: default
     filename: logs/interface/mqtt.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   interface_thread:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/interface/thread.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
   interface_telnet:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/interface/telnet.log
     maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
+    backupCount: 1
 
 root:
   level: WARN

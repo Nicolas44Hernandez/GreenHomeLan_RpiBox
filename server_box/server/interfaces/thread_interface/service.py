@@ -1,6 +1,7 @@
 """
 Thread interface service
 """
+import time
 import logging
 import yaml
 import subprocess
@@ -52,15 +53,15 @@ class ThreadBoarderRouter(threading.Thread):
 
     def run(self):
         """Run thread"""
-        process = subprocess.Popen(shlex.split("sudo ot-ctl"), stdout=subprocess.PIPE)
+        process = subprocess.Popen(["sudo", "ot-ctl"], stdout=subprocess.PIPE)
         while self.running:
             try:
                 output = process.stdout.readline()
                 if output == "" and process.poll() is not None:
                     break
                 elif output:
-                    logger.info("Thread Message received")
                     msg = output.strip().split()[-1].decode()
+                    logger.info(f"Thread Message received: {msg}")
                     if self.msg_callback is None:
                         logger.error("Message reception callback is None")
                         break
@@ -94,6 +95,8 @@ class ThreadBoarderRouter(threading.Thread):
                 raise ServerBoxException(ErrorCode.THREAD_CONFIG_FILE_ERROR)
 
         # Thread network initialisation (ot-cli)
+        # Necesary for boot ?
+        time.sleep(5)
         for command in configuration["THREAD"]["NETWORK_SETUP_COMMANDS"]:
             try:
                 # run command
