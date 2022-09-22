@@ -20,28 +20,22 @@ resources_status_timeloop = Timeloop()
 class OrchestratorNotification:
     """OrchestratorNotification service"""
 
-    server_cloud_path: str
+    server_cloud_notify_status_path: str
     server_cloud_port: int
     server_cloud_mac: str
 
     def init_notification_module(
-        self, server_cloud_path: str, server_cloud_mac: str, server_cloud_port: int
+        self,
+        server_cloud_notify_status_path: str,
+        server_cloud_mac: str,
+        server_cloud_port: int,
     ):
         """Initialize the polling service for the orchestrator"""
         logger.info("initializing Orchestrator polling module")
 
-        self.server_cloud_path = server_cloud_path
+        self.server_cloud_notify_status_path = server_cloud_notify_status_path
         self.server_cloud_mac = server_cloud_mac
         self.server_cloud_port = server_cloud_port
-
-    def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):
-        """Notify current wifi status"""
-
-        # Notify wifi status to rpi relay
-        self.notify_wifi_status_to_rpi_relays(bands_status=bands_status)
-
-        # Notify wifi status to rpi cloud
-        self.notify_wifi_status_to_rpi_cloud(bands_status=bands_status)
 
     def notify_wifi_status_to_rpi_relays(self, bands_status: Iterable[WifiBandStatus]):
         """Send MQTT command to electrical pannel to represent the wifi bands status"""
@@ -65,10 +59,10 @@ class OrchestratorNotification:
         # Call electrical panel manager service to publish relays status command
         electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
 
-    def notify_wifi_status_to_rpi_cloud(self, bands_status: Iterable[WifiBandStatus]):
-        """Call HTTP post to notify wifi status to rpi cloud"""
+    def notify_cloud_server(self, bands_status: Iterable[WifiBandStatus], use_situation: str):
+        """Notify current wifi status and use situation to cloud server"""
 
-        logger.info("Posting HTTP to notify wifi status to RPI cloud")
+        logger.info("Posting HTTP to notify current wifi status and use situation to RPI cloud")
 
         # Get wifi status from bands status
         wifi_status = False
@@ -87,10 +81,10 @@ class OrchestratorNotification:
             return
 
         # Post wifi status to rpi cloud
-        post_url = f"http://{rpi_cloud_ip_addr}:{self.server_cloud_port}/{self.server_cloud_path}"
+        post_url = f"http://{rpi_cloud_ip_addr}:{self.server_cloud_port}/{self.server_cloud_notify_status_path}"
         try:
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            data = {"status": wifi_status}
+            data = {"wifi_status": wifi_status, "use_situation": use_situation}
             rpi_cloud_response = requests.post(post_url, data=(data), headers=headers)
             logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
         except (ConnectionError, InvalidURL):

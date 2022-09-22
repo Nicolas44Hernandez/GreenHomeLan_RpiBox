@@ -1,12 +1,10 @@
 import logging
-from typing import Iterable
-from datetime import datetime, timedelta
+from datetime import timedelta
 from timeloop import Timeloop
 from server.orchestrator.model import WifiBandStatus, WifiStatus
 from server.orchestrator.notification import orchestrator_notification_service
+from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service, BANDS
-from server.managers.electrical_panel_manager import electrical_panel_manager_service
-from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +35,6 @@ class OrchestratorPolling:
         def poll_wifi_status():
             # retrieve wifi status
             logger.info(f"Polling wifi status")
-
             status = wifi_bands_manager_service.get_wifi_status()
             bands_status = []
 
@@ -48,10 +45,17 @@ class OrchestratorPolling:
                 bands_status.append(band_status)
 
             self.wifi_status = WifiStatus(status=status, bands_status=bands_status)
-            logger.info(f"Current wifi status: {self.wifi_status}")
 
-            # Notify wifi status
-            orchestrator_notification_service.notify_wifi_status(bands_status=bands_status)
+            # Notify wifi status toi RPI relais
+            orchestrator_notification_service.notify_wifi_status_to_rpi_relays(
+                bands_status=bands_status
+            )
+
+            # Notify current wifi status and use situation to rpi cloud
+            orchestrator_notification_service.notify_cloud_server(
+                bands_status=bands_status,
+                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+            )
 
         resources_status_timeloop.start(block=False)
 

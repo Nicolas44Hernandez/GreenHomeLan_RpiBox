@@ -22,9 +22,6 @@ resources_status_timeloop = Timeloop()
 class Orchestrator:
     """Orchestrator service"""
 
-    # Attributes
-    wifi_status: WifiStatus
-
     def __init__(self, app: Flask = None) -> None:
         if app is not None:
             self.init_app(app)
@@ -42,7 +39,7 @@ class Orchestrator:
 
             # Init notification module
             orchestrator_notification_service.init_notification_module(
-                server_cloud_path=app.config["RPI_CLOUD_PATH"],
+                server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
                 server_cloud_mac=app.config["RPI_CLOUD_MAC"],
                 server_cloud_port=app.config["RPI_CLOUD_PORT"],
             )
