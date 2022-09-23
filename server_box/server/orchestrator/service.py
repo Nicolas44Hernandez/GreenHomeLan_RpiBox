@@ -41,7 +41,7 @@ class Orchestrator:
             orchestrator_notification_service.init_notification_module(
                 server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
                 server_cloud_mac=app.config["RPI_CLOUD_MAC"],
-                server_cloud_port=app.config["RPI_CLOUD_PORT"],
+                server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
             )
 
             # Init ressources polling module
