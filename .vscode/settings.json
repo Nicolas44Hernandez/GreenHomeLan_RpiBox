@@ -1,0 +1,33 @@
+{
+    //
+    // Commons
+    //
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.encoding": "utf8",
+    //
+    // server specific settings
+    //
+    "python.pipenvPath": "server_box/.venv/bin/python",
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "./server_box/.venv/bin/black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "100",
+        "--experimental-string-processing",
+    ],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintPath": "./server_box/.venv/bin/pylint",
+    "python.linting.pylintArgs": [
+        "--max-line-length=100",
+        "--rcfile=./server/pylintrc"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "server_box",
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.languageServer": "Pylance",
+}

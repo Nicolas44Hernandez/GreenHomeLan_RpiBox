@@ -1,0 +1,47 @@
+API_TITLE: ORCHESTRATOR API
+API_VERSION: v1
+
+# openapi.json version and URL prefix
+OPENAPI_VERSION: 3.0.3
+OPENAPI_URL_PREFIX: /
+
+# Enable swagger UI
+OPENAPI_SWAGGER_UI_PATH: /docs
+OPENAPI_SWAGGER_UI_URL: https://cdn.jsdelivr.net/npm/swagger-ui-dist/
+
+# Telnet connection configuration
+LIVEBOX_IP_ADDRESS: 192.168.1.1 # LIVEBOX
+LIVEBOX_TELNET_PORT: 23
+LIVEBOX_LOGIN: root
+LIVEBOX_PASSWORD: sah
+TELNET_TIMOUT_IN_SECS: 5
+LIVEBOX_TELNET_COMMANDS: server_box/server/config/telnet_commands.yml
+
+# Use situations configuration
+USE_SITUATIONS_CONFIG: server_box/server/config/use_situations.yml
+DEFAULT_USE_SITUATION: PRESENCE_HOME_OFFICE
+
+# Thread configuration
+SUDO_PASSWORD: Nico44
+THREAD_NETWORK_CONFIG: server_box/server/config/thread_network_nodes.yml
+
+# MQTT CONFIGURATION
+MQTT_BROKER_ADDRESS: 192.168.1.22 # rpi_electrical_panel address
+MQTT_USERNAME: rpi_box
+MQTT_PASSWORD: lamp
+MQTT_COMMAND_RELAYS_TOPIC: command/relays
+MQTT_RELAYS_STATUS_TOPIC: status/relays
+MQTT_QOS: 1
+MQTT_RECONNECTION_TIMEOUT_IN_SEG: 1
+MQTT_MSG_PUBLISH_TIMEOUT_IN_SECS: 5
+
+# RESOURCES STATUS POLLING CONFIGURATION
+WIFI_STATUS_POLLING_PERIOD_IN_SECS: 2
+
+# RPI CLOUD SERVER CONFIGURATION
+#RPI_CLOUD_MAC: 08:00:27:12:FB:6B  # VM for tests
+RPI_CLOUD_MAC: E4:5F:01:1E:0A:33 # rpi-cloud
+RPI_CLOUD_PORTS:
+  - 3000
+  - 3001
+RPI_CLOUD_NOTIFY_STATUS_PATH: status

@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Server Box: Run flask app in dev post",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "server_box/server/app:create_app()",
+                "FLASK_ENV": "production",
+            },
+            "args": [
+                "run",
+                "--host",
+                "0.0.0.0",
+                "--no-reload",
+            ]
+        },
+    ]
+}

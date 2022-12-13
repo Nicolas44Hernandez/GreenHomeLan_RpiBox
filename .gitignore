@@ -1,8 +1,35 @@
-Server_Cloud/node_modules/*
+tmux-*.log
+Server_Cloud/node_modules/**
 Server_Cloud/package-lock.json
 Server_Cloud/package.json
 Server_Box/__pycache__/local.cpython-39.pyc
 Server_Camera/__pycache__/local.cpython-37.pyc
-Server_Camera/node_modules/*
+Server_Camera/node_modules/**
 Server_Camera/tmp.jpg
 Server_Camera/package-lock.json
+Server_Box/package-lock.json
+Server_Box/package.json
+Server_Box/node_modules
+
+# Environments
+.venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+*.py,cover
+cover/
+report/
+coverage/
+
+# Logs
+logs/
