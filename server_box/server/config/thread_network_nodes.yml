@@ -1,0 +1,18 @@
+THREAD:
+    NETWORK_SETUP_COMMANDS:
+      - "ot-ctl dataset init new"
+      - "ot-ctl dataset commit active"
+      - "ot-ctl ifconfig up"
+      - "ot-ctl thread start"
+      - "ot-ctl state"
+      - "ot-ctl netdata show"
+      - "ot-ctl ipaddr"
+      - "ot-ctl dataset active -x"
+      - "ot-ctl udp open"
+      - "ot-ctl udp bind :: 45"
+
+    NODES:
+      - name: rpi_camera
+        mac: E4:5F:01:1E:0A:46  #RPI4 -> E4:5F:01:1E:0A:46  RPI3 -> B8:27:EB:C0:BD:FF
+        server_port: 5000
+        server_path: thread/setup

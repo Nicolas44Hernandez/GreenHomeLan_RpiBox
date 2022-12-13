@@ -1,0 +1,1 @@
+"""Server box tests"""

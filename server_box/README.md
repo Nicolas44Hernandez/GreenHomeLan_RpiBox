@@ -1,0 +1,167 @@
+## RPI Box
+
+![RPI box connection](../images/rpi_box.png)
+
+# OS installation
+You can use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to flash the last 64-bit Bullseye ligth version (no desktop)
+
+# Initial setup
+
+Use raspi-config to configure the RPI
+```bash
+sudo raspi-config
+```
+- Configure the camera interface
+- Configure the SSH interface
+- Connect to your Wi-Fi network (you must have an internet connection)
+
+## Update OS
+
+```bash
+sudo apt update
+sudo apt upgrade
+```
+
+## Install and configure git
+
+```bash
+sudo apt install git
+git config --global user.name "Nicolas44Hernandez"
+git config --global user.email n44hernandezp@gmail.com
+```
+
+## Create and add ssh key to your github account
+
+Complete ssh key setup is explained in the following [link](https://docs.github.com/es/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+
+## Clone rpi_box repository
+
+```bash
+mkdir workspace
+git clone git@github.com:Nicolas44Hernandez/GreenHomeLan_RpiBox.git
+```
+## Installer poetry
+
+To install the [poetry](https://python-poetry.org/) dependency manager:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Configure poetry to be able to create virtual environments in the project directory
+
+```bash
+poetry config virtualenvs.in-project true
+```
+
+Create the virtual environment and install dependencies:
+```bash
+cd server_box
+poetry install
+```
+
+Activate the virtual environment:
+```bash
+poetry shell
+```
+
+## **Open Thread setup**
+The complete installation and network setup procedure can be found [here](https://espace.agir.orange.com/display/HOMEINAI/How+to+set+up+OpenThread+Network)
+
+First, you need to retrieve Git Project:
+
+```bash
+git clone https://github.com/openthread/ot-br-posix.git --depth 1
+```
+Then you need to execute a scripts to bootstrap the Thread Border Router (not with sudo):
+
+```bash
+cd ot-br-posix
+./script/bootstrap
+```
+You will need to also retrieve infrastructure network interface (e.g. Wi-Fi/Ethernet) to specified it in a script to start Thread Border Router:
+
+Use this command to determine correct interface
+```bash
+ip addr
+```
+
+Execute script
+```bash
+INFRA_IF_NAME=<interface> ./script/setup
+#Examples Below
+#INFRA_IF_NAME=eth0 ./script/setup
+#INFRA_IF_NAME=wlan0 ./script/setup
+```
+
+Note: If your Raspberry Pi is connected by an Ethernet cable, specify the Ethernet interface name (e.g. eth0)
+
+You can verify the installation  by verifying otbr-agent status:
+
+```bash
+sudo service otbr-agent status
+```
+Note: otbr-agent service is not active, because it requires an RCP chip to run.
+
+Connect nRF52840-dongle to your Raspberry Pi/NUC (the one flashed with ot-rcp.hex), restart otbr-agent service and recheck status to observe everything is now working fine:
+
+```bash
+sudo service otbr-agent restart
+sudo service otbr-agent status
+```
+
+## Disable Bluethoot and Wifi interfaces
+```bash
+sudo nano /boot/config.txt
+```
+
+Find the section *[all]* and add the following lines
+```bash
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+```
+
+# Run the application
+
+## Environment variables
+
+To launch the application you must define the environment variables:
+```bash
+export FLASK_APP="server_box/server/app:create_app()"
+export FLASK_ENV=development
+```
+
+## Create logfiles:
+
+Log files defined in configuration file located in *server_box/server/config/logging-config.yml* must be created before launching the application
+
+```bash
+mkdir logs
+mkdir logs/manager
+mkdir logs/interface
+mkdir logs/orchestrator
+touch logs/app.log logs/api-rest.log
+touch logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log
+touch logs/interface/mqtt.log logs/interface/thread.log logs/interface/telnet.log
+touch logs/orchestrator/orchestrator.log logs/orchestrator/orchestrator_notification.log logs/orchestrator/orchestrator_polling.log logs/orchestrator/orchestrator_requests.log logs/orchestrator/orchestrator_use_situations.log
+```
+
+Pour lancer l'application flask, depuis Server_Box
+```bash
+flask run
+```
+
+## Set the rpi-box application as a service
+
+Copy the service file
+```bash
+sudo cp server_box/service/rpi-box.service /etc/systemd/system/
+```
+
+Register service
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable rpi-box
+sudo systemctl restart rpi-box
+```
+
