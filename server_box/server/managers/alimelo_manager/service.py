@@ -26,6 +26,7 @@ class AlimeloManager:
             self.alimelo_interface = AlimeloInterface(
                 serial_port=app.config["ALIMELO_SERIAL_PORT"],
                 notification_separator=app.config["ALIMELO_NOTIFICATION_SEPARATOR"],
+                command_separator=app.config["ALIMELO_COMMAND_SEPARATOR"],
             )
             self.alimelo_interface.start()
 
@@ -34,7 +35,9 @@ class AlimeloManager:
                 self.ressources_notification_callback
             )
 
-    # TODO: set_live_objects_command_reception_callback
+    def set_live_objects_command_reception_callback(self, callback: callable):
+        """Set command reception callback, used in the orchestrator"""
+        self.alimelo_interface.set_command_reception_callback(callback=callback)
 
     def ressources_notification_callback(self, notification: str):
         """Ressources notification serial reception callback"""
