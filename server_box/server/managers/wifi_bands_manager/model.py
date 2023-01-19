@@ -1,4 +1,4 @@
-"""Data model for Orchestrator package"""
+"""Data model for Wifi manager package"""
 from dataclasses import dataclass
 from typing import Iterable
 

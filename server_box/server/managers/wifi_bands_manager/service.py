@@ -4,10 +4,12 @@ from typing import Iterable
 from flask import Flask
 import yaml
 import time
+from datetime import datetime, timedelta
 from telnetlib import Telnet
 from server.interfaces.wifi_interface import wifi_telnet_interface
 from server.common import ServerBoxException, ErrorCode
-from datetime import datetime, timedelta
+from .model import WifiBandStatus, WifiStatus
+
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +28,7 @@ class WifiBandsManager:
     livebox_password: str = None
     telnet_timeout_in_secs: float = 5
     telnet_commands = {}
+    wifi_status: WifiStatus = None
 
     def __init__(self, app: Flask = None) -> None:
         if app is not None:
@@ -262,6 +265,26 @@ class WifiBandsManager:
                 station = " ".join(station.split())
                 connected_stations.append(station)
         return connected_stations
+
+    def update_wifi_status_attribute(self) -> WifiStatus:
+        """Retrieve wifi status and update wifi_status attribute"""
+
+        status = wifi_bands_manager_service.get_wifi_status()
+        bands_status = []
+
+        for band in BANDS:
+            band_status = WifiBandStatus(
+                band=band, status=wifi_bands_manager_service.get_band_status(band=band)
+            )
+            bands_status.append(band_status)
+
+        self.wifi_status = WifiStatus(status=status, bands_status=bands_status)
+
+        return self.wifi_status
+
+    def get_current_wifi_status(self) -> WifiStatus:
+        """Retrieve current wifi² status"""
+        return self.wifi_status
 
 
 wifi_bands_manager_service: WifiBandsManager = WifiBandsManager()
