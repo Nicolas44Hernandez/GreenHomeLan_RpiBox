@@ -4,6 +4,7 @@ Alimelo interface service
 import logging
 import threading
 import serial
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +19,21 @@ class AlimeloSerialCom(threading.Thread):
     notification_callback: callable
     command_callback: callable
 
-    def __init__(self, serial_port: str, notification_separator: str, command_separator: str):
+    def __init__(
+        self,
+        serial_port: str,
+        notification_separator: str,
+        command_separator: str,
+        serial_connection_restart_timeout_in_secs: int,
+    ):
         self.serial_port = serial_port
         self.notification_separator = notification_separator
         self.command_separator = command_separator
+        self.conn_restart_timeout_in_secs = serial_connection_restart_timeout_in_secs
         self.serial = None
         self.notification_callback = None
         self.command_callback = None
+        self.connected = False
 
         # setup thread network
         self.setup_serial_communication()
@@ -46,44 +55,52 @@ class AlimeloSerialCom(threading.Thread):
         command_received = ""
         while self.running:
             try:
-                serial_read = self.serial.readline().decode("utf-8")
-                if len(serial_read) > 10:
-                    # Notification reception managment
-                    if notification_separator_start in serial_read:
-                        reading_notification = True
-                        while reading_notification:
-                            notification_segment_received = self.serial.readline().decode("utf-8")
-                            if notification_separator_end in notification_segment_received:
-                                reading_notification = False
-                                if self.notification_callback is None:
-                                    logger.error("Notification reception callback is None")
-                                    break
-                                self.notification_callback(
-                                    notification_received.replace("\r\n", "")
+                if self.connected:
+                    serial_read = self.serial.readline().decode("utf-8")
+                    if len(serial_read) > 10:
+                        # Notification reception managment
+                        if notification_separator_start in serial_read:
+                            reading_notification = True
+                            while reading_notification:
+                                notification_segment_received = self.serial.readline().decode(
+                                    "utf-8"
                                 )
-                                notification_received = ""
-                                continue
-                            notification_received += notification_segment_received
+                                if notification_separator_end in notification_segment_received:
+                                    reading_notification = False
+                                    if self.notification_callback is None:
+                                        logger.error("Notification reception callback is None")
+                                        break
+                                    self.notification_callback(
+                                        notification_received.replace("\r\n", "")
+                                    )
+                                    notification_received = ""
+                                    continue
+                                notification_received += notification_segment_received
 
-                    # Command reception managment
-                    elif commannd_separator_start in serial_read:
-                        reading_command = True
-                        while reading_command:
-                            command_segment_received = self.serial.readline().decode("utf-8")
-                            if command_separator_end in command_segment_received:
-                                reading_command = False
-                                if self.command_callback is None:
-                                    logger.error("Command reception callback is None")
-                                    break
-                                self.command_callback(command_received.replace("\r\n", ""))
-                                command_received = ""
-                                continue
-                            command_received += command_segment_received
-
-            except (Exception, ValueError) as e:  # TODO: manage serial com exceptions
-                self.serial.close()
-                logger.error("Error in serial communication, restarting connection")
-                self.setup_serial_communication()
+                        # Command reception managment
+                        elif commannd_separator_start in serial_read:
+                            reading_command = True
+                            while reading_command:
+                                command_segment_received = self.serial.readline().decode("utf-8")
+                                if command_separator_end in command_segment_received:
+                                    reading_command = False
+                                    if self.command_callback is None:
+                                        logger.error("Command reception callback is None")
+                                        break
+                                    self.command_callback(command_received.replace("\r\n", ""))
+                                    command_received = ""
+                                    continue
+                                command_received += command_segment_received
+                else:
+                    logger.error("Serial connection is down")
+                    self.restart_serial_connection()
+            except (
+                serial.SerialException,
+                AttributeError,
+            ) as e:
+                logger.error("Exception in serial connection")
+                logger.error(e)
+                self.restart_serial_connection()
         logger.info("End of Alimelo serial communication")
         self.serial.close()
 
@@ -99,16 +116,56 @@ class AlimeloSerialCom(threading.Thread):
         """Setup the Serial communication with Alimelo"""
         logger.info("Setting up the serial communication")
 
-        self.serial = serial.Serial(
-            port=self.serial_port,
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=0,
-        )
+        try:
+            self.serial = serial.Serial(
+                port=self.serial_port,
+                baudrate=9600,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS,
+                timeout=0,
+            )
+            self.serial.flushInput()
+            self.serial.flushOutput()
+        except (
+            serial.SerialException,
+            AttributeError,
+        ) as e:
+            logger.error("Exception in serial connection")
+            logger.error(e)
+            self.connected = False
+        else:
+            self.connected = True
+            logger.info("Connected to: " + self.serial.portstr)
 
-        self.serial.flushInput()
-        self.serial.flushOutput()
+    def restart_serial_connection(self):
+        """Restart serial connection"""
+        # Sleep time
+        time.sleep(self.conn_restart_timeout_in_secs)
+        logger.error("Restarting serial connection")
+        try:
+            self.connected = False
+            self.serial.close()
+        except (
+            serial.SerialException,
+            AttributeError,
+        ) as e:
+            logger.error("Exception in serial connection")
+            logger.error(e)
+        self.setup_serial_communication()
 
-        logger.info("Connected to: " + self.serial.portstr)
+    def send_data_to_live_objects(self, data_to_send: str):
+        """Send data to liveobjects"""
+        logger.info(f"Sending data to liveobjects: {data_to_send}")
+        try:
+            if self.connected:
+                self.serial.write(data_to_send.encode())
+            else:
+                logger.error("Serial connection is down")
+        except (
+            serial.SerialException,
+            AttributeError,
+        ) as e:
+            logger.error("Exception in serial connection")
+            logger.error(e)
+            self.restart_serial_connection()

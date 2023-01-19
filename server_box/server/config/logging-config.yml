@@ -188,7 +188,7 @@ loggers:
 
   server.managers.thread_manager:
     level: INFO
-    handlers: [console]
+    handlers: [manager_thread]
     propagate: no
 
   server.managers.wifi_bands_manager:
@@ -203,12 +203,12 @@ loggers:
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [console]
+    handlers: [manager_alimelo]
     propagate: no
 
   server.interfaces.thread_interface:
     level: INFO
-    handlers: [console]
+    handlers: [interface_thread]
     propagate: no
 
   server.interfaces.mqtt_interface:

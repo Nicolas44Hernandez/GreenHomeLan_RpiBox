@@ -27,6 +27,9 @@ class AlimeloManager:
                 serial_port=app.config["ALIMELO_SERIAL_PORT"],
                 notification_separator=app.config["ALIMELO_NOTIFICATION_SEPARATOR"],
                 command_separator=app.config["ALIMELO_COMMAND_SEPARATOR"],
+                serial_connection_restart_timeout_in_secs=app.config[
+                    "ALIMELO_SERIAL_CONNECTION_RESTART_TIMEOUT_IN_SECS"
+                ],
             )
             self.alimelo_interface.start()
 
@@ -42,7 +45,8 @@ class AlimeloManager:
     def ressources_notification_callback(self, notification: str):
         """Ressources notification serial reception callback"""
         logger.info(f"Serial notification received :{notification}")
-        alimelo_notification_dict = json.loads(notification)["alim"]
+        # TODO: catch exception
+        alimelo_notification_dict = json.loads(notification)["alimelo"]
         self.alimelo_ressources = AlimeloRessources(
             busvoltage=alimelo_notification_dict["bv"],
             shuntvoltage=alimelo_notification_dict["sw"],
@@ -53,9 +57,12 @@ class AlimeloManager:
             electricSocketIsPowerSupplied=alimelo_notification_dict["vs"],
             isPowredByBattery=alimelo_notification_dict["pb"],
             isChargingBattery=alimelo_notification_dict["ch"],
-            rssi=alimelo_notification_dict["rssi"],
         )
         logger.info(f"alim: {alimelo_notification_dict}")
+
+    def send_data_to_live_objects(self, data: str):
+        """Send data to LiveObjects"""
+        self.alimelo_interface.send_data_to_live_objects(data)
 
 
 alimelo_manager_service: AlimeloManager = AlimeloManager()

@@ -10,7 +10,6 @@ class AlimeloRessources:
     electricSocketIsPowerSupplied: bool
     isPowredByBattery: bool
     isChargingBattery: bool
-    rssi: int
 
     def __init__(
         self,
@@ -23,7 +22,6 @@ class AlimeloRessources:
         electricSocketIsPowerSupplied: bool,
         isPowredByBattery: bool,
         isChargingBattery: bool,
-        rssi: int,
     ):
         self.busvoltage = busvoltage
         self.shuntvoltage = shuntvoltage
@@ -34,4 +32,3 @@ class AlimeloRessources:
         self.electricSocketIsPowerSupplied = electricSocketIsPowerSupplied
         self.isPowredByBattery = isPowredByBattery
         self.isChargingBattery = isChargingBattery
-        self.rssi = rssi

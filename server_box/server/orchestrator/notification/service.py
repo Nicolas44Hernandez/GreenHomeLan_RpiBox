@@ -1,13 +1,15 @@
 import logging
 import requests
+import json
 from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
 from timeloop import Timeloop
-from ..model import WifiBandStatus
+from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.ip_discovery import ip_discovery_service
+from server.managers.alimelo_manager import alimelo_manager_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.common import ServerBoxException
 
@@ -93,6 +95,46 @@ class OrchestratorNotification:
                     f"Error when posting wifi info to rpi cloud, check if rpi cloud server is"
                     f" running"
                 )
+
+    def notify_status_to_liveobjects(
+        self, wifi_status: WifiStatus, relay_statuses: RelaysStatus, use_situation: str
+    ):
+        """Notify current status to LieObjects"""
+        logger.info(f"Notify status to LiveObjects")
+
+        # Format wifi bands status
+        w = wifi_status.status
+        for band_status in wifi_status.bands_status:
+            if band_status.band == "2.4GHz":
+                w2 = band_status.status
+            if band_status.band == "5GHz":
+                w5 = band_status.status
+            if band_status.band == "6GHz":
+                w6 = band_status.status
+
+        # Format electrical panel relays status
+        ep = ""
+        for idx in range(0, 6):
+            if relay_statuses.relay_statuses[idx].status:
+                ep += "1"
+            else:
+                ep += "0"
+
+        # Format use situation
+        us = use_situation
+
+        data_to_send = {
+            "wf": {
+                "w": w,
+                "w2": w2,
+                "w5": w5,
+                "w6": w6,
+            },
+            "ep": ep,
+            "us": us,
+        }
+        data = json.dumps(data_to_send).replace(" ", "")
+        alimelo_manager_service.send_data_to_live_objects(data)
 
 
 orchestrator_notification_service: OrchestratorNotification = OrchestratorNotification()

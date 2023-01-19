@@ -16,4 +16,3 @@ class AlimeloRessourcesSchema(Schema):
     electricSocketIsPowerSupplied = Bool(required=True, allow_none=False)
     isPowredByBattery = Bool(required=True, allow_none=False)
     isChargingBattery = Bool(required=True, allow_none=False)
-    rssi = Integer(required=True, allow_none=False)
