@@ -13,8 +13,6 @@ relays_status_timeloop = Timeloop()
 
 logger = logging.getLogger(__name__)
 
-# TODO:
-
 
 class ElectricalPanelManager:
     """Manager for connected electrical panel"""
