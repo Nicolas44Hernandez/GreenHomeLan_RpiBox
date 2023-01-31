@@ -5,6 +5,7 @@ from server.orchestrator.requests import orchestrator_requests_service
 from server.orchestrator.polling import orchestrator_polling_service
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
+from server.orchestrator.live_objects import live_objects_service
 
 
 logger = logging.getLogger(__name__)
@@ -37,11 +38,14 @@ class Orchestrator:
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
             )
 
+            # Init LiveObjects module
+            live_objects_service.init_live_objects_module()
+
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(
                 wifi_status_polling_period_in_secs=app.config["WIFI_STATUS_POLLING_PERIOD_IN_SECS"],
-                alimelo_send_status_notification_period=app.config[
-                    "ALIMELO_STATUS_SEND_NOTIFICATION_PERIOD_IN_SECS"
+                live_objects_notification_period=app.config[
+                    "LIVE_OBJECTS_NOTIFICATION_PERIOD_IN_SECS"
                 ],
             )
 
