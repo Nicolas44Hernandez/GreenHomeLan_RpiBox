@@ -5,6 +5,7 @@ from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
 from timeloop import Timeloop
+from server.orchestrator.live_objects import live_objects_service
 from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
@@ -97,13 +98,18 @@ class OrchestratorNotification:
                 )
 
     def notify_status_to_liveobjects(
-        self, wifi_status: WifiStatus, relay_statuses: RelaysStatus, use_situation: str
+        self,
+        wifi_status: WifiStatus,
+        connected_to_internet: bool,
+        relay_statuses: RelaysStatus,
+        use_situation: str,
     ):
-        """Notify current status to LieObjects"""
-        logger.info(f"Notify status to LiveObjects")
+        """Notify current status to LiveObjects"""
+        logger.info(f"Notify status to Live Objects")
 
         # Format wifi bands status
         w = wifi_status.status
+        connected_to_internet = connected_to_internet
         for band_status in wifi_status.bands_status:
             if band_status.band == "2.4GHz":
                 w2 = band_status.status
@@ -126,6 +132,7 @@ class OrchestratorNotification:
         data_to_send = {
             "wf": {
                 "w": w,
+                "ci": connected_to_internet,
                 "w2": w2,
                 "w5": w5,
                 "w6": w6,
@@ -133,8 +140,12 @@ class OrchestratorNotification:
             "ep": ep,
             "us": us,
         }
-        data = json.dumps(data_to_send).replace(" ", "")
-        alimelo_manager_service.send_data_to_live_objects(data)
+        # If connnected to internet send via internet, else send via Alimelo
+        if connected_to_internet:
+            live_objects_service.publish_data(topic="orch", data=data_to_send)
+        else:
+            data = json.dumps(data_to_send).replace(" ", "")
+            alimelo_manager_service.send_data_to_live_objects(data)
 
 
 orchestrator_notification_service: OrchestratorNotification = OrchestratorNotification()

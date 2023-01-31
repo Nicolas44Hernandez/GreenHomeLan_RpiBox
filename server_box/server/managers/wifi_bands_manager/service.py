@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import urllib.request
 from typing import Iterable
 from flask import Flask
 import yaml
@@ -285,6 +286,14 @@ class WifiBandsManager:
     def get_current_wifi_status(self) -> WifiStatus:
         """Retrieve current wifi² status"""
         return self.wifi_status
+
+    def is_connected_to_internet(self) -> bool:
+        """Check internet connection"""
+        try:
+            urllib.request.urlopen("http://google.com")
+            return True
+        except:
+            return False
 
 
 wifi_bands_manager_service: WifiBandsManager = WifiBandsManager()

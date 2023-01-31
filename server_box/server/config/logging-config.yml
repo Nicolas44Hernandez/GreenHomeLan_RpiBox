@@ -31,6 +31,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  orchestrator_live_objects:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_live_objects.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   orchestrator_polling:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -110,6 +117,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  interface_live_objects:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/interface/live_objects.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   interface_thread:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -154,6 +168,11 @@ loggers:
   server.orchestrator.notification:
     level: INFO
     handlers: [orchestrator_notification]
+    propagate: no
+
+  server.orchestrator.live_objects:
+    level: INFO
+    handlers: [orchestrator_live_objects]
     propagate: no
 
   server.orchestrator.polling:
@@ -214,6 +233,11 @@ loggers:
   server.interfaces.mqtt_interface:
     level: INFO
     handlers: [interface_mqtt]
+    propagate: no
+
+  server.interfaces.live_objects_interface:
+    level: INFO
+    handlers: [interface_live_objects]
     propagate: no
 
   server.interfaces.wifi_interface:

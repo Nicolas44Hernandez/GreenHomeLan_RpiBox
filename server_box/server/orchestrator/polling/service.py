@@ -18,16 +18,16 @@ class OrchestratorPolling:
 
     # Attributes
     wifi_status_polling_period_in_secs: int
-    alimelo_send_status_notification_period: int
+    live_objects_notification_period: int
 
     def init_polling_module(
-        self, wifi_status_polling_period_in_secs: int, alimelo_send_status_notification_period: int
+        self, wifi_status_polling_period_in_secs: int, live_objects_notification_period: int
     ):
         """Initialize the polling service for the orchestrator"""
         logger.info("initializing Orchestrator polling module")
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
-        self.alimelo_send_status_notification_period = alimelo_send_status_notification_period
+        self.live_objects_notification_period = live_objects_notification_period
 
         # Schedule ressources polling
         self.schedule_resources_status_polling()
@@ -57,19 +57,46 @@ class OrchestratorPolling:
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.alimelo_send_status_notification_period)
+            interval=timedelta(seconds=self.live_objects_notification_period)
         )
         def poll_ressources_and_notify_live_objects():
             # retrieve wifi status
             logger.info(f"Polling ressources status and send to LiveObjects")
-
             wifi_status = wifi_bands_manager_service.get_current_wifi_status()
             relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
             use_situation = orchestrator_use_situations_service.get_current_use_situation()
+            connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
 
-            # Notify wifi status and relays status to Alimelo (LiveObjects)
+            # TODO: delete, only for test
+            # MOCKED VALUES
+            # wifi_status = WifiStatus(
+            #     status=True,
+            #     bands_status=[
+            #         WifiBandStatus(band="2.4GHz", status=True),
+            #         WifiBandStatus(band="5GHz", status=False),
+            #         WifiBandStatus(band="6GHz", status=False),
+            #     ],
+            # )
+            # relay_statuses = RelaysStatus(
+            #     relay_statuses=[
+            #         SingleRelayStatus(relay_number=0, status=True),
+            #         SingleRelayStatus(relay_number=1, status=True),
+            #         SingleRelayStatus(relay_number=2, status=True),
+            #         SingleRelayStatus(relay_number=3, status=True),
+            #         SingleRelayStatus(relay_number=4, status=True),
+            #         SingleRelayStatus(relay_number=5, status=True),
+            #     ],
+            #     command=False,
+            # )
+            # use_situation = "MY_USE_SITUATION"
+            # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+
+            # Notify wifi status and relays status to LiveObjects via Alimelo
             orchestrator_notification_service.notify_status_to_liveobjects(
-                wifi_status=wifi_status, relay_statuses=relay_statuses, use_situation=use_situation
+                wifi_status=wifi_status,
+                connected_to_internet=connected_to_internet,
+                relay_statuses=relay_statuses,
+                use_situation=use_situation,
             )
 
         resources_status_timeloop.start(block=False)
