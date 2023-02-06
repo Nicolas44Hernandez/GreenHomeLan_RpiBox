@@ -156,7 +156,7 @@ mkdir logs/manager
 mkdir logs/interface
 mkdir logs/orchestrator
 touch logs/app.log logs/api-rest.log
-touch logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log logs/manager/alimelo.log
+touch logs/manager/mqtt.log logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log logs/manager/alimelo.log
 touch logs/interface/mqtt.log logs/interface/live_objects.log logs/interface/thread.log logs/interface/telnet.log logs/interface/alimelo.log
 touch logs/orchestrator/orchestrator.log logs/orchestrator/orchestrator_notification.log logs/orchestrator/orchestrator_live_objects.log logs/orchestrator/orchestrator_polling.log logs/orchestrator/orchestrator_requests.log logs/orchestrator/orchestrator_use_situations.log
 ```
@@ -188,6 +188,6 @@ sudo systemctl restart rpi-box
 **Alimelo manager/interface**
 
 - [ ] Manage serial com exceptions
-- [ ] Send periodically Orchestrator status to Alimelo to be sent to LO
+- [X] Send periodically Orchestrator status to Alimelo to be sent to LO
 - [ ] Review notification to cloud to print Alimelo state
-- [ ] Callback and traitment for commands received from alimelo (LO)
+- [X] Callback and traitment for commands received from alimelo (LO)

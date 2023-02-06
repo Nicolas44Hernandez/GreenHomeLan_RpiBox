@@ -6,6 +6,7 @@ from os import path
 import yaml
 from flask import Flask
 
+from .managers.mqtt_manager import mqtt_manager_service
 from .managers.wifi_bands_manager import wifi_bands_manager_service
 from .managers.thread_manager import thread_manager_service
 from .managers.alimelo_manager import alimelo_manager_service
@@ -80,7 +81,8 @@ def register_extensions(app: Flask):
             },
         },
     )
-
+    # MQTT service
+    mqtt_manager_service.init_app(app=app)
     # Wifi bands manager extension
     wifi_bands_manager_service.init_app(app=app)
     # Thread manager extension

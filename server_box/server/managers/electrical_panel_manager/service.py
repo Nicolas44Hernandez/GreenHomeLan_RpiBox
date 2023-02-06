@@ -1,7 +1,7 @@
 import logging
 from typing import Iterable
 from flask import Flask
-from server.interfaces.mqtt_interface import mqtt_client_interface
+from server.managers.mqtt_manager import mqtt_manager_service
 from datetime import datetime
 from timeloop import Timeloop
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
@@ -17,14 +17,8 @@ logger = logging.getLogger(__name__)
 class ElectricalPanelManager:
     """Manager for connected electrical panel"""
 
-    mqtt_broker_address: str
-    mqtt_username: str
-    mqtt_password: str
     mqtt_command_relays_topic: str
     mqtt_relays_status_topic: str
-    mqtt_qos: int
-    mqtt_reconnection_timeout_in_secs: int
-    mqtt_publish_timeout_in_secs: int
     last_relays_status_received: RelaysStatus = None
 
     def __init__(self, app: Flask = None) -> None:
@@ -36,17 +30,15 @@ class ElectricalPanelManager:
         if app is not None:
             logger.info("initializing the ElectricalPanelManager")
             # Initialize configuration
-            self.mqtt_broker_address = app.config["MQTT_BROKER_ADDRESS"]
-            self.mqtt_username = app.config["MQTT_USERNAME"]
-            self.mqtt_password = app.config["MQTT_PASSWORD"]
             self.mqtt_command_relays_topic = app.config["MQTT_COMMAND_RELAYS_TOPIC"]
             self.mqtt_relays_status_topic = app.config["MQTT_RELAYS_STATUS_TOPIC"]
-            self.mqtt_qos = app.config["MQTT_QOS"]
-            self.mqtt_reconnection_timeout_in_secs = app.config["MQTT_RECONNECTION_TIMEOUT_IN_SEG"]
-            self.mqtt_publish_timeout_in_secs = app.config["MQTT_MSG_PUBLISH_TIMEOUT_IN_SECS"]
+            self.last_relays_status_received = None
 
-            # Connect to MQTT broker
-            self.init_mqtt_service()
+            # Subscribe to relays command MQTT topic
+            mqtt_manager_service.subscribe_to_topic(
+                topic=self.mqtt_relays_status_topic,
+                callback=self.receive_relays_statuses,
+            )
 
     def get_relays_last_received_status(self):
         """retrieve relays last received status and timestamp"""
@@ -80,21 +72,9 @@ class ElectricalPanelManager:
         """publish MQTT relays status command"""
 
         logger.debug(f"Publishing relays status command")
-        self.mqtt_client.publish(self.mqtt_command_relays_topic, relays_status)
-
-    def init_mqtt_service(self):
-        """Connect to MQTT broker"""
-
-        self.mqtt_client = mqtt_client_interface(
-            broker_address=self.mqtt_broker_address,
-            username=self.mqtt_username,
-            password=self.mqtt_password,
-            subscriptions={self.mqtt_relays_status_topic: self.receive_relays_statuses},
-            reconnection_timeout_in_secs=self.mqtt_reconnection_timeout_in_secs,
-            publish_timeout_in_secs=self.mqtt_publish_timeout_in_secs,
+        mqtt_manager_service.publish_message(
+            topic=self.mqtt_command_relays_topic, message=relays_status
         )
-        self.mqtt_client.connect()
-        self.mqtt_client.loop_start()
 
 
 electrical_panel_manager_service: ElectricalPanelManager = ElectricalPanelManager()
