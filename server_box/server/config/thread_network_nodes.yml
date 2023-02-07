@@ -13,6 +13,4 @@ THREAD:
 
     NODES:
       - name: rpi_camera
-        mac: E4:5F:01:1E:0A:46  #RPI4 -> E4:5F:01:1E:0A:46  RPI3 -> B8:27:EB:C0:BD:FF
-        server_port: 5000
-        server_path: thread/setup
+        id: cam

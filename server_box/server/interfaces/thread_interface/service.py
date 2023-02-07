@@ -5,10 +5,8 @@ import time
 import logging
 import yaml
 import subprocess
-import shlex
 import threading
 from typing import Iterable
-from server.common import ServerBoxException, ErrorCode
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +15,15 @@ class ThreadNode:
     """Thread nodes model"""
 
     name: str
-    mac: str
-    port: str
-    path: str
+    _id: str
+    connected: bool
 
-    def __init__(self, name: str, mac: str, port: int, path: str):
+    def __init__(self, name: str, _id: str):
         self.name = name
-        self.mac = mac
-        self.port = port
-        self.path = path
+        self._id = _id
+        self.connected = False
+
+    # TODO: modify connected status
 
 
 class ThreadBoarderRouter(threading.Thread):
@@ -35,26 +33,30 @@ class ThreadBoarderRouter(threading.Thread):
     thread_network_setup: dict = {}
     nodes = Iterable[ThreadNode]
     running: bool
+    network_set_up_is_ok: bool
     msg_callback: callable
 
     def __init__(self, sudo_password: str, thread_network_config_file: str):
         self.sudo_password = sudo_password
         self.msg_callback = None
+        self.network_set_up_is_ok = False
+        self.running = False
 
         # setup thread network
         self.setup_thread_network(thread_network_config_file)
 
-        # Running flag
-        self.running = True
-
-        # Call Super constructor
-        super(ThreadBoarderRouter, self).__init__(name="ThreadBorderRouterThread")
-        self.setDaemon(True)
+    def run_dedicated_thread(self):
+        """Run Thread loop in dedicated if network is setted up"""
+        if self.network_set_up_is_ok and self.running:
+            logger.info(f"Running Thread loop in dedicated thread")
+            self.start()
+        else:
+            logger.error(f"Thread loop cant be run, network setup failed")
 
     def run(self):
         """Run thread"""
-        process = subprocess.Popen(["sudo", "ot-ctl"], stdout=subprocess.PIPE)
         while self.running:
+            process = subprocess.Popen(["sudo", "ot-ctl"], stdout=subprocess.PIPE)
             try:
                 output = process.stdout.readline()
                 if output == "" and process.poll() is not None:
@@ -74,7 +76,7 @@ class ThreadBoarderRouter(threading.Thread):
         """Set Thread message reception callback"""
         self.msg_callback = callback
 
-    def setup_thread_network(self, thread_network_config_file: str):
+    def setup_thread_network(self, thread_network_config_file: str) -> bool:
         """Setup the thread network"""
         logger.info("Thread network config file: %s", thread_network_config_file)
 
@@ -85,21 +87,23 @@ class ThreadBoarderRouter(threading.Thread):
                 self.nodes = [
                     ThreadNode(
                         name=node["name"],
-                        mac=node["mac"],
-                        port=node["server_port"],
-                        path=node["server_path"],
+                        _id=node["id"],
                     )
                     for node in configuration["THREAD"]["NODES"]
                 ]
-            except (yaml.YAMLError, KeyError) as exc:
-                raise ServerBoxException(ErrorCode.THREAD_CONFIG_FILE_ERROR)
+            except (yaml.YAMLError, KeyError):
+                logger.error("Error in Thread configuration load, check file")
+                self.network_set_up_is_ok = False
+                return False
 
         # Thread network initialisation (ot-cli)
         # Necesary for boot ?
         time.sleep(5)
-        for command in configuration["THREAD"]["NETWORK_SETUP_COMMANDS"]:
-            try:
+
+        try:
+            for command in configuration["THREAD"]["NETWORK_SETUP_COMMANDS"]:
                 # run command
+                logger.debug(f"command: {command}")
                 cmd = command.split()
                 cmd1 = subprocess.Popen(["echo", self.sudo_password], stdout=subprocess.PIPE)
                 cmd2 = subprocess.Popen(
@@ -114,11 +118,24 @@ class ThreadBoarderRouter(threading.Thread):
                     output = cmd2.stdout.read().decode()
                     out = output.split("\r\n")
                     self.thread_network_setup["dataset_key"] = out[0]
-            except:
-                logger.error("Thread network setup error")
-                raise ServerBoxException(ErrorCode.THREAD_NETWORK_SETUP_ERROR)
+        except Exception as exc:
+            logger.error("Thread network setup error")
+            logger.error(exc)
+            self.network_set_up_is_ok = False
+            return False
 
+        self.network_set_up_is_ok = True
+
+        # Run dedicated thread
+        if self.network_set_up_is_ok:
+            self.running = True
+            # Call Super constructor
+            super(ThreadBoarderRouter, self).__init__(name="ThreadBorderRouterThread")
+            self.setDaemon(True)
+
+        logger.info(f"Thread network is running")
         logger.info(f"Thread network config: {self.thread_network_setup}")
+        return True
 
     def getNodes(self) -> Iterable[ThreadNode]:
         """Returns the configured nodes"""
