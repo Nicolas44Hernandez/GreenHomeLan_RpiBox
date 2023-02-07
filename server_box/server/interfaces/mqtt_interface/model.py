@@ -12,11 +12,16 @@ Msg = TypeVar("Msg")
 
 def serialize(msg: Msg) -> bytes:
     """serialize MQTT message"""
-    return bson.dumps(msg.to_json())
+    if type(msg) is dict:
+        data_to_send = msg
+    else:
+        data_to_send = msg.to_json()
+    return bson.dumps(data_to_send)
 
 
 def deserialize(payload: bytes) -> Msg:
     """deserialize MQTT message"""
+    # TODO: review for other messages
     return RelaysStatus.from_json(bson.loads(payload))
 
 
