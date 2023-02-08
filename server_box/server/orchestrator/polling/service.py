@@ -1,8 +1,6 @@
 import logging
-from datetime import timedelta, datetime
+from datetime import timedelta
 from timeloop import Timeloop
-from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
-from server.interfaces.mqtt_interface.model import SingleRelayStatus, RelaysStatus
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
@@ -42,17 +40,7 @@ class OrchestratorPolling:
         def poll_wifi_status():
             # retrieve wifi status
             logger.info(f"Polling wifi status")
-            # wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
-
-            # MOCKED VALUES
-            wifi_status = WifiStatus(
-                status=True,
-                bands_status=[
-                    WifiBandStatus(band="2.4GHz", status=True),
-                    WifiBandStatus(band="5GHz", status=False),
-                    WifiBandStatus(band="6GHz", status=False),
-                ],
-            )
+            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
 
             # Notify wifi status toi RPI relais
             orchestrator_notification_service.notify_wifi_status_to_rpi_relays(
@@ -65,49 +53,25 @@ class OrchestratorPolling:
             #     use_situation=orchestrator_use_situations_service.get_current_use_situation(),
             # )
 
-        # # Start ressources polling and live objects notification
-        # @resources_status_timeloop.job(
-        #     interval=timedelta(seconds=self.live_objects_notification_period)
-        # )
-        # def poll_ressources_and_notify_live_objects():
-        #     # retrieve wifi status
-        #     logger.info(f"Polling ressources status and send to LiveObjects")
-        #     # wifi_status = wifi_bands_manager_service.get_current_wifi_status()
-        #     # relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
-        #     # use_situation = orchestrator_use_situations_service.get_current_use_situation()
-        #     # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        # Start ressources polling and live objects notification
+        @resources_status_timeloop.job(
+            interval=timedelta(seconds=self.live_objects_notification_period)
+        )
+        def poll_ressources_and_notify_live_objects():
+            # retrieve wifi status
+            logger.info(f"Polling ressources status and send to LiveObjects")
+            wifi_status = wifi_bands_manager_service.get_current_wifi_status()
+            relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
+            use_situation = orchestrator_use_situations_service.get_current_use_situation()
+            connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
 
-        #     # TODO: delete, only for test
-        #     # MOCKED VALUES
-        #     wifi_status = WifiStatus(
-        #         status=True,
-        #         bands_status=[
-        #             WifiBandStatus(band="2.4GHz", status=True),
-        #             WifiBandStatus(band="5GHz", status=False),
-        #             WifiBandStatus(band="6GHz", status=False),
-        #         ],
-        #     )
-        #     relay_statuses = RelaysStatus(
-        #         relay_statuses=[
-        #             SingleRelayStatus(relay_number=0, status=True),
-        #             SingleRelayStatus(relay_number=1, status=True),
-        #             SingleRelayStatus(relay_number=2, status=True),
-        #             SingleRelayStatus(relay_number=3, status=True),
-        #             SingleRelayStatus(relay_number=4, status=True),
-        #             SingleRelayStatus(relay_number=5, status=True),
-        #         ],
-        #         command=False,
-        #     )
-        #     use_situation = "MY_USE_SITUATION"
-        #     connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
-
-        #     # Notify wifi status and relays status to LiveObjects via Alimelo
-        #     orchestrator_notification_service.notify_status_to_liveobjects(
-        #         wifi_status=wifi_status,
-        #         connected_to_internet=connected_to_internet,
-        #         relay_statuses=relay_statuses,
-        #         use_situation=use_situation,
-        #     )
+            # Notify wifi status and relays status to LiveObjects via Alimelo
+            orchestrator_notification_service.notify_status_to_liveobjects(
+                wifi_status=wifi_status,
+                connected_to_internet=connected_to_internet,
+                relay_statuses=relay_statuses,
+                use_situation=use_situation,
+            )
 
         resources_status_timeloop.start(block=False)
 
