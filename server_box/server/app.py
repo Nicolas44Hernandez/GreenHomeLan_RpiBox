@@ -92,7 +92,7 @@ def register_extensions(app: Flask):
     # Electrical panel manager service
     electrical_panel_manager_service.init_app(app=app)
     # Alimelo manager extension
-    alimelo_manager_service.init_app(app=app)
+    # alimelo_manager_service.init_app(app=app)
 
 
 def register_orchestrator(app: Flask):

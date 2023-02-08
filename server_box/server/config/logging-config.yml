@@ -101,13 +101,6 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_ip_discovery:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/manager/ip_discovery.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
   manager_alimelo:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -167,37 +160,37 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [orchestrator_notification]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [orchestrator_live_objects]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [orchestrator_polling]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [orchestrator_requests]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [orchestrator_use_situations]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [manager_mqtt]
+    handlers: [console]
     propagate: no
 
   server.managers.camera_manager:
@@ -212,17 +205,12 @@ loggers:
 
   server.managers.thread_manager:
     level: INFO
-    handlers: [manager_thread]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_manager:
     level: INFO
     handlers: [manager_wifi_bands]
-    propagate: no
-
-  server.managers.ip_discovery:
-    level: INFO
-    handlers: [manager_ip_discovery]
     propagate: no
 
   server.managers.alimelo_manager:
@@ -232,12 +220,12 @@ loggers:
 
   server.interfaces.thread_interface:
     level: INFO
-    handlers: [interface_thread]
+    handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [interface_mqtt]
+    handlers: [console]
     propagate: no
 
   server.interfaces.live_objects_interface:
