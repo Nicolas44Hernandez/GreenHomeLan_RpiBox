@@ -1,11 +1,10 @@
 THREAD:
     NETWORK_SETUP_COMMANDS:
       - "ot-ctl dataset init new"
+      - "ot-ctl udp close"
       - "ot-ctl dataset commit active"
       - "ot-ctl ifconfig up"
       - "ot-ctl thread start"
-      - "ot-ctl state"
-      - "ot-ctl netdata show"
       - "ot-ctl ipaddr"
       - "ot-ctl dataset active -x"
       - "ot-ctl udp open"
