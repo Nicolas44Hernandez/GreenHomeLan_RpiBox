@@ -175,7 +175,7 @@ loggers:
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator_polling]
     propagate: no
 
   server.orchestrator.requests:
@@ -190,7 +190,7 @@ loggers:
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [console]
+    handlers: [manager_mqtt]
     propagate: no
 
   server.managers.camera_manager:
@@ -219,13 +219,13 @@ loggers:
     propagate: no
 
   server.interfaces.thread_interface:
-    level: INFO
+    level: DEBUG
     handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [console]
+    handlers: [interface_mqtt]
     propagate: no
 
   server.interfaces.live_objects_interface:

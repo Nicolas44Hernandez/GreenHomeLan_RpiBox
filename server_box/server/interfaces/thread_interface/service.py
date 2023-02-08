@@ -7,6 +7,7 @@ import yaml
 import subprocess
 import threading
 from typing import Iterable
+from server.common import ServerBoxException, ErrorCode
 
 logger = logging.getLogger(__name__)
 
@@ -109,15 +110,18 @@ class ThreadBoarderRouter(threading.Thread):
                 cmd2 = subprocess.Popen(
                     ["sudo", "-S"] + cmd, stdin=cmd1.stdout, stdout=subprocess.PIPE
                 )
+                output = cmd2.stdout.read().decode()
+                logger.debug(f"output: {output}")
+                if "Done" not in output:
+                    raise ServerBoxException(ErrorCode.THREAD_NETWORK_SETUP_ERROR)
                 if "ipaddr" in command:
-                    output = cmd2.stdout.read().decode()
                     out = output.split("\r\n")[:-2]
                     self.thread_network_setup["ipv6_otbr"] = out[3]
                     self.thread_network_setup["ipv6_mesh"] = out[-1]
                 elif "dataset active -x" in command:
-                    output = cmd2.stdout.read().decode()
                     out = output.split("\r\n")
                     self.thread_network_setup["dataset_key"] = out[0]
+                time.sleep(1)
         except Exception as exc:
             logger.error("Thread network setup error")
             logger.error(exc)
