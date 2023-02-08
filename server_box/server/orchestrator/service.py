@@ -26,10 +26,10 @@ class Orchestrator:
             logger.info("initializing Orchestrator")
 
             # Init use situations module
-            orchestrator_use_situations_service.init_use_situations_module(
-                use_situations_config_file=app.config["USE_SITUATIONS_CONFIG"],
-                default_use_situation=app.config["DEFAULT_USE_SITUATION"],
-            )
+            # orchestrator_use_situations_service.init_use_situations_module(
+            #     use_situations_config_file=app.config["USE_SITUATIONS_CONFIG"],
+            #     default_use_situation=app.config["DEFAULT_USE_SITUATION"],
+            # )
 
             # Init notification module
             orchestrator_notification_service.init_notification_module(
@@ -39,7 +39,7 @@ class Orchestrator:
             )
 
             # Init LiveObjects module
-            live_objects_service.init_live_objects_module()
+            # live_objects_service.init_live_objects_module()
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(
@@ -50,7 +50,7 @@ class Orchestrator:
             )
 
             # Init requests module
-            orchestrator_requests_service.init_requests_module()
+            # orchestrator_requests_service.init_requests_module()
 
 
 orchestrator_service: Orchestrator = Orchestrator()
