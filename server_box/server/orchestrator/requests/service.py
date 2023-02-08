@@ -24,9 +24,9 @@ class OrchestratorRequests:
         # Set callback functions
         thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
 
-        # alimelo_manager_service.set_live_objects_command_reception_callback(
-        #     self.live_objects_command_reception_callback
-        # )
+        alimelo_manager_service.set_live_objects_command_reception_callback(
+            self.live_objects_command_reception_callback
+        )
 
         live_objects_service.set_commands_reception_callback(
             self.live_objects_command_reception_callback
