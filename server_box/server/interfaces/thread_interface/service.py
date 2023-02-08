@@ -61,15 +61,15 @@ class ThreadBoarderRouter(threading.Thread):
             try:
                 output = process.stdout.readline()
                 if output == "" and process.poll() is not None:
-                    break
+                    continue
                 elif output:
                     msg = output.strip().split()[-1].decode()
                     logger.info(f"Thread Message received: {msg}")
                     if self.msg_callback is None:
                         logger.error("Message reception callback is None")
-                        break
+                        continue
                     self.msg_callback(msg)
-            except KeyboardInterrupt:
+            except Exception:
                 break
         logger.info("End of Border Router thread")
 
