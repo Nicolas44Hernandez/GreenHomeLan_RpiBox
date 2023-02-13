@@ -9,7 +9,8 @@ from flask import Flask
 from .managers.mqtt_manager import mqtt_manager_service
 from .managers.wifi_bands_manager import wifi_bands_manager_service
 from .managers.thread_manager import thread_manager_service
-from .managers.alimelo_manager import alimelo_manager_service
+
+# from .managers.alimelo_manager import alimelo_manager_service
 from .managers.camera_manager import camera_manager_service
 from .managers.electrical_panel_manager import electrical_panel_manager_service
 from .rest_api.wifi_controler import bp as wifi_controler_bp
@@ -92,7 +93,7 @@ def register_extensions(app: Flask):
     # Electrical panel manager service
     electrical_panel_manager_service.init_app(app=app)
     # Alimelo manager extension
-    alimelo_manager_service.init_app(app=app)
+    # alimelo_manager_service.init_app(app=app)
 
 
 def register_orchestrator(app: Flask):

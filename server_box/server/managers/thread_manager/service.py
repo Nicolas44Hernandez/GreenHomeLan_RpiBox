@@ -72,7 +72,7 @@ class ThreadManager:
                 logger.info(
                     f"Network info published to MQTT topic {self.mqtt_command_relays_topic}"
                 )
-                logger.info(f"Network info: {network_info}")
+                # logger.info(f"Network info: {network_info}")
                 return True
             else:
                 logger.error(

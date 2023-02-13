@@ -3,10 +3,14 @@ import json
 from datetime import datetime
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
-from server.managers.alimelo_manager import alimelo_manager_service
+from server.managers.mqtt_manager import mqtt_manager_service
+
+# from server.managers.alimelo_manager import alimelo_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
-from server.orchestrator.live_objects import live_objects_service
+from server.orchestrator.notification import orchestrator_notification_service
+
+# from server.orchestrator.live_objects import live_objects_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 
@@ -17,23 +21,30 @@ class OrchestratorRequests:
     """OrchestratorRequests service"""
 
     # Attributes
-    def init_requests_module(self):
+    def init_requests_module(self, mqtt_alarm_notif_topic: str):
         """Initialize the requests callbacks for the orchestrator"""
         logger.info("initializing Orchestrator requests module")
 
         # Set callback functions
         thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
 
-        alimelo_manager_service.set_live_objects_command_reception_callback(
-            self.live_objects_command_reception_callback
-        )
+        # alimelo_manager_service.set_live_objects_command_reception_callback(
+        #     self.live_objects_command_reception_callback
+        # )
 
-        live_objects_service.set_commands_reception_callback(
-            self.live_objects_command_reception_callback
-        )
+        # live_objects_service.set_commands_reception_callback(
+        #     self.live_objects_command_reception_callback
+        # )
 
-        live_objects_service.set_notifications_reception_callback(
-            self.live_objects_notification_reception_callback
+        # live_objects_service.set_notifications_reception_callback(
+        #     self.live_objects_notification_reception_callback
+        # )
+
+        # Subscribe to alarm notification MQTT topic
+        logger.info(f"Subscribe to MQTT topic: {mqtt_alarm_notif_topic}")
+        mqtt_manager_service.subscribe_to_topic(
+            topic=mqtt_alarm_notif_topic,
+            callback=self.alarm_notification_reception_callback,
         )
 
     def thread_msg_reception_callback(self, msg: str):
@@ -42,20 +53,37 @@ class OrchestratorRequests:
         # TODO: add message format (BSON)
         logger.info(f"Thread received message: {msg}")
 
-        try:
-            # Parse received message
-            ressource, band, status = msg.split("-")
+        # Thread message is an alarm
+        if msg.startswith("al"):
+            _type = msg.split("_")[2]
+            if _type == "db":
+                alarm_type = "doorbell"
+            elif _type == "pd":
+                alarm_type = "presence"
+            else:
+                logger.error(f"Error in alarm received format {msg}")
+                return
 
-            # set wifi status
-            if ressource == "wifi":
-                status = status == "on"
-                if band == "all":
-                    wifi_bands_manager_service.set_wifi_status(status=status)
-                else:
-                    wifi_bands_manager_service.set_band_status(band=band, status=status)
-        except:
-            logger.error(f"Error in message received format")
-            return
+            logger.info(f"Alarm received {alarm_type}")
+            orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
+                alarm_type
+            )
+
+        # Thread message is a command
+        else:
+            try:
+                # Parse received message
+                ressource, band, status = msg.split("-")
+
+                # set wifi status
+                if ressource == "wifi":
+                    status = status == "on"
+                    if band == "all":
+                        wifi_bands_manager_service.set_wifi_status(status=status)
+                    else:
+                        wifi_bands_manager_service.set_band_status(band=band, status=status)
+            except:
+                logger.error(f"Error in message received format {msg}")
 
     def live_objects_command_reception_callback(self, command: str):
         """Callback for alimelo command reception"""
@@ -140,6 +168,13 @@ class OrchestratorRequests:
 
         logger.info(f"Live objects received notification: {notification}")
         # TODO: What to do with notifications
+
+    def alarm_notification_reception_callback(self, msg):
+        """Callback for object alarm notification"""
+        logger.info(f"Alarm notification received: {msg} ")
+        orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
+            msg["type"]
+        )
 
 
 orchestrator_requests_service: OrchestratorRequests = OrchestratorRequests()

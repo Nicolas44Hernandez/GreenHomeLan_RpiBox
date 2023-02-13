@@ -22,7 +22,11 @@ def serialize(msg: Msg) -> bytes:
 def deserialize(payload: bytes) -> Msg:
     """deserialize MQTT message"""
     # TODO: review for other messages
-    return RelaysStatus.from_json(bson.loads(payload))
+    data = bson.loads(payload)
+    if "relay_statuses" in data:
+        return RelaysStatus.from_json(data)
+    else:
+        return data
 
 
 class SingleRelayStatus:
