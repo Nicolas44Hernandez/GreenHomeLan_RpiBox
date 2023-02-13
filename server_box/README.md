@@ -44,31 +44,20 @@ mkdir workspace
 git clone git@github.com:Nicolas44Hernandez/GreenHomeLan_RpiBox.git
 ```
 
-## Installer poetry
-
-To install the [poetry](https://python-poetry.org/) dependency manager:
-
+## Install the dependencies
 ```bash
-curl -sSL https://install.python-poetry.org | python3 -
+cd GreenHomeLan_RpiBox
+pip install -r server_box/requirements.txt
 ```
 
-Configure poetry to be able to create virtual environments in the project directory
+To add the dependencies to PATH, edit the `bashrc` file
 
 ```bash
-poetry config virtualenvs.in-project true
+nano ~/.bashrc
 ```
-
-Create the virtual environment and install dependencies:
-
-```bash
-cd server_box
-poetry install
+add line
 ```
-
-Activate the virtual environment:
-
-```bash
-poetry shell
+export PATH="$PATH:/home/pi/.local/bin"
 ```
 
 ## **Open Thread setup**
