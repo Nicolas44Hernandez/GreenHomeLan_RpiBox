@@ -2,10 +2,6 @@ import logging
 import time
 from flask import Flask
 from server.interfaces.mqtt_interface import mqtt_client_interface
-from timeloop import Timeloop
-
-
-relays_status_timeloop = Timeloop()
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +40,7 @@ class MQTTManager:
 
     def subscribe_to_topic(self, topic: str, callback: callable):
         """Subscribe to MQTT topic"""
-        return self.mqtt_client.subscribe(topic=topic, callback=callable)
+        return self.mqtt_client.subscribe(topic=topic, callback=callback)
 
     def publish_message(self, topic: str, message: str) -> bool:
         """Publish message to topic"""

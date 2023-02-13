@@ -33,13 +33,14 @@ class Orchestrator:
 
             # Init notification module
             orchestrator_notification_service.init_notification_module(
+                rpi_cloud_ip_addr=app.config["RPI_CLOUD_IP"],
+                server_cloud_notify_alarm_path=app.config["RPI_CLOUD_NOTIFY_ALARM_PATH"],
                 server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
-                server_cloud_mac=app.config["RPI_CLOUD_MAC"],
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
             )
 
             # Init LiveObjects module
-            live_objects_service.init_live_objects_module()
+            # live_objects_service.init_live_objects_module()
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(
@@ -50,7 +51,9 @@ class Orchestrator:
             )
 
             # Init requests module
-            orchestrator_requests_service.init_requests_module()
+            orchestrator_requests_service.init_requests_module(
+                mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"]
+            )
 
 
 orchestrator_service: Orchestrator = Orchestrator()
