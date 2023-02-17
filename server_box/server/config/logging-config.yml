@@ -160,17 +160,17 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator_notification]
     propagate: no
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator_live_objects]
     propagate: no
 
   server.orchestrator.polling:
@@ -185,7 +185,7 @@ loggers:
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator_use_situations]
     propagate: no
 
   server.managers.mqtt_manager:
@@ -240,6 +240,6 @@ loggers:
 
   server.interfaces.alimelo_interface:
     level: DEBUG
-    handlers: [console]
+    handlers: [interface_alimelo]
     propagate: no
 
