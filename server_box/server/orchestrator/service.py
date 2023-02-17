@@ -40,7 +40,7 @@ class Orchestrator:
             )
 
             # Init LiveObjects module
-            # live_objects_service.init_live_objects_module()
+            live_objects_service.init_live_objects_module()
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(

@@ -4,13 +4,11 @@ from datetime import datetime
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.mqtt_manager import mqtt_manager_service
-
-# from server.managers.alimelo_manager import alimelo_manager_service
+from server.managers.alimelo_manager import alimelo_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.notification import orchestrator_notification_service
-
-# from server.orchestrator.live_objects import live_objects_service
+from server.orchestrator.live_objects import live_objects_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 
@@ -28,17 +26,17 @@ class OrchestratorRequests:
         # Set callback functions
         thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
 
-        # alimelo_manager_service.set_live_objects_command_reception_callback(
-        #     self.live_objects_command_reception_callback
-        # )
+        alimelo_manager_service.set_live_objects_command_reception_callback(
+            self.live_objects_command_reception_callback
+        )
 
-        # live_objects_service.set_commands_reception_callback(
-        #     self.live_objects_command_reception_callback
-        # )
+        live_objects_service.set_commands_reception_callback(
+            self.live_objects_command_reception_callback
+        )
 
-        # live_objects_service.set_notifications_reception_callback(
-        #     self.live_objects_notification_reception_callback
-        # )
+        live_objects_service.set_notifications_reception_callback(
+            self.live_objects_notification_reception_callback
+        )
 
         # Subscribe to alarm notification MQTT topic
         logger.info(f"Subscribe to MQTT topic: {mqtt_alarm_notif_topic}")
@@ -63,8 +61,12 @@ class OrchestratorRequests:
             else:
                 logger.error(f"Error in alarm received format {msg}")
                 return
-
             logger.info(f"Alarm received {alarm_type}")
+
+            # Turn wifi ON
+            wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
+
+            # Transfer alarm to cloud server and liveobjects
             orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
                 alarm_type
             )

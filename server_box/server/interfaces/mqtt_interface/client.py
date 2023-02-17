@@ -75,7 +75,7 @@ class MQTTClient:
                     logger.info(f"Message : {str(msg)}")
                     callback(msg)
                 except Exception:
-                    logger.exception("Message processing failed")
+                    logger.error("Message processing failed")
                     raise
 
         def on_publish(client, userdata, mid):
