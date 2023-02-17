@@ -111,6 +111,66 @@ sudo service otbr-agent restart
 sudo service otbr-agent status
 ```
 
+## **MQTT Broker setup**
+
+This project uses a mosquitto MQTT broker.
+
+**Step-1**
+Update the RPI OS
+
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+```
+
+**Step-2**
+Install mosquitto and then the mosquitto-clients packages.
+
+```bash
+sudo apt-get install mosquitto -y
+sudo apt-get install mosquitto-clients -y
+```
+
+**Step-3**
+Configure the MQTT broker. The Mosquitto broker’s configuration file is located at */etc/mosquitto/mosquitto.conf*
+
+```bash
+sudo nano /etc/mosquitto/mosquitto.conf
+```
+
+Replace the line *include_dir /etc/mosquitto/conf.d* by :
+
+```
+allow_anonymous true
+listener 1883
+```
+
+A reboot is necessary to take into account the modifications
+
+```bash
+sudo reboot now
+```
+
+**Step-4**
+Test de MQTT broker by using the *mosquito_sub* and *mosquito_pub* commands (run commands in separated terminals)
+
+```bash
+mosquitto_sub -d -u username -t test
+```
+
+```bash
+mosquitto_pub -d -u username -t test -m "Hello, World!"
+```
+
+**To empty MQTT Mosquito Broker**
+
+```bash
+sudo systemctl stop mosquitto.service
+sudo rm /var/lib/mosquitto/mosquitto.db
+sudo systemctl start mosquitto.service
+```
+
 ## Disable Bluethoot and Wifi interfaces
 
 ```bash
