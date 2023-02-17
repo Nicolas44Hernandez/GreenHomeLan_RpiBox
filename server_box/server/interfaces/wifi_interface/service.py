@@ -49,7 +49,7 @@ class Telnet:
                 tn_connection.write(password.encode("utf-8"))
         except (socket.timeout, socket.error):
             logger.error("Telnet connection creation failed")
-            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
+            return None
 
         logger.info(f"Telnet connection established with host: %s", self.host)
         return tn_connection
@@ -57,6 +57,9 @@ class Telnet:
     def create_super_user_session(self):
         """Create superuser session in connected host (~$sudo su)"""
         try:
+            if not self.connection:
+                logger.error("Telnet connection not stablished")
+                return None
             self.connection.write("sudo su\n".encode("utf-8"))
             flag = self.login + ":"
             self.connection.read_until(flag.encode("utf-8"), timeout=self.telnet_timeout_in_secs)
@@ -71,6 +74,9 @@ class Telnet:
 
     def close(self):
         try:
+            if not self.connection:
+                logger.error("Telnet connection not stablished")
+                return None
             self.connection.write(b"exit\n")
         except (socket.timeout, socket.error):
             logger.error("Error in telnet connection")
@@ -82,14 +88,20 @@ class Telnet:
         if "sudo " in command:
             self.create_super_user_session()
         try:
+            if not self.connection:
+                logger.error("Telnet connection not stablished")
+                return None
             command = f"echo -n 'EE''EE '; {command}; echo 'FF''FF'\n"
             self.connection.write(command.encode("ascii"))
             return self.get_command_output()
-        except (socket.timeout, socket.error):
+        except (socket.timeout, socket.error, Exception) as e:
             raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
     def send_fast_command(self, command: str):
         """Send command without waiting for response"""
+        if not self.connection:
+            logger.error("Telnet connection not stablished")
+            return None
         command = command + "\n"
         self.connection.write(command.encode("ascii"))
         time.sleep(0.1)

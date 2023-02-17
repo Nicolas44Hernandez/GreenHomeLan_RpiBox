@@ -43,7 +43,7 @@ class ElectricalPanelManager:
     def get_relays_last_received_status(self):
         """retrieve relays last received status and timestamp"""
         if self.last_relays_status_received is None:
-            raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
+            logger.error(f"The relays status have not been received yet")
         return self.last_relays_status_received
 
     def get_single_relay_last_received_status(self, relay_number: int):

@@ -186,8 +186,10 @@ class WifiBandsManager:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
 
         commands_response = self.execute_telnet_commands(["WIFI", "bands", band, "status"])
-
-        band_status = True if "up" in commands_response else False
+        if not commands_response:
+            band_status = False
+        else:
+            band_status = True if "up" in commands_response else False
         return band_status
 
     def set_band_status(self, band: str, status: bool):
@@ -231,8 +233,7 @@ class WifiBandsManager:
             time.sleep(0.2)
             now = datetime.now()
             status_change_trys += 1
-
-        raise ServerBoxException(ErrorCode.STATUS_CHANGE_TIMER)
+        logger.error(f"Wifi status change is taking too long, verify wifi status")
 
     def get_connected_stations_mac_list(self, band=None) -> Iterable[str]:
         """Execute get connected stations in the livebox using telnet service"""
