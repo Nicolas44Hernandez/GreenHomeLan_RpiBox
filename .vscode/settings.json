@@ -9,9 +9,7 @@
     //
     // server specific settings
     //
-    "python.pipenvPath": "server_box/.venv/bin/python",
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "./server_box/.venv/bin/black",
     "python.formatting.blackArgs": [
         "--line-length",
         "100",
@@ -19,7 +17,6 @@
     ],
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.pylintPath": "./server_box/.venv/bin/pylint",
     "python.linting.pylintArgs": [
         "--max-line-length=100",
         "--rcfile=./server/pylintrc"
