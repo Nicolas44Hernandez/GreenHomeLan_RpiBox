@@ -145,19 +145,13 @@ class OrchestratorNotification:
 
     def transfer_alarm_to_cloud_server_and_liveobjects(self, alarm_type: str):
         """Transfer alarm notification to cloud server and Live objects"""
-        logger.info("transfer notification")
-        return
 
-        # TODO: test send to orchestrator (mock connected to internet status and test in local)
-        # TODO: test send to LO via internet et Alimelo
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
-        data_to_send = {"alarm_type": alarm_type}
-
         if connected_to_internet:
-
             logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
+            data_to_send = {"alarm_type": alarm_type}
             # Post alarm to rpi cloud
-            for port in self.rpi_cloud_ports:
+            for port in self.server_cloud_ports:
                 post_url = (
                     f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
                 )
@@ -173,10 +167,13 @@ class OrchestratorNotification:
                         f"Error when posting alarm notification to rpi cloud, check if rpi cloud"
                         f" server is running"
                     )
-
                 logger.info(f"Sendig alarm {alarm_type} to LiveObjects via internet")
                 live_objects_service.publish_data(topic="orch", data=data_to_send)
         else:
+            logger.info(
+                f"Box is disconnected from internet. Posting notify alarm to LiveObects via Alimelo"
+            )
+            data_to_send = {"al": {alarm_type: 1}}
             data = json.dumps(data_to_send).replace(" ", "")
             alimelo_manager_service.send_data_to_live_objects(data)
 

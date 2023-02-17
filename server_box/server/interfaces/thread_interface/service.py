@@ -8,6 +8,8 @@ import subprocess
 import threading
 from typing import Iterable
 from server.common import ServerBoxException, ErrorCode
+from queue import Queue, Empty
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,11 @@ class ThreadBoarderRouter(threading.Thread):
         # setup thread network
         self.setup_thread_network(thread_network_config_file)
 
+    def enqueue_output(self, out, queue):
+        for line in iter(out.readline, b""):
+            queue.put(line)
+        out.close()
+
     def run_dedicated_thread(self):
         """Run Thread loop in dedicated if network is setted up"""
         if self.network_set_up_is_ok and self.running:
@@ -56,21 +63,26 @@ class ThreadBoarderRouter(threading.Thread):
 
     def run(self):
         """Run thread"""
+
+        process = subprocess.Popen(
+            ["sudo", "ot-ctl"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        queue = Queue()
+        reading_thread = threading.Thread(target=self.enqueue_output, args=(process.stdout, queue))
+        reading_thread.daemon = True
+        reading_thread.start()
         while self.running:
-            process = subprocess.Popen(["sudo", "ot-ctl"], stdout=subprocess.PIPE)
             try:
-                output = process.stdout.readline()
-                if output == "" and process.poll() is not None:
+                output = queue.get_nowait()
+            except Empty:
+                pass
+            else:
+                msg = output.strip().split()[-1].decode()
+                logger.info(f"Thread Message received: {msg}")
+                if self.msg_callback is None:
+                    logger.error("Message reception callback is None")
                     continue
-                elif output:
-                    msg = output.strip().split()[-1].decode()
-                    logger.info(f"Thread Message received: {msg}")
-                    if self.msg_callback is None:
-                        logger.error("Message reception callback is None")
-                        continue
-                    self.msg_callback(msg)
-            except Exception:
-                break
+                self.msg_callback(msg)
         logger.info("End of Border Router thread")
 
     def set_msg_reception_callback(self, callback: callable):
@@ -121,7 +133,7 @@ class ThreadBoarderRouter(threading.Thread):
                 elif "dataset active -x" in command:
                     out = output.split("\r\n")
                     self.thread_network_setup["dataset_key"] = out[0]
-                time.sleep(1)
+                time.sleep(2)
         except Exception as exc:
             logger.error("Thread network setup error")
             logger.error(exc)
