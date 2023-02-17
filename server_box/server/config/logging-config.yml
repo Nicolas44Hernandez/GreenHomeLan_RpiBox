@@ -190,7 +190,7 @@ loggers:
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [console]
+    handlers: [manager_mqtt]
     propagate: no
 
   server.managers.camera_manager:
@@ -225,7 +225,7 @@ loggers:
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [console]
+    handlers: [interface_mqtt]
     propagate: no
 
   server.interfaces.live_objects_interface:
