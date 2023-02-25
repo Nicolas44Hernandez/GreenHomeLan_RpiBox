@@ -5,6 +5,7 @@ from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
+from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +18,20 @@ class OrchestratorPolling:
     # Attributes
     wifi_status_polling_period_in_secs: int
     live_objects_notification_period: int
+    alimelo_status_check_period_in_secs: int
 
     def init_polling_module(
-        self, wifi_status_polling_period_in_secs: int, live_objects_notification_period: int
+        self,
+        wifi_status_polling_period_in_secs: int,
+        live_objects_notification_period: int,
+        alimelo_status_check_period_in_secs,
     ):
         """Initialize the polling service for the orchestrator"""
         logger.info("initializing Orchestrator polling module")
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
         self.live_objects_notification_period = live_objects_notification_period
+        self.alimelo_status_check_period_in_secs = alimelo_status_check_period_in_secs
 
         # Schedule ressources polling
         self.schedule_resources_status_polling()
@@ -51,6 +57,7 @@ class OrchestratorPolling:
             orchestrator_notification_service.notify_cloud_server(
                 bands_status=wifi_status.bands_status,
                 use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+                alimelo_ressources=alimelo_manager_service.alimelo_ressources,
             )
 
         # Start ressources polling and live objects notification
@@ -72,6 +79,26 @@ class OrchestratorPolling:
                 relay_statuses=relay_statuses,
                 use_situation=use_situation,
             )
+
+        @resources_status_timeloop.job(
+            interval=timedelta(seconds=self.alimelo_status_check_period_in_secs)
+        )
+        def check_alimelo_status():
+            """Check alimelo rssources status, if necessary manage wifi ressources"""
+            logger.info("CHECK ALIMELO STATUS")
+            if alimelo_manager_service.alimelo_ressources is not None:
+                # Get alimelo ressources to evaluate
+                alimelo_vs = (
+                    alimelo_manager_service.alimelo_ressources.electricSocketIsPowerSupplied
+                )
+                bat_level = alimelo_manager_service.get_battery_level()
+
+                # if electric socket is not power supplied and low battery level, send alarm
+                if not alimelo_vs and bat_level < 10:
+                    logger.info("Alimelo low power alarm")
+                    orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
+                        alarm_type="low_power"
+                    )
 
         resources_status_timeloop.start(block=False)
 

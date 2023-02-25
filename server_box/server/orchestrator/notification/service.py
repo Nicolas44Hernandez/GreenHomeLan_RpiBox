@@ -10,7 +10,7 @@ from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
-from server.managers.alimelo_manager import alimelo_manager_service
+from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.common import ServerBoxException
 
@@ -65,33 +65,91 @@ class OrchestratorNotification:
         # Call electrical panel manager service to publish relays status command
         electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
 
-    def notify_cloud_server(self, bands_status: Iterable[WifiBandStatus], use_situation: str):
+    def notify_cloud_server(
+        self,
+        bands_status: Iterable[WifiBandStatus],
+        use_situation: str,
+        alimelo_ressources: AlimeloRessources,
+    ):
         """Notify current wifi status and use situation to cloud server"""
 
         logger.info("Posting HTTP to notify current wifi status and use situation to RPI cloud")
 
-        # Get wifi status from bands status
-        wifi_status = False
-        for band_status in bands_status:
-            if band_status.status:
-                wifi_status = True
-                break
+        # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        # TODO: remove MOCK
+        connected_to_internet = True
+        if connected_to_internet:
+            # Get wifi status from bands status
+            wifi_status = False
+            band_status_2GHz = False
+            band_status_5GHz = False
+            band_status_6GHz = False
 
-        # Post wifi status to rpi cloud
-        for port in self.server_cloud_ports:
-            post_url = (
-                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
-            )
-            try:
-                headers = {"Content-Type": "application/x-www-form-urlencoded"}
-                data = {"wifi_status": wifi_status, "use_situation": use_situation}
-                rpi_cloud_response = requests.post(post_url, data=(data), headers=headers)
-                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-            except (ConnectionError, InvalidURL):
-                logger.error(
-                    f"Error when posting wifi info to rpi cloud, check if rpi cloud server is"
-                    f" running"
+            for band_status in bands_status:
+                if band_status.band == "2.4GHz":
+                    band_status_2GHz = band_status.status
+                elif band_status.band == "5GHz":
+                    band_status_5GHz = band_status.status
+                elif band_status.band == "6GHz":
+                    band_status_6GHz = band_status.status
+                if band_status.status:
+                    wifi_status = True
+
+            # get Alimelo values
+            alimelo_busvoltage = "unknown"
+            alimelo_shuntvoltage = "unknown"
+            alimelo_loadvoltage = "unknown"
+            alimelo_current_mA = "unknown"
+            alimelo_power_mW = "unknown"
+            alimelo_battery_level = "unknown"
+            alimelo_power_supplied = "unknown"
+            alimelo_is_powered_by_battery = "unknown"
+            alimelo_is_charging = "unknown"
+
+            if alimelo_ressources is not None:
+                alimelo_busvoltage = alimelo_ressources.busvoltage
+                alimelo_shuntvoltage = alimelo_ressources.shuntvoltage
+                alimelo_loadvoltage = alimelo_ressources.loadvoltage
+                alimelo_current_mA = alimelo_ressources.current_mA
+                alimelo_power_mW = alimelo_ressources.power_mW
+                alimelo_battery_level = alimelo_manager_service.get_battery_level()
+                alimelo_power_supplied = alimelo_ressources.electricSocketIsPowerSupplied
+                alimelo_is_powered_by_battery = alimelo_ressources.isPowredByBattery
+                alimelo_is_charging = alimelo_ressources.isChargingBattery
+
+            # Post wifi status to rpi cloud
+            for port in self.server_cloud_ports:
+                post_url = (
+                    f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
                 )
+                try:
+                    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+                    data = {
+                        "wifi_status": wifi_status,
+                        "band_2GHz_status": band_status_2GHz,
+                        "band_5GHz_status": band_status_5GHz,
+                        "band_6GHz_status": band_status_6GHz,
+                        "use_situation": use_situation,
+                        "alimelo_busvoltage": alimelo_busvoltage,
+                        "alimelo_shuntvoltage": alimelo_shuntvoltage,
+                        "alimelo_loadvoltage": alimelo_loadvoltage,
+                        "alimelo_current_mA": alimelo_current_mA,
+                        "alimelo_power_mW": alimelo_power_mW,
+                        "alimelo_battery_level": alimelo_battery_level,
+                        "alimelo_power_supplied": alimelo_power_supplied,
+                        "alimelo_is_powered_by_battery": alimelo_is_powered_by_battery,
+                        "alimelo_is_charging": alimelo_is_charging,
+                    }
+
+                    rpi_cloud_response = requests.post(post_url, data=(data), headers=headers)
+                    logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
+                except (ConnectionError, InvalidURL):
+                    logger.error(
+                        f"Error when posting wifi info to rpi cloud, check if rpi cloud server is"
+                        f" running"
+                    )
+        else:
+            logger.error(f"Imposible to post notification, box is disconnected from internet")
 
     def notify_status_to_liveobjects(
         self,
@@ -116,11 +174,12 @@ class OrchestratorNotification:
 
         # Format electrical panel relays status
         ep = ""
-        for idx in range(0, 6):
-            if relay_statuses.relay_statuses[idx].status:
-                ep += "1"
-            else:
-                ep += "0"
+        if relay_statuses is not None:
+            for idx in range(0, 6):
+                if relay_statuses.relay_statuses[idx].status:
+                    ep += "1"
+                else:
+                    ep += "0"
 
         # Format use situation
         us = use_situation
@@ -146,7 +205,9 @@ class OrchestratorNotification:
     def transfer_alarm_to_cloud_server_and_liveobjects(self, alarm_type: str):
         """Transfer alarm notification to cloud server and Live objects"""
 
-        connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        # TODO: remove MOCK
+        connected_to_internet = True
         if connected_to_internet:
             logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
             data_to_send = {"alarm_type": alarm_type}
