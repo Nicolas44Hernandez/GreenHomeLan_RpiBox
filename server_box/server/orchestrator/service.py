@@ -48,6 +48,9 @@ class Orchestrator:
                 live_objects_notification_period=app.config[
                     "LIVE_OBJECTS_NOTIFICATION_PERIOD_IN_SECS"
                 ],
+                alimelo_status_check_period_in_secs=app.config[
+                    "ALIMELO_STATUS_CHECK_PERIOD_IN_SECS"
+                ],
             )
 
             # Init requests module

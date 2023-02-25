@@ -5,6 +5,7 @@ from logging.config import dictConfig
 from os import path
 import yaml
 from flask import Flask
+from flask_cors import CORS
 
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
@@ -33,6 +34,7 @@ def create_app(
 
     # Create app Flask
     app = Flask("Server Box")
+    cors = CORS(app)
 
     # Get configuration files
     app_config = path.join(config_dir, "server-box-config.yml")

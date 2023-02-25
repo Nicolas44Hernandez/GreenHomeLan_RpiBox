@@ -33,6 +33,9 @@ class AlimeloManager:
             )
             self.alimelo_interface.start()
 
+            # Init ressources
+            self.alimelo_ressources = None
+
             # set ressources notification callback
             self.alimelo_interface.set_notification_reception_callback(
                 self.ressources_notification_callback
@@ -63,6 +66,12 @@ class AlimeloManager:
     def send_data_to_live_objects(self, data: str):
         """Send data to LiveObjects"""
         self.alimelo_interface.send_data_to_live_objects(data)
+
+    def get_battery_level(self):
+        """Get alimelo batery level in percentage"""
+        if self.alimelo_ressources is None:
+            return "unknown"
+        return self.alimelo_ressources.batLevel - 700
 
 
 alimelo_manager_service: AlimeloManager = AlimeloManager()

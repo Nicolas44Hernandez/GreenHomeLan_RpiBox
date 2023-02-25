@@ -97,6 +97,7 @@ class AlimeloSerialCom(threading.Thread):
             except (
                 serial.SerialException,
                 AttributeError,
+                Exception,
             ) as e:
                 logger.error("Exception in serial connection")
                 logger.error(e)
