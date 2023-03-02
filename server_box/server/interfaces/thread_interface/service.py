@@ -38,10 +38,12 @@ class ThreadBoarderRouter(threading.Thread):
     running: bool
     network_set_up_is_ok: bool
     msg_callback: callable
+    keep_alive_callback: callable
 
     def __init__(self, sudo_password: str, thread_network_config_file: str):
         self.sudo_password = sudo_password
         self.msg_callback = None
+        self.keep_alive_callback = None
         self.network_set_up_is_ok = False
         self.running = False
 
@@ -79,6 +81,15 @@ class ThreadBoarderRouter(threading.Thread):
             else:
                 msg = output.strip().split()[-1].decode()
                 logger.info(f"Thread Message received: {msg}")
+                if msg.startswith("ka"):
+                    node = msg.split("_")[1]
+                    logger.info(f"Keep alive message received for node {node}")
+                    if self.keep_alive_callback is None:
+                        logger.error("Keep alive reception callback is None")
+                    else:
+                        self.keep_alive_callback(node_id=node)
+                    continue
+
                 if self.msg_callback is None:
                     logger.error("Message reception callback is None")
                     continue
@@ -88,6 +99,10 @@ class ThreadBoarderRouter(threading.Thread):
     def set_msg_reception_callback(self, callback: callable):
         """Set Thread message reception callback"""
         self.msg_callback = callback
+
+    def set_keep_alive_reception_callback(self, callback: callable):
+        """Set Thread keep_alive reception callback"""
+        self.keep_alive_callback = callback
 
     def setup_thread_network(self, thread_network_config_file: str) -> bool:
         """Setup the thread network"""

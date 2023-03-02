@@ -1,7 +1,8 @@
 THREAD:
     NETWORK_SETUP_COMMANDS:
-      - "ot-ctl dataset init new"
       - "ot-ctl udp close"
+      - "ot-ctl ifconfig down"
+      - "ot-ctl dataset init new"
       - "ot-ctl dataset commit active"
       - "ot-ctl ifconfig up"
       - "ot-ctl thread start"
