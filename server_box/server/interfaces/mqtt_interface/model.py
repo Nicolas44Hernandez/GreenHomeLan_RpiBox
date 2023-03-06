@@ -30,23 +30,27 @@ def deserialize(payload: bytes) -> Msg:
 
 
 class SingleRelayStatus:
-    def __init__(self, relay_number: int, status: bool):
+    def __init__(self, relay_number: int, status: bool, powered: bool):
         self.relay_number = relay_number
         self.status = status
+        self.powered = powered
 
     def __str__(self):
         """String representation of the SingleRelayStatus instance"""
-        return "{}".format({"relay_number": self.relay_number, "status": self.status})
+        return "{}".format(
+            {"relay_number": self.relay_number, "status": self.status, "powered": self.powered}
+        )
 
     def to_json(self):
         """Return json dict that represents the SingleRelayStatus instance"""
-        return {"relay_number": self.relay_number, "status": self.status}
+        return {"relay_number": self.relay_number, "status": self.status, "powered": self.powered}
 
     def from_json(dictionary: dict):
         """Return SingleRelayStatus instance from json dict"""
         return SingleRelayStatus(
             relay_number=dictionary["relay_number"],
             status=dictionary["status"],
+            powered=dictionary["powered"],
         )
 
 

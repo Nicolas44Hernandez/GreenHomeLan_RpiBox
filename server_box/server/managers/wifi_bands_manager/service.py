@@ -8,6 +8,8 @@ import time
 from datetime import datetime, timedelta
 from telnetlib import Telnet
 from server.interfaces.wifi_interface import wifi_telnet_interface
+from server.interfaces.mqtt_interface import RelaysStatus
+from server.managers.mqtt_manager import mqtt_manager_service
 from server.common import ServerBoxException, ErrorCode
 from .model import WifiBandStatus, WifiStatus
 
@@ -30,6 +32,7 @@ class WifiBandsManager:
     telnet_timeout_in_secs: float = 5
     telnet_commands = {}
     wifi_status: WifiStatus = None
+    mqtt_wifi_status_relays_topic: str
 
     def __init__(self, app: Flask = None) -> None:
         if app is not None:
@@ -45,6 +48,7 @@ class WifiBandsManager:
             self.livebox_login = app.config["LIVEBOX_LOGIN"]
             self.livebox_ip_password = app.config["LIVEBOX_PASSWORD"]
             self.telnet_timeout_in_secs = app.config["TELNET_TIMOUT_IN_SECS"]
+            self.mqtt_wifi_status_relays_topic = app.config["MQTT_WIFI_STATUS_RELAYS_TOPIC"]
             self.load_telnet_commands(app.config["LIVEBOX_TELNET_COMMANDS"])
 
     def create_telnet_connection(self) -> Telnet:
@@ -295,6 +299,14 @@ class WifiBandsManager:
             return True
         except:
             return False
+
+    def publish_wifi_status_mqtt_relays(self, relays_status: RelaysStatus):
+        """publish MQTT relays status command"""
+
+        logger.debug(f"Publishing relays status command")
+        mqtt_manager_service.publish_message(
+            topic=self.mqtt_wifi_status_relays_topic, message=relays_status
+        )
 
 
 wifi_bands_manager_service: WifiBandsManager = WifiBandsManager()

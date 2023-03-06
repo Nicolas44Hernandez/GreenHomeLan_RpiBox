@@ -12,6 +12,7 @@ class SingleRelayStatusSchema(Schema):
 
     relay_number = Integer(required=True, allow_none=False)
     status = Boolean(required=True, allow_none=False)
+    powered = Boolean(required=False, allow_none=False)
 
 
 class RelaysStatusResponseSchema(Schema):

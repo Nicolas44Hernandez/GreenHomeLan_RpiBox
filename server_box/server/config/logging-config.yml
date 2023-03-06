@@ -155,7 +155,7 @@ loggers:
 
   server.rest_api:
       level: INFO
-      handlers: [api_rest]
+      handlers: [console]
       propagate: no
 
   server.orchestrator.service:
@@ -175,17 +175,17 @@ loggers:
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [orchestrator_polling]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator_requests]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [orchestrator_use_situations]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
@@ -205,7 +205,7 @@ loggers:
 
   server.managers.thread_manager:
     level: INFO
-    handlers: [manager_thread]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_manager:
@@ -215,12 +215,12 @@ loggers:
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [manager_alimelo]
+    handlers: [console]
     propagate: no
 
   server.interfaces.thread_interface:
     level: DEBUG
-    handlers: [interface_thread]
+    handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_interface:
