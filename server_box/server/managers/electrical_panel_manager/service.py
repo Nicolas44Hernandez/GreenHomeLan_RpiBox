@@ -63,6 +63,7 @@ class ElectricalPanelManager:
     def receive_relays_statuses(self, relays_status: RelaysStatus):
         """Callback for relays/status topic"""
         logger.info(f"Relays status received")
+        logger.info(f"{relays_status.to_json()}")
 
         # Update relays last status received
         relays_status.timestamp = datetime.now()

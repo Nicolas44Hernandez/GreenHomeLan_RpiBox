@@ -31,7 +31,10 @@ class AlimeloManager:
                     "ALIMELO_SERIAL_CONNECTION_RESTART_TIMEOUT_IN_SECS"
                 ],
             )
-            self.alimelo_interface.start()
+            try:
+                self.alimelo_interface.start()
+            except Exception as e:
+                logger.error(e)
 
             # Init ressources
             self.alimelo_ressources = None

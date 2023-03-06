@@ -49,7 +49,11 @@ class RelaysStatusApi(MethodView):
         for relay in RELAYS:
             if relay in args:
                 statuses_from_query.append(
-                    SingleRelayStatus(relay_number=int(relay.split("_")[1]), status=args[relay]),
+                    SingleRelayStatus(
+                        relay_number=int(relay.split("_")[1]),
+                        status=args[relay],
+                        powered=args[relay],
+                    ),
                 )
 
         relays_statuses = RelaysStatus(

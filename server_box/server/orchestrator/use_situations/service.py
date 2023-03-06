@@ -1,7 +1,10 @@
 import logging
 import yaml
+from datetime import datetime
 from timeloop import Timeloop
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.electrical_panel_manager import electrical_panel_manager_service
+from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.common import ServerBoxException, ErrorCode
 
 
@@ -57,12 +60,43 @@ class OrchestratorUseSituations:
             self.use_situations_dict[self.current_use_situation]["WIFI"]
         )
 
+        # Set use situation Electrical panel
+        self.set_use_situation_electgrical_panel_status(
+            self.use_situations_dict[self.current_use_situation]["ELECTRICAL_OUTLETS"]
+        )
+
     def set_use_situation_wifi_status(self, wifi_bands_status: dict):
         """Set wifi status"""
         for band in wifi_bands_status:
             band_status = wifi_bands_status[band]
             logger.info(f"Setting wifi band {band} to {band_status}")
             wifi_bands_manager_service.set_band_status(band=band, status=band_status)
+
+    def set_use_situation_electgrical_panel_status(self, electrical_panel_status: dict):
+        """Set electrical panel status"""
+        # Build RelayStatus instance
+        relays_status = []
+        for outlet_number in range(6):
+            if outlet_number in electrical_panel_status:
+                outlet_status = electrical_panel_status[outlet_number]
+            else:
+                outlet_status = False
+            logger.info(f"Setting power outlet {outlet_number} to {outlet_status}")
+            relays_status.append(
+                SingleRelayStatus(
+                    relay_number=outlet_number,
+                    status=outlet_status,
+                    powered=False,
+                ),
+            )
+
+        relays_statuses = RelaysStatus(
+            relay_statuses=relays_status, command=True, timestamp=datetime.now()
+        )
+        logger.info(f"{relays_statuses.to_json()}")
+
+        # Call electrical panel manager service to publish relays status command
+        electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
 
     def get_current_use_situation(self):
         """Get current use situation"""

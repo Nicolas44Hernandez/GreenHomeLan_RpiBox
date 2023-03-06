@@ -54,6 +54,7 @@ class ThreadManager:
 
             # Schedule MQTT Publish Thread network info
             self.schedule_thread_management_tasks()
+            self.publish_thread_network_info_mqtt()
 
             self.nodes_keep_alive_msgs = {}
             for node in self.get_thread_nodes():
@@ -69,29 +70,29 @@ class ThreadManager:
             logger.info(f"Publish thread netswork info to MQTT topic")
             self.publish_thread_network_info_mqtt()
 
-        @thread_network_info_timeloop.job(
-            interval=timedelta(seconds=self.nodes_check_period_in_secs)
-        )
-        def check_connected_nodes_keepalive_msg():
-            if self.thread_interface.network_set_up_is_ok and self.thread_interface.running:
-                logger.info(f"Checking thread nodes")
-                reset_thread_network = False
-                for node in self.get_thread_nodes():
-                    last_received_keep_alive = self.nodes_keep_alive_msgs[node._id]
-                    if last_received_keep_alive is None:
-                        logger.error(
-                            f"Haven't received keep alive message from node {node._id} in last"
-                            f" {self.nodes_check_period_in_secs} secs"
-                        )
-                        reset_thread_network = True
+        # @thread_network_info_timeloop.job(
+        #     interval=timedelta(seconds=self.nodes_check_period_in_secs)
+        # )
+        # def check_connected_nodes_keepalive_msg():
+        #     if self.thread_interface.network_set_up_is_ok and self.thread_interface.running:
+        #         logger.info(f"Checking thread nodes")
+        #         reset_thread_network = False
+        #         for node in self.get_thread_nodes():
+        #             last_received_keep_alive = self.nodes_keep_alive_msgs[node._id]
+        #             if last_received_keep_alive is None:
+        #                 logger.error(
+        #                     f"Haven't received keep alive message from node {node._id} in last"
+        #                     f" {self.nodes_check_period_in_secs} secs"
+        #                 )
+        #                 reset_thread_network = True
 
-                # reset to None the keep alive msgs dict
-                for node in self.get_thread_nodes():
-                    self.nodes_keep_alive_msgs[node._id] = None
+        #         # reset to None the keep alive msgs dict
+        #         for node in self.get_thread_nodes():
+        #             self.nodes_keep_alive_msgs[node._id] = None
 
-                # Launch Thread network reset
-                if reset_thread_network:
-                    self.reset_thread_network()
+        #         # Launch Thread network reset
+        #         if reset_thread_network:
+        #             self.reset_thread_network()
 
         thread_network_info_timeloop.start(block=False)
 
@@ -105,7 +106,10 @@ class ThreadManager:
             wifi_off_timer = threading.Timer(
                 60, wifi_bands_manager_service.set_wifi_status(status=False)
             )
-            wifi_off_timer.start()
+            try:
+                wifi_off_timer.start()
+            except Exception as e:
+                logger.error(e)
 
         # Thread network reset
         self.thread_interface.setup_thread_network(self.thread_config_file)

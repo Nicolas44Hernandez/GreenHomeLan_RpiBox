@@ -2,6 +2,7 @@ import logging
 import json
 from datetime import datetime
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
+
 from server.managers.thread_manager import thread_manager_service
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
@@ -141,7 +142,9 @@ class OrchestratorRequests:
                 for relay_idx in cmd_dict.keys():
                     relay_status = cmd_dict[relay_idx]
                     statuses_from_query.append(
-                        SingleRelayStatus(relay_number=int(relay_idx), status=relay_status),
+                        SingleRelayStatus(
+                            relay_number=int(relay_idx), status=relay_status, powered=True
+                        ),
                     )
 
                 relays_statuses = RelaysStatus(

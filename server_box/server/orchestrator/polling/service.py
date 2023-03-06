@@ -49,7 +49,7 @@ class OrchestratorPolling:
             wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
 
             # Notify wifi status toi RPI relais
-            orchestrator_notification_service.notify_wifi_status_to_rpi_relays(
+            orchestrator_notification_service.notify_wifi_status(
                 bands_status=wifi_status.bands_status
             )
 
@@ -58,6 +58,7 @@ class OrchestratorPolling:
                 bands_status=wifi_status.bands_status,
                 use_situation=orchestrator_use_situations_service.get_current_use_situation(),
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
+                relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
             )
 
         # Start ressources polling and live objects notification

@@ -59,7 +59,10 @@ class ThreadBoarderRouter(threading.Thread):
         """Run Thread loop in dedicated if network is setted up"""
         if self.network_set_up_is_ok and self.running:
             logger.info(f"Running Thread loop in dedicated thread")
-            self.start()
+            try:
+                self.start()
+            except Exception as e:
+                logger.error(e)
         else:
             logger.error(f"Thread loop cant be run, network setup failed")
 
@@ -72,7 +75,10 @@ class ThreadBoarderRouter(threading.Thread):
         queue = Queue()
         reading_thread = threading.Thread(target=self.enqueue_output, args=(process.stdout, queue))
         reading_thread.daemon = True
-        reading_thread.start()
+        try:
+            reading_thread.start()
+        except Exception as e:
+                logger.error(e)
         while self.running:
             try:
                 output = queue.get_nowait()
