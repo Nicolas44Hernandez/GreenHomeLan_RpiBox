@@ -35,3 +35,6 @@ WIFI:
                 - pcb_cli
                 - NeMo.Intf.rad6g0.Enable=0
             stations: wl -i wl1 assoclist
+    counters:
+        2.4GHz: wl -i wl2 counters
+

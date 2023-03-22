@@ -51,6 +51,10 @@ class Orchestrator:
                 alimelo_status_check_period_in_secs=app.config[
                     "ALIMELO_STATUS_CHECK_PERIOD_IN_SECS"
                 ],
+                band_5GHz_on_datarate_threshold_in_bytes=app.config[
+                    "BAND_5GHZ_ON_DATARATE_THRESHOLD_IN_BYTES"
+                ],
+                home_office_mac_addr=app.config["HOME_OFFICE_MAC_ADDR"],
             )
 
             # Init requests module

@@ -67,7 +67,12 @@ class OrchestratorNotification:
         )
 
         # Call wifi bands manager service to publish relays status command
-        wifi_bands_manager_service.publish_wifi_status_mqtt_relays(relays_status=relays_statuses)
+        try:
+            wifi_bands_manager_service.publish_wifi_status_mqtt_relays(
+                relays_status=relays_statuses
+            )
+        except Exception as e:
+            logger.error("Error publishing wifi status")
 
     def notify_cloud_server(
         self,
@@ -227,8 +232,10 @@ class OrchestratorNotification:
         }
         # If connnected to internet send via internet, else send via Alimelo
         if connected_to_internet:
+            logger.info("Connected to internet, sending notification via internet")
             live_objects_service.publish_data(topic="orch", data=data_to_send)
         else:
+            logger.info("Not connected to internet, sending notification via Alimelo")
             data = json.dumps(data_to_send).replace(" ", "")
             alimelo_manager_service.send_data_to_live_objects(data)
 
@@ -236,30 +243,27 @@ class OrchestratorNotification:
         """Transfer alarm notification to cloud server and Live objects"""
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
-        #  MOCK
-        # connected_to_internet = True
-        # if connected_to_internet:
-        logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
-        data_to_send = {"alarm_type": alarm_type}
-        # Post alarm to rpi cloud
-        for port in self.server_cloud_ports:
-            post_url = (
-                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
-            )
-            try:
-                headers = {"Content-Type": "application/x-www-form-urlencoded"}
-
-                rpi_cloud_response = requests.post(post_url, data=(data_to_send), headers=headers)
-                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-            except (ConnectionError, InvalidURL):
-                logger.error(
-                    f"Error when posting alarm notification to rpi cloud, check if rpi cloud"
-                    f" server is running"
-                )
         if connected_to_internet:
-            logger.info(f"Sendig alarm {alarm_type} to LiveObjects via internet")
-            live_objects_service.publish_data(topic="orch", data=data_to_send)
-        else:
+            logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
+            data_to_send = {"alarm_type": alarm_type}
+            # Post alarm to rpi cloud
+            for port in self.server_cloud_ports:
+                post_url = (
+                    f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
+                )
+                try:
+                    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+                    rpi_cloud_response = requests.post(
+                        post_url, data=(data_to_send), headers=headers
+                    )
+                    logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
+                except (ConnectionError, InvalidURL):
+                    logger.error(
+                        f"Error when posting alarm notification to rpi cloud, check if rpi cloud"
+                        f" server is running"
+                    )
+        if not connected_to_internet:
             logger.info(
                 f"Box is disconnected from internet. Posting notify alarm to LiveObects via Alimelo"
             )
