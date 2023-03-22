@@ -61,7 +61,7 @@ class OrchestratorUseSituations:
         )
 
         # Set use situation Electrical panel
-        self.set_use_situation_electgrical_panel_status(
+        self.set_use_situation_electrical_panel_status(
             self.use_situations_dict[self.current_use_situation]["ELECTRICAL_OUTLETS"]
         )
 
@@ -72,7 +72,7 @@ class OrchestratorUseSituations:
             logger.info(f"Setting wifi band {band} to {band_status}")
             wifi_bands_manager_service.set_band_status(band=band, status=band_status)
 
-    def set_use_situation_electgrical_panel_status(self, electrical_panel_status: dict):
+    def set_use_situation_electrical_panel_status(self, electrical_panel_status: dict):
         """Set electrical panel status"""
         # Build RelayStatus instance
         relays_status = []

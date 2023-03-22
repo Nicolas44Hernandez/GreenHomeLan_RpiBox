@@ -155,22 +155,22 @@ loggers:
 
   server.rest_api:
       level: INFO
-      handlers: [console]
+      handlers: [api_rest]
       propagate: no
 
   server.orchestrator.service:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [orchestrator_notification]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [orchestrator_live_objects]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.polling:
@@ -180,7 +180,7 @@ loggers:
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [orchestrator_requests]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.use_situations:

@@ -19,12 +19,16 @@ class OrchestratorPolling:
     wifi_status_polling_period_in_secs: int
     live_objects_notification_period: int
     alimelo_status_check_period_in_secs: int
+    band_5GHz_on_datarate_threshold_in_bytes: int
+    home_office_mac_addr: str
 
     def init_polling_module(
         self,
         wifi_status_polling_period_in_secs: int,
         live_objects_notification_period: int,
-        alimelo_status_check_period_in_secs,
+        alimelo_status_check_period_in_secs: int,
+        band_5GHz_on_datarate_threshold_in_bytes: int,
+        home_office_mac_addr: str,
     ):
         """Initialize the polling service for the orchestrator"""
         logger.info("initializing Orchestrator polling module")
@@ -32,6 +36,8 @@ class OrchestratorPolling:
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
         self.live_objects_notification_period = live_objects_notification_period
         self.alimelo_status_check_period_in_secs = alimelo_status_check_period_in_secs
+        self.band_5GHz_on_datarate_threshold_in_bytes = band_5GHz_on_datarate_threshold_in_bytes
+        self.home_office_mac_addr = home_office_mac_addr
 
         # Schedule ressources polling
         self.schedule_resources_status_polling()
@@ -46,20 +52,46 @@ class OrchestratorPolling:
         def poll_wifi_status():
             # retrieve wifi status
             logger.info(f"Polling wifi status")
-            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+            (
+                wifi_status,
+                counters_txbyte_2GHz,
+                counters_rxbyte_2GHz,
+            ) = wifi_bands_manager_service.update_wifi_status_attribute()
+
+            # If only 2.4GHz band is ON and high trafic Turn 5GHz band ON
+            if counters_txbyte_2GHz is not None and counters_rxbyte_2GHz is not None:
+                if (
+                    counters_txbyte_2GHz + counters_rxbyte_2GHz
+                    > self.band_5GHz_on_datarate_threshold_in_bytes
+                ):
+                    wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
+
+                else:
+                    connected_stations = (
+                        wifi_bands_manager_service.get_connected_stations_mac_list()
+                    )
+                    if self.home_office_mac_addr in connected_stations:
+                        logger.info(
+                            f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
+                        )
+                        orchestrator_use_situations_service.set_use_situation(
+                            use_situation="PRESENCE_HOME_OFFICE"
+                        )
 
             # Notify wifi status toi RPI relais
             orchestrator_notification_service.notify_wifi_status(
                 bands_status=wifi_status.bands_status
             )
+            logger.info(f"Polling wifi: RPI relas wifi notification ok")
 
             # Notify current wifi status and use situation to rpi cloud
             orchestrator_notification_service.notify_cloud_server(
                 bands_status=wifi_status.bands_status,
                 use_situation=orchestrator_use_situations_service.get_current_use_situation(),
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
-                relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
+                relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
+            logger.info(f"Polling wifi done")
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(
@@ -81,25 +113,25 @@ class OrchestratorPolling:
                 use_situation=use_situation,
             )
 
-        @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.alimelo_status_check_period_in_secs)
-        )
-        def check_alimelo_status():
-            """Check alimelo rssources status, if necessary manage wifi ressources"""
-            logger.info("CHECK ALIMELO STATUS")
-            if alimelo_manager_service.alimelo_ressources is not None:
-                # Get alimelo ressources to evaluate
-                alimelo_vs = (
-                    alimelo_manager_service.alimelo_ressources.electricSocketIsPowerSupplied
-                )
-                bat_level = alimelo_manager_service.get_battery_level()
+        # @resources_status_timeloop.job(
+        #     interval=timedelta(seconds=self.alimelo_status_check_period_in_secs)
+        # )
+        # def check_alimelo_status():
+        #     """Check alimelo rssources status, if necessary manage wifi ressources"""
+        #     logger.info("CHECK ALIMELO STATUS")
+        #     if alimelo_manager_service.alimelo_ressources is not None:
+        #         # Get alimelo ressources to evaluate
+        #         alimelo_vs = (
+        #             alimelo_manager_service.alimelo_ressources.electricSocketIsPowerSupplied
+        #         )
+        #         bat_level = alimelo_manager_service.get_battery_level()
 
-                # if electric socket is not power supplied and low battery level, send alarm
-                if not alimelo_vs and bat_level < 10:
-                    logger.info("Alimelo low power alarm")
-                    orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
-                        alarm_type="low_power"
-                    )
+        #         # if electric socket is not power supplied and low battery level, send alarm
+        #         if not alimelo_vs and bat_level < 10:
+        #             logger.info("Alimelo low power alarm")
+        #             orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
+        #                 alarm_type="low_power"
+        #             )
 
         resources_status_timeloop.start(block=False)
 
