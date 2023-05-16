@@ -54,18 +54,21 @@ class OrchestratorRequests:
 
         # Thread message is an alarm
         if msg.startswith("al"):
-            _type = msg.split("_")[2]
+            _device, _type = msg.split("_")[1:]
             if _type == "db":
                 alarm_type = "doorbell"
             elif _type == "pd":
                 alarm_type = "presence"
+            elif _type == "em":
+                alarm_type = "emergency_btn"
             else:
                 logger.error(f"Error in alarm received format {msg}")
                 return
             logger.info(f"Alarm received {alarm_type}")
 
-            # Turn wifi ON
-            wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
+            if _device == "cam":
+                # Turn wifi ON if alarm from camera
+                wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
 
             # Transfer alarm to cloud server and liveobjects
             orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
