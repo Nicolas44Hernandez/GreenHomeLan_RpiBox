@@ -178,7 +178,7 @@ class OrchestratorRequests:
         # TODO: What to do with notifications
 
     def alarm_notification_reception_callback(self, msg):
-        """Callback for object alarm notification"""
+        """Callback for MQTT object alarm notification"""
         logger.info(f"Alarm notification received: {msg} ")
         orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
             msg["type"]
