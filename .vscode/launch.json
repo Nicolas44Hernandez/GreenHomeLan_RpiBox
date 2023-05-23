@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Run model test SLN",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/demo_SLN/test_model.py",
+            "console": "integratedTerminal",
+        },
+        {
             "name": "Server Box: Run flask app in dev post",
             "type": "python",
             "request": "launch",
@@ -19,6 +26,6 @@
                 "0.0.0.0",
                 "--no-reload",
             ]
-        },
+        }
     ]
 }
