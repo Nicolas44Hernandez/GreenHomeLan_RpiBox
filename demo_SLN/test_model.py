@@ -7,9 +7,9 @@ import pickle
 #import pandas
 #import datetime
 
-MODEL="/home/pi/workspace/Livebox-wifi-stats/demo/model/XGBRegressor.sav"
-SCALER ="/home/pi/workspace/Livebox-wifi-stats/demo/scaler/scaler.gz"
-DATA_TEST="/home/pi/workspace/Livebox-wifi-stats/demo/data/X_test.csv"
+MODEL="/home/pi/workspace/GreenHomeLan_RpiBox/demo/model/XGBRegressor.sav"
+SCALER ="/home/pi/workspace/GreenHomeLan_RpiBox/demo/scaler/scaler.gz"
+DATA_TEST="/home/pi/workspace/GreenHomeLan_RpiBox/demo/data/X_test.csv"
 
 
 # def load_test_data(csv_file: str):
