@@ -1,9 +1,6 @@
 
 import joblib
-# from sklearn.preprocessing import StandardScaler, RobustScaler
-import xgboost as xgb
 import pickle
-import numpy
 import pandas
 import datetime
 
@@ -25,12 +22,10 @@ model = pickle.load(open(MODEL, 'rb'))
 # load scaler
 scaler = joblib.load(SCALER)
 end = datetime.datetime.now()
-model_load_time = end - start
+model_load_time = (end - start).total_seconds()
 
 # load data test
 dataset = load_test_data(DATA_TEST)
-small_dataset = dataset.iloc[1:2]
-
 predictions = []
 inference_times = []
 
@@ -53,4 +48,3 @@ mean_inference_time = sum(inference_times) / len(inference_times)
 print("----------------------------------------------------------------")
 print(f"Model load time: {model_load_time}")
 print(f"Mean inference time: {mean_inference_time}")
-
