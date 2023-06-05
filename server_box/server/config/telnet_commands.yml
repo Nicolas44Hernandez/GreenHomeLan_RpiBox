@@ -37,4 +37,9 @@ WIFI:
             stations: wl -i wl1 assoclist
     counters:
         2.4GHz: wl -i wl2 counters
-
+        5GHz: wl -i wl0 counters
+        6GHz: wl -i wl1 counters
+        station_info:
+            2.4GHz: wl -i wl2 sta_info STATION
+            5GHz: wl -i wl0 sta_info STATION
+            6GHz: wl -i wl1 sta_info STATION
