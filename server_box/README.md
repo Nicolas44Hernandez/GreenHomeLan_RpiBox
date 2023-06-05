@@ -205,7 +205,7 @@ mkdir logs/manager
 mkdir logs/interface
 mkdir logs/orchestrator
 touch logs/app.log logs/api-rest.log
-touch logs/manager/mqtt.log logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/ip_discovery.log logs/manager/alimelo.log
+touch logs/manager/mqtt.log logs/manager/camera.log logs/manager/electrical_panel.log logs/manager/thread.log logs/manager/wifi_bands.log logs/manager/wifi_5GHz_on_off.log logs/manager/alimelo.log
 touch logs/interface/mqtt.log logs/interface/live_objects.log logs/interface/thread.log logs/interface/telnet.log logs/interface/alimelo.log
 touch logs/orchestrator/orchestrator.log logs/orchestrator/orchestrator_notification.log logs/orchestrator/orchestrator_live_objects.log logs/orchestrator/orchestrator_polling.log logs/orchestrator/orchestrator_requests.log logs/orchestrator/orchestrator_use_situations.log
 ```
@@ -233,6 +233,7 @@ sudo systemctl restart rpi-box
 ```
 
 ## TODO
+- [ ] Update readme file
 
 **Alimelo manager/interface**
 

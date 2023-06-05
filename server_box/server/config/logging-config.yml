@@ -101,6 +101,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  wifi_5GHz_on_off:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/manager/wifi_5GHz_on_off.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   manager_alimelo:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -211,6 +218,11 @@ loggers:
   server.managers.wifi_bands_manager:
     level: INFO
     handlers: [manager_wifi_bands]
+    propagate: no
+
+  server.managers.wifi_5GHz_on_off_manager:
+    level: INFO
+    handlers: [console]
     propagate: no
 
   server.managers.alimelo_manager:

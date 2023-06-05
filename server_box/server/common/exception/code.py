@@ -27,6 +27,7 @@ class ErrorCode(Enum):
     )
     INVALID_USE_SITUATION = (14, 400, "Invalid use situation selected")
     THREAD_NETWORK_NOT_RUNNING = (15, 500, "Thread network is not running")
+    ERROR_IN_PREDICTOR_MODEL_LOAD = (16, 500, "Error in 5GHZ ON/OFF rtt predictor model load")
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):

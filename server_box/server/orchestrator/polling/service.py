@@ -4,6 +4,7 @@ from timeloop import Timeloop
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_5GHz_on_off_manager import wifi_5GHz_on_off_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 
@@ -18,16 +19,16 @@ class OrchestratorPolling:
     # Attributes
     wifi_status_polling_period_in_secs: int
     live_objects_notification_period: int
+    wifi_counters_polling_period_in_secs: int
     alimelo_status_check_period_in_secs: int
-    band_5GHz_on_datarate_threshold_in_bytes: int
     home_office_mac_addr: str
 
     def init_polling_module(
         self,
         wifi_status_polling_period_in_secs: int,
         live_objects_notification_period: int,
+        wifi_counters_polling_period_in_secs: int,
         alimelo_status_check_period_in_secs: int,
-        band_5GHz_on_datarate_threshold_in_bytes: int,
         home_office_mac_addr: str,
     ):
         """Initialize the polling service for the orchestrator"""
@@ -35,8 +36,8 @@ class OrchestratorPolling:
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
         self.live_objects_notification_period = live_objects_notification_period
+        self.wifi_counters_polling_period_in_secs = wifi_counters_polling_period_in_secs
         self.alimelo_status_check_period_in_secs = alimelo_status_check_period_in_secs
-        self.band_5GHz_on_datarate_threshold_in_bytes = band_5GHz_on_datarate_threshold_in_bytes
         self.home_office_mac_addr = home_office_mac_addr
 
         # Schedule ressources polling
@@ -52,31 +53,17 @@ class OrchestratorPolling:
         def poll_wifi_status():
             # retrieve wifi status
             logger.info(f"Polling wifi status")
-            (
-                wifi_status,
-                counters_txbyte_2GHz,
-                counters_rxbyte_2GHz,
-            ) = wifi_bands_manager_service.update_wifi_status_attribute()
-
-            # If only 2.4GHz band is ON and high trafic Turn 5GHz band ON
-            if counters_txbyte_2GHz is not None and counters_rxbyte_2GHz is not None:
-                if (
-                    counters_txbyte_2GHz + counters_rxbyte_2GHz
-                    > self.band_5GHz_on_datarate_threshold_in_bytes
-                ):
-                    wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
-
-                else:
-                    connected_stations = (
-                        wifi_bands_manager_service.get_connected_stations_mac_list()
-                    )
-                    if self.home_office_mac_addr in connected_stations:
-                        logger.info(
-                            f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
-                        )
-                        orchestrator_use_situations_service.set_use_situation(
-                            use_situation="PRESENCE_HOME_OFFICE"
-                        )
+            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+            connected_stations = (
+                wifi_bands_manager_service.get_connected_stations_mac_list()
+            )
+            if self.home_office_mac_addr in connected_stations:
+                logger.info(
+                    f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
+                )
+                orchestrator_use_situations_service.set_use_situation(
+                    use_situation="PRESENCE_HOME_OFFICE"
+                )
 
             # Notify wifi status toi RPI relais
             orchestrator_notification_service.notify_wifi_status(
@@ -92,6 +79,19 @@ class OrchestratorPolling:
                 relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
             logger.info(f"Polling wifi done")
+
+        # 5GHz on/off management
+        @resources_status_timeloop.job(
+            interval=timedelta(seconds=self.wifi_counters_polling_period_in_secs)
+        )
+        def poll_wifi_counters_and_perform_inference():
+            logger.info(f"Polling wifi counters")
+
+            # retrieve wifi status
+            wifi_5GHz_on_off_manager_service.perform_prediction()
+
+            logger.info(f"Polling wifi counters done")
+
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(

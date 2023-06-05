@@ -53,9 +53,6 @@ class WifiBandsManager:
             self.telnet_timeout_in_secs = app.config["TELNET_TIMOUT_IN_SECS"]
             self.mqtt_wifi_status_relays_topic = app.config["MQTT_WIFI_STATUS_RELAYS_TOPIC"]
             self.load_telnet_commands(app.config["LIVEBOX_TELNET_COMMANDS"])
-            self.last_counter_txbytes = None
-            self.last_counter_rxbytes = None
-            self.last_counter_datetime = None
 
     def create_telnet_connection(self) -> Telnet:
         """Create wifi telnet interface object for telnet commands"""
@@ -78,7 +75,7 @@ class WifiBandsManager:
             except yaml.YAMLError as exc:
                 raise ServerBoxException(ErrorCode.TELNET_COMMANDS_FILE_ERROR)
 
-    def execute_telnet_commands(self, dictionary_keys: Iterable[str]):
+    def execute_telnet_commands(self, dictionary_keys: Iterable[str], station_mac: str=None):
         """
         Create a telnet connection and execute a command or a group of commands
         in telnet host
@@ -102,6 +99,9 @@ class WifiBandsManager:
         telnet = self.create_telnet_connection()
 
         if isinstance(commands, str):
+            # replace station mac if needed
+            if station_mac and "STATION" in commands:
+                commands = commands.replace("STATION", station_mac)
             # Execute telnet comand
             output = telnet.send_command(commands)
 
@@ -278,79 +278,44 @@ class WifiBandsManager:
                 connected_stations.append(station)
         return connected_stations
 
+    def get_connected_stations_by_band_mac_list(self):
+        """Retrive the list of mac addresses of the stations connected for each frequency band"""
+        # Get connected stations
+        connected_stations_2_4GHz = self.get_stations_connected_to_band(band="2.4GHz")
+        connected_stations_5GHz = self.get_stations_connected_to_band(band="5GHz")
+        total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
+        return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
+
+    def get_stations_connected_to_band(self, band: str):
+        """Returns the MAC list of stations connected to the band WiFi"""
+        # Input check
+        if band not in ["2.4GHz", "5GHz"]:
+            return []
+
+        _stations = self.execute_telnet_commands(["WIFI", "bands", band, "stations"])
+        if len(_stations) == 0:
+            return []
+        connected_stations_raw = _stations.split("\r\n")
+        connected_stations = []
+        for _station in connected_stations_raw:
+            connected_stations.append(_station.split("assoclist ")[1])
+        return connected_stations
+
+
     def update_wifi_status_attribute(self) -> WifiStatus:
         """Retrieve wifi status and update wifi_status attribute"""
 
         status = wifi_bands_manager_service.get_wifi_status()
-        only_2_4GHz = True
-        counters_txbyte_2GHz = None
-        counters_rxbyte_2GHz = None
         bands_status = []
 
         for band in BANDS:
             band_status = WifiBandStatus(
                 band=band, status=wifi_bands_manager_service.get_band_status(band=band)
             )
-            if band != "2.4GHz" and band_status.status:
-                only_2_4GHz = False
             bands_status.append(band_status)
 
         self.wifi_status = WifiStatus(status=status, bands_status=bands_status)
-
-        if only_2_4GHz:
-            counters_txbyte_2GHz, counters_rxbyte_2GHz = self.get_2GHz_tx_rx_counters()
-        return self.wifi_status, counters_txbyte_2GHz, counters_rxbyte_2GHz
-
-    def get_2GHz_tx_rx_counters(self):
-        """Retrieve 2.4GHz tx and rx counters"""
-
-        try:
-            # Get tx and rx values
-            commands_response = self.execute_telnet_commands(["WIFI", "counters", "2.4GHz"])
-            new_txbyte = int(commands_response.split("txbyte")[1].split(" ")[1])
-            new_rxbyte = int(commands_response.split("rxbyte")[1].split(" ")[1])
-
-            # If its the first time
-            new_counter_datetime = datetime.now()
-            if self.last_counter_datetime is None:
-                logger.info("First datarate sample setted")
-                self.last_counter_datetime = new_counter_datetime
-                self.last_counter_txbytes = new_txbyte
-                self.last_counter_rxbytes = new_rxbyte
-                return None, None
-
-            # Calculate deltatime with last sample
-            _delta = new_counter_datetime - self.last_counter_datetime
-            delta_time_in_secs = _delta.seconds + (_delta.microseconds / 1000000.0)
-
-            # If delta is too old
-            if delta_time_in_secs > 40:
-                logger.info("Last datarate is too old")
-                self.last_counter_datetime = new_counter_datetime
-                self.last_counter_txbytes = new_txbyte
-                self.last_counter_rxbytes = new_rxbyte
-                return None, None
-
-            # Calculate Tx and Rx rate
-            txbytes = new_txbyte - self.last_counter_txbytes
-            rxbytes = new_rxbyte - self.last_counter_rxbytes
-            tx_rate = txbytes / delta_time_in_secs
-            rx_rate = rxbytes / delta_time_in_secs
-            logger.info(
-                f"new_txbyte: {new_txbyte}  last_counter_txbytes: {self.last_counter_txbytes}"
-            )
-            logger.info(
-                f"new_rxbyte: {new_rxbyte}  last_counter_rxbytes: {self.last_counter_rxbytes}"
-            )
-            logger.info(f" for 2.4GHz band   txrate :{tx_rate} b/s rxbyte{rx_rate} b/s")
-            self.last_counter_datetime = new_counter_datetime
-            self.last_counter_txbytes = new_txbyte
-            self.last_counter_rxbytes = new_rxbyte
-            return tx_rate, rx_rate
-
-        except Exception:
-            logger.error("Error in counters command execution")
-            return None, None
+        return self.wifi_status
 
     def get_current_wifi_status(self) -> WifiStatus:
         """Retrieve current wifi² status"""
