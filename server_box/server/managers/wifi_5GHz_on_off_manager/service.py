@@ -22,6 +22,7 @@ class Wifi5GHzOnOffManager:
     predictions_list_max_size: int
     rtt_th_for_5GHz_on: float
     rtt_th_for_5GHz_off: float
+    service_active: bool
 
     def __init__(self, app: Flask = None) -> None:
         if app is not None:
@@ -48,6 +49,7 @@ class Wifi5GHzOnOffManager:
             self.predictions_list_max_size = app.config["RTT_PREDICTIONS_LIST_MAX_SIZE"]
             self.rtt_th_for_5GHz_on=app.config["PREDICTED_RTT_TH_5GHZ_ON"]
             self.rtt_th_for_5GHz_off=app.config["PREDICTED_RTT_TH_5GHZ_OFF"]
+            self.service_active=app.config["ON_OFF_5GHZ_SERVICE_ACTIVE"]
 
 
     def perform_prediction(self):
@@ -55,6 +57,9 @@ class Wifi5GHzOnOffManager:
         # predicted_rtt = self.predictor.predict_rtt(tx_Mbps_2g=1, rx_Mbps_2g=1, tx_Mbps=0.004, rx_Mbps=0.003)
         # return
 
+        if not self.service_active:
+            logger.info(f"5GHz ON/OFF service is inactive")
+            return
 
         # Update 5GHz band status
         self.wifi_5GHz_band_status=wifi_bands_manager_service.get_band_status(band="5GHz")
@@ -153,8 +158,6 @@ class Wifi5GHzOnOffManager:
                 wifi_bands_manager_service.set_band_status(band="5GHz", status=False)
                 logger.info(f"5GHz BAND OFF")
                 self.clear_predictions_counter()
-
-
 
     def add_prediction_to_station_rtt_list(self, station:str, predicted_rtt: float, prediction_timestamp: datetime):
         """Add predicted rtt to station rtt list"""
@@ -398,6 +401,14 @@ class Wifi5GHzOnOffManager:
     def clear_predictions_counter(self):
         """Clear rtt prediction for all stations"""
         self.rtt_predictions = {}
+
+    def set_service_status(self, status:bool):
+        """Set service status active/inactive"""
+        self.service_active=status
+
+    def get_service_status(self):
+        """Get service status"""
+        return self.service_active
 
 
 wifi_5GHz_on_off_manager_service: Wifi5GHzOnOffManager = Wifi5GHzOnOffManager()

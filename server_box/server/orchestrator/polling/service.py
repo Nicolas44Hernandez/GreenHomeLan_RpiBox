@@ -85,12 +85,10 @@ class OrchestratorPolling:
             interval=timedelta(seconds=self.wifi_counters_polling_period_in_secs)
         )
         def poll_wifi_counters_and_perform_inference():
-            logger.info(f"Polling wifi counters")
-
-            # retrieve wifi status
+            # Launch RTT prediction
+            logger.info(f"Launch 5GHz prediction")
             wifi_5GHz_on_off_manager_service.perform_prediction()
-
-            logger.info(f"Polling wifi counters done")
+            logger.info(f"5GHz prediction done")
 
 
         # Start ressources polling and live objects notification
