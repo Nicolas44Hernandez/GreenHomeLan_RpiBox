@@ -87,7 +87,7 @@ class OrchestratorNotification:
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # MOCK for test
-        # connected_to_internet = True
+        connected_to_internet = True
         if connected_to_internet:
             # Get wifi status from bands status
             wifi_status = False
@@ -270,7 +270,6 @@ class OrchestratorNotification:
             data_to_send = {"al": {alarm_type: 1}}
             data = json.dumps(data_to_send).replace(" ", "")
             alimelo_manager_service.send_data_to_live_objects(data)
-
 
 orchestrator_notification_service: OrchestratorNotification = OrchestratorNotification()
 """ OrchestratorNotification service singleton"""

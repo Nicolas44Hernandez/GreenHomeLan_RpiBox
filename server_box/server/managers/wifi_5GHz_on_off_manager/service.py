@@ -1,6 +1,8 @@
 """Wifi 5GHz band on/off managment package"""
 
 import logging
+import requests
+from requests.exceptions import ConnectionError, InvalidURL
 from flask import Flask
 from datetime import datetime
 from statistics import mean
@@ -23,6 +25,12 @@ class Wifi5GHzOnOffManager:
     rtt_th_for_5GHz_on: float
     rtt_th_for_5GHz_off: float
     service_active: bool
+    rtt_predictions_cloud_ip: str
+    rtt_predictions_cloud_port: int
+    rtt_predictions_cloud_path: str
+    rtt_predictions_service_status_cloud_path: str
+    st1_for_cloud_notification_mac: str
+    st2_for_cloud_notification_mac: str
 
     def __init__(self, app: Flask = None) -> None:
         if app is not None:
@@ -50,16 +58,30 @@ class Wifi5GHzOnOffManager:
             self.rtt_th_for_5GHz_on=app.config["PREDICTED_RTT_TH_5GHZ_ON"]
             self.rtt_th_for_5GHz_off=app.config["PREDICTED_RTT_TH_5GHZ_OFF"]
             self.service_active=app.config["ON_OFF_5GHZ_SERVICE_ACTIVE"]
+            self.rtt_predictions_cloud_ip=app.config["RTT_PREDICTIONS_CLOUD_IP"]
+            self.rtt_predictions_cloud_port=app.config["RTT_PREDICTIONS_CLOUD_PORT"]
+            self.rtt_predictions_cloud_path=app.config["RTT_PREDICTIONS_CLOUD_PATH"]
+            self.rtt_predictions_service_status_cloud_path=app.config["RTT_PREDICTIONS_SERVICE_STATUS_PATH"]
+            self.st1_for_cloud_notification_mac=app.config["ST1_IN_CLOUD_MAC"]
+            self.st2_for_cloud_notification_mac=app.config["ST2_IN_CLOUD_MAC"]
 
 
     def perform_prediction(self):
         """Get bands and stations counters and perform RTT predictions"""
+
+        # FOR TESTING
         # predicted_rtt = self.predictor.predict_rtt(tx_Mbps_2g=1, rx_Mbps_2g=1, tx_Mbps=0.004, rx_Mbps=0.003)
         # return
+
+        # Notify service status
+        self.notify_service_status_to_cloud_server()
 
         if not self.service_active:
             logger.info(f"5GHz ON/OFF service is inactive")
             return
+
+        # Flag for prediction
+        perform_prediction = True
 
         # Update 5GHz band status
         self.wifi_5GHz_band_status=wifi_bands_manager_service.get_band_status(band="5GHz")
@@ -77,18 +99,25 @@ class Wifi5GHzOnOffManager:
         total_tx_throughput_Mbps = bands_counters_sample.tx_rate_2GHz_Mbps + bands_counters_sample.tx_rate_5GHz_Mbps
         total_rx_throughput_Mbps = bands_counters_sample.rx_rate_2GHz_Mbps + bands_counters_sample.rx_rate_5GHz_Mbps
         total_throughput =  total_tx_throughput_Mbps + total_rx_throughput_Mbps
+        total_2GHz_throughput=bands_counters_sample.tx_rate_2GHz_Mbps + bands_counters_sample.rx_rate_2GHz_Mbps
+        total_5GHz_throughput=bands_counters_sample.tx_rate_5GHz_Mbps + bands_counters_sample.rx_rate_5GHz_Mbps
         low_rtt = False
 
         if total_throughput < 0.02:
             if not self.wifi_5GHz_band_status:
                 logger.info("Prediction not performed, total throughput is too low")
-                return
+                perform_prediction = False
             else:
                 low_rtt=True
 
-        if total_throughput > 20:
+        if total_throughput > 40:
+            perform_prediction = False
             logger.info("Prediction not performed, total throughput is too high")
-            return
+
+        # To notify cloud
+        iteration_predictions = {}
+        for station in connected_stations_counters_sample:
+            iteration_predictions[station]=10
 
         # Perform predictions
         for station in connected_stations_counters_sample:
@@ -96,16 +125,17 @@ class Wifi5GHzOnOffManager:
                 prediction_timestamp = datetime.now()
 
                 # For low troughtputs assume low RTT
-                if low_rtt:
-                    predicted_rtt = 5
+                if low_rtt or not perform_prediction:
+                    predicted_rtt = 10
                 else:
                     predicted_rtt = self.predictor.predict_rtt(
-                        tx_Mbps_2g=bands_counters_sample.tx_rate_2GHz_Mbps + bands_counters_sample.tx_rate_5GHz_Mbps,
-                        rx_Mbps_2g=bands_counters_sample.rx_rate_2GHz_Mbps + bands_counters_sample.rx_rate_5GHz_Mbps,
+                        tx_Mbps_2g=total_tx_throughput_Mbps,
+                        rx_Mbps_2g=total_rx_throughput_Mbps,
                         tx_Mbps=connected_stations_counters_sample[station].tx_rate_Mbps,
                         rx_Mbps=connected_stations_counters_sample[station].rx_rate_Mbps,
                     )
 
+                iteration_predictions[station]=predicted_rtt
                 #logger.info(f"For station {station} instant predicted_RTT={predicted_rtt}")
 
                 # Add prediction to sation RTT list
@@ -122,6 +152,14 @@ class Wifi5GHzOnOffManager:
             except Exception as e:
                 logger.error("Error in prediction")
 
+        self.notify_rtt_prediction_to_cloud_server(
+            livebox_traffic=total_throughput,
+            band_5GHz_traffic=total_5GHz_throughput,
+            band_2GHz_traffic=total_2GHz_throughput,
+            stations_counters=connected_stations_counters_sample,
+            rtt_predictions=iteration_predictions
+        )
+
     def evaluate_5GHz_band_on_off(self):
         """Evaluate if its necessary to turn on/off  5GHz band"""
 
@@ -135,8 +173,9 @@ class Wifi5GHzOnOffManager:
                     # If average rtt for at least one station is higher than threshold turn on 5GHz band
                     if average_rtt >= self.rtt_th_for_5GHz_on:
                         logger.info(f"5GHz BAND ON trigger_station:{station}  average_predicted_rtt:{average_rtt}")
-                        self.clear_predictions_counter()
+                        #self.clear_predictions_counter()
                         wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
+                        self.wifi_5GHz_band_status=True
                         return
 
         # Evaluate if the 5GHz band should be turned off
@@ -156,8 +195,9 @@ class Wifi5GHzOnOffManager:
             # If average rtt for at all the station is lower than threshold turn off 5GHz band
             if turn_off_band:
                 wifi_bands_manager_service.set_band_status(band="5GHz", status=False)
+                self.wifi_5GHz_band_status=False
                 logger.info(f"5GHz BAND OFF")
-                self.clear_predictions_counter()
+                #self.clear_predictions_counter()
 
     def add_prediction_to_station_rtt_list(self, station:str, predicted_rtt: float, prediction_timestamp: datetime):
         """Add predicted rtt to station rtt list"""
@@ -410,6 +450,99 @@ class Wifi5GHzOnOffManager:
         """Get service status"""
         return self.service_active
 
+    def notify_rtt_prediction_to_cloud_server(
+            self,
+            livebox_traffic: float,
+            band_5GHz_traffic: float,
+            band_2GHz_traffic: float,
+            stations_counters: dict,
+            rtt_predictions: dict
+        ):
+        """Notify rtt predictions to cloud"""
+        logger.info(f"Posting HTTP to notify rtt predictions to RPI cloud")
+
+        # Get st1 and st2 traffic
+        st1_traffic = 0
+        st2_traffic = 0
+        if self.st1_for_cloud_notification_mac in stations_counters:
+            st1_traffic=stations_counters[self.st1_for_cloud_notification_mac].rx_rate_Mbps + stations_counters[self.st1_for_cloud_notification_mac].tx_rate_Mbps
+        if self.st2_for_cloud_notification_mac in stations_counters:
+            st2_traffic=stations_counters[self.st2_for_cloud_notification_mac].rx_rate_Mbps + stations_counters[self.st2_for_cloud_notification_mac].tx_rate_Mbps
+
+        # Get st1 and st2 rtt predicted
+        st1_rtt = None
+        st2_rtt = None
+        if self.st1_for_cloud_notification_mac in rtt_predictions:
+            st1_rtt=rtt_predictions[self.st1_for_cloud_notification_mac]
+        if self.st2_for_cloud_notification_mac in rtt_predictions:
+            st2_rtt=rtt_predictions[self.st2_for_cloud_notification_mac]
+
+
+        # Get band status
+        band_status = 1 if self.wifi_5GHz_band_status else 0
+
+        # Get mean rtt for st1 and st2
+        st1_mean_rtt = None
+        st2_mean_rtt = None
+        if self.st1_for_cloud_notification_mac in self.rtt_predictions:
+            if len(self.rtt_predictions[self.st1_for_cloud_notification_mac]["rtt_predictions"]) == self.predictions_list_max_size:
+                st1_mean_rtt = mean(self.rtt_predictions[self.st1_for_cloud_notification_mac]["rtt_predictions"])
+        if self.st2_for_cloud_notification_mac in self.rtt_predictions:
+            if len(self.rtt_predictions[self.st2_for_cloud_notification_mac]["rtt_predictions"]) == self.predictions_list_max_size:
+                st2_mean_rtt = mean(self.rtt_predictions[self.st2_for_cloud_notification_mac]["rtt_predictions"])
+
+        # Prepare data to send
+        data_to_send = {
+            "livebox_traffic": livebox_traffic,
+            "traffic_5GHz": band_5GHz_traffic,
+            "traffic_2GHz": band_2GHz_traffic,
+            "livebox_traffic": livebox_traffic,
+            "st1_traffic": st1_traffic,
+            "st2_traffic": st2_traffic,
+            "st1_rtt": st1_rtt,
+            "st2_rtt": st2_rtt,
+            "st1_mean_rtt": st1_mean_rtt,
+            "st2_mean_rtt": st2_mean_rtt,
+            "band_5ghz_status": band_status,
+        }
+        # Post rtt predictions to rpi cloud
+        post_url = (
+                f"http://{self.rtt_predictions_cloud_ip}:{self.rtt_predictions_cloud_port}/{self.rtt_predictions_cloud_path}"
+            )
+        try:
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+            rpi_cloud_response = requests.post(
+                post_url, data=(data_to_send), headers=headers
+            )
+        except (ConnectionError, InvalidURL):
+            logger.error(
+                f"Error when posting rtt notification to rpi cloud, check if rpi cloud"
+                f" server is running"
+            )
+
+
+    def notify_service_status_to_cloud_server(self):
+        """Notify automatic 5GHz ON/OFF service status"""
+
+        logger.info(f"notify service status {self.service_active} to cloud service ")
+        # Prepare data to send
+        data_to_send = {"status": self.service_active}
+        # Post rtt predictions to rpi cloud
+        post_url = (
+                f"http://{self.rtt_predictions_cloud_ip}:{self.rtt_predictions_cloud_port}/{self.rtt_predictions_service_status_cloud_path}"
+            )
+        try:
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+            rpi_cloud_response = requests.post(
+                post_url, data=(data_to_send), headers=headers
+            )
+        except (ConnectionError, InvalidURL):
+            logger.error(
+                f"Error when posting rtt notification to rpi cloud, check if rpi cloud"
+                f" server is running"
+            )
 
 wifi_5GHz_on_off_manager_service: Wifi5GHzOnOffManager = Wifi5GHzOnOffManager()
 """ Wifi 5GHz on/off manager service singleton"""
