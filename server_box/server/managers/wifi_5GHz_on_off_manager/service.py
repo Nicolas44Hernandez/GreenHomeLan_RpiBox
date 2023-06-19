@@ -123,10 +123,15 @@ class Wifi5GHzOnOffManager:
         for station in connected_stations_counters_sample:
             try:
                 prediction_timestamp = datetime.now()
-
+                station_total_traffic = connected_stations_counters_sample[station].rx_rate_Mbps + connected_stations_counters_sample[station].tx_rate_Mbps
                 # For low troughtputs assume low RTT
                 if low_rtt or not perform_prediction:
                     predicted_rtt = 10
+
+                # if not low throughput in box but low traffic in station assume low RTT
+                elif station_total_traffic < 0.02:
+                    predicted_rtt = 10
+
                 else:
                     predicted_rtt = self.predictor.predict_rtt(
                         tx_Mbps_2g=total_tx_throughput_Mbps,
