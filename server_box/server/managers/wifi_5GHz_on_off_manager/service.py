@@ -21,9 +21,9 @@ class Wifi5GHzOnOffManager:
     last_sample_timestamp: datetime
     last_stations_samples: dict
     predictor: RttPredictor
-    predictions_list_max_size: int
+    instant_rtt_predictions_list_max_size: int
+    avg_rtt_predictions_list_max_size: int
     rtt_th_for_5GHz_on: float
-    rtt_th_for_5GHz_off: float
     service_active: bool
     rtt_predictions_cloud_ip: str
     rtt_predictions_cloud_port: int
@@ -54,9 +54,9 @@ class Wifi5GHzOnOffManager:
                 scaler_path=app.config["RTT_PREDICTOR_SCALER"],
                 min_predicted_rtt=app.config["MIN_PREDICTED_RTT_IN_MS"],
             )
-            self.predictions_list_max_size = app.config["RTT_PREDICTIONS_LIST_MAX_SIZE"]
+            self.instant_rtt_predictions_list_max_size = app.config["RTT_INSTANT_PREDICTIONS_LIST_MAX_SIZE"]
+            self.avg_rtt_predictions_list_max_size = app.config["RTT_AVG_PREDICTIONS_LIST_MAX_SIZE"]
             self.rtt_th_for_5GHz_on=app.config["PREDICTED_RTT_TH_5GHZ_ON"]
-            self.rtt_th_for_5GHz_off=app.config["PREDICTED_RTT_TH_5GHZ_OFF"]
             self.service_active=app.config["ON_OFF_5GHZ_SERVICE_ACTIVE"]
             self.rtt_predictions_cloud_ip=app.config["RTT_PREDICTIONS_CLOUD_IP"]
             self.rtt_predictions_cloud_port=app.config["RTT_PREDICTIONS_CLOUD_PORT"]
@@ -68,10 +68,6 @@ class Wifi5GHzOnOffManager:
 
     def perform_prediction(self):
         """Get bands and stations counters and perform RTT predictions"""
-
-        # FOR TESTING
-        # predicted_rtt = self.predictor.predict_rtt(tx_Mbps_2g=1, rx_Mbps_2g=1, tx_Mbps=0.004, rx_Mbps=0.003)
-        # return
 
         # Notify service status
         self.notify_service_status_to_cloud_server()
@@ -143,7 +139,7 @@ class Wifi5GHzOnOffManager:
                 iteration_predictions[station]=predicted_rtt
                 #logger.info(f"For station {station} instant predicted_RTT={predicted_rtt}")
 
-                # Add prediction to sation RTT list
+                # Add prediction to station RTT list
                 self.add_prediction_to_station_rtt_list(
                     station=station,
                     predicted_rtt=predicted_rtt,
@@ -168,41 +164,27 @@ class Wifi5GHzOnOffManager:
     def evaluate_5GHz_band_on_off(self):
         """Evaluate if its necessary to turn on/off  5GHz band"""
 
-        # Evaluate if the 5GHz band should be turned on
-        if not self.wifi_5GHz_band_status:
-            for station in self.rtt_predictions:
-                if len(self.rtt_predictions[station]["rtt_predictions"]) == self.predictions_list_max_size:
-                    # Compute average RTT for station
-                    average_rtt = mean(self.rtt_predictions[station]["rtt_predictions"])
+        new_band_status = None
+        for station in self.rtt_predictions:
+            #If the avg rtt predictions list for station is full
+            if len(self.rtt_predictions[station]["avg_rtt_predictions"]) == self.avg_rtt_predictions_list_max_size:
+                # Get max value
+                max_rtt = max(self.rtt_predictions[station]["avg_rtt_predictions"])
 
-                    # If average rtt for at least one station is higher than threshold turn on 5GHz band
-                    if average_rtt >= self.rtt_th_for_5GHz_on:
-                        logger.info(f"5GHz BAND ON trigger_station:{station}  average_predicted_rtt:{average_rtt}")
-                        #self.clear_predictions_counter()
-                        wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
-                        self.wifi_5GHz_band_status=True
-                        return
+                # If max average rtt for at least one station is higher than threshold turn on 5GHz band
+                if max_rtt >= self.rtt_th_for_5GHz_on:
+                    new_band_status=True
+                    break
+                else:
+                    new_band_status=False
 
-        # Evaluate if the 5GHz band should be turned off
-        else:
-            turn_off_band = False
-            for station in self.rtt_predictions:
-                if len(self.rtt_predictions[station]["rtt_predictions"]) == self.predictions_list_max_size:
-                    # Compute average RTT for station
-                    average_rtt = mean(self.rtt_predictions[station]["rtt_predictions"])
+        if new_band_status is not None:
+            if self.wifi_5GHz_band_status != new_band_status:
+                status = "ON" if new_band_status else "OFF"
+                logger.info(f"Setting 5GHz BAND {status}")
+                wifi_bands_manager_service.set_band_status(band="5GHz", status=new_band_status)
+                self.wifi_5GHz_band_status=new_band_status
 
-                    # If average rtt for at least one station is higher than threshold keep 5GHz band on
-                    if average_rtt > self.rtt_th_for_5GHz_off:
-                        return
-                    else:
-                        turn_off_band=True
-
-            # If average rtt for at all the station is lower than threshold turn off 5GHz band
-            if turn_off_band:
-                wifi_bands_manager_service.set_band_status(band="5GHz", status=False)
-                self.wifi_5GHz_band_status=False
-                logger.info(f"5GHz BAND OFF")
-                #self.clear_predictions_counter()
 
     def add_prediction_to_station_rtt_list(self, station:str, predicted_rtt: float, prediction_timestamp: datetime):
         """Add predicted rtt to station rtt list"""
@@ -210,7 +192,6 @@ class Wifi5GHzOnOffManager:
         stations_to_delete = []
         for candidate_station in self.rtt_predictions:
             # if sample timestamp is too old clear from dictionary
-            nb_of_predictions = len(self.rtt_predictions[candidate_station]["rtt_predictions"])
             _delta = datetime.now() - self.rtt_predictions[candidate_station]["last_prediction_timestamp"]
             delta_time_in_secs = _delta.seconds + (_delta.microseconds / 1000000.0)
             if delta_time_in_secs > 30:
@@ -224,7 +205,8 @@ class Wifi5GHzOnOffManager:
         # Add station to dictionary if not present
         if station not in self.rtt_predictions:
             _dict_entry = {
-                "rtt_predictions": [predicted_rtt],
+                "instant_rtt_predictions": [predicted_rtt],
+                "avg_rtt_predictions": [],
                 "last_prediction_timestamp": prediction_timestamp
             }
             self.rtt_predictions[station] = _dict_entry
@@ -235,15 +217,25 @@ class Wifi5GHzOnOffManager:
             _delta_time_in_secs = _delta.seconds + (_delta.microseconds / 1000000.0)
 
             if _delta_time_in_secs > 40:
-                self.rtt_predictions[station]["rtt_predictions"] = []
+                self.rtt_predictions[station]["instant_rtt_predictions"] = []
 
-            # If rtt predictions list is max len pop oldest prediction
-            if len(self.rtt_predictions[station]["rtt_predictions"]) == self.predictions_list_max_size:
-                self.rtt_predictions[station]["rtt_predictions"].pop(0)
+            # If instant rtt predictions list is max len pop oldest prediction
+            if len(self.rtt_predictions[station]["instant_rtt_predictions"]) == self.instant_rtt_predictions_list_max_size:
+                self.rtt_predictions[station]["instant_rtt_predictions"].pop(0)
 
             # Add prediction to list
-            self.rtt_predictions[station]["rtt_predictions"].append(predicted_rtt)
+            self.rtt_predictions[station]["instant_rtt_predictions"].append(predicted_rtt)
             self.rtt_predictions[station]["last_prediction_timestamp"] = prediction_timestamp
+
+            # If avg rtt predictions list is max len pop oldest avg prediction
+            if len(self.rtt_predictions[station]["avg_rtt_predictions"]) == self.avg_rtt_predictions_list_max_size:
+                self.rtt_predictions[station]["avg_rtt_predictions"].pop(0)
+
+            # If instant rtt predictions list is max len calculate avg rtt and append to list
+            if len(self.rtt_predictions[station]["instant_rtt_predictions"]) == self.instant_rtt_predictions_list_max_size:
+                avg_rtt = mean(self.rtt_predictions[station]["instant_rtt_predictions"])
+                self.rtt_predictions[station]["avg_rtt_predictions"].append(avg_rtt)
+
 
     def get_sample_connected_stations_counters(self):
         """Take connected stations tx and rx counters samples"""
@@ -490,11 +482,11 @@ class Wifi5GHzOnOffManager:
         st1_mean_rtt = None
         st2_mean_rtt = None
         if self.st1_for_cloud_notification_mac in self.rtt_predictions:
-            if len(self.rtt_predictions[self.st1_for_cloud_notification_mac]["rtt_predictions"]) == self.predictions_list_max_size:
-                st1_mean_rtt = mean(self.rtt_predictions[self.st1_for_cloud_notification_mac]["rtt_predictions"])
+            if len(self.rtt_predictions[self.st1_for_cloud_notification_mac]["instant_rtt_predictions"]) == self.instant_rtt_predictions_list_max_size:
+                st1_mean_rtt = mean(self.rtt_predictions[self.st1_for_cloud_notification_mac]["instant_rtt_predictions"])
         if self.st2_for_cloud_notification_mac in self.rtt_predictions:
-            if len(self.rtt_predictions[self.st2_for_cloud_notification_mac]["rtt_predictions"]) == self.predictions_list_max_size:
-                st2_mean_rtt = mean(self.rtt_predictions[self.st2_for_cloud_notification_mac]["rtt_predictions"])
+            if len(self.rtt_predictions[self.st2_for_cloud_notification_mac]["instant_rtt_predictions"]) == self.instant_rtt_predictions_list_max_size:
+                st2_mean_rtt = mean(self.rtt_predictions[self.st2_for_cloud_notification_mac]["instant_rtt_predictions"])
 
         # Prepare data to send
         data_to_send = {
