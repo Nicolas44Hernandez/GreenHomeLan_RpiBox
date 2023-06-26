@@ -373,10 +373,14 @@ class Wifi5GHzOnOffManager:
         #logger.info(f"txbytes_2GHz:{txbytes_2GHz} rxbytes_2GHz:{rxbytes_2GHz}   txbytes_5GHz:{txbytes_5GHz} rxbytes_5GHz:{rxbytes_5GHz}")
 
         # Compute rx and tx bytes since last sample
-        txbytes_sample_2GHz = txbytes_2GHz - self.last_txbytes_2GHz
-        rxbytes_sample_2GHz = rxbytes_2GHz - self.last_rxbytes_2GHz
-        txbytes_sample_5GHz = txbytes_5GHz - self.last_txbytes_5GHz
-        rxbytes_sample_5GHz = rxbytes_5GHz - self.last_rxbytes_5GHz
+        try:
+            txbytes_sample_2GHz = txbytes_2GHz - self.last_txbytes_2GHz
+            rxbytes_sample_2GHz = rxbytes_2GHz - self.last_rxbytes_2GHz
+            txbytes_sample_5GHz = txbytes_5GHz - self.last_txbytes_5GHz
+            rxbytes_sample_5GHz = rxbytes_5GHz - self.last_rxbytes_5GHz
+        except:
+            logger.error("Error in counters")
+            return None
 
         # Fix for negative (32 bits cyclic counter)
         if txbytes_sample_2GHz < 0:
