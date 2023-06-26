@@ -120,9 +120,20 @@ class Wifi5GHzOnOffManager:
             try:
                 prediction_timestamp = datetime.now()
                 station_total_traffic = connected_stations_counters_sample[station].rx_rate_Mbps + connected_stations_counters_sample[station].tx_rate_Mbps
+
+                high_rate = False
+
+                if station_total_traffic > 40:
+                    perform_prediction = False
+                    high_rate = True
+                    logger.info("Prediction not performed, total throughput is too high")
+
                 # For low troughtputs assume low RTT
                 if low_rtt or not perform_prediction:
                     predicted_rtt = 10
+
+                if high_rate and not perform_prediction:
+                    predicted_rtt = 180
 
                 # if not low throughput in box but low traffic in station assume low RTT
                 elif station_total_traffic < 0.02:

@@ -20,7 +20,7 @@ class RttPredictor:
     def __init__(self, model_path: str, scaler_path: str, min_predicted_rtt: float):
         self.scaler = self.load_scaler(scaler_path=scaler_path)
         self.model = self.load_model(model_path=model_path)
-        self.min_predicted_rtt=min_predicted_rtt
+        self.min_predicted_rtt=[min_predicted_rtt]
 
     def load_scaler(self, scaler_path: str):
         """Load scaler for data transformation"""
