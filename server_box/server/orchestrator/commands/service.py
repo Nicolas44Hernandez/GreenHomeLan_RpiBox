@@ -135,6 +135,7 @@ class OrchestratorCommands:
         """
         #TODO: retreive current relays status and switch
         logger.error("Command not already implemented")
+        return True
 
     def execute_use_situations_commmand(self, command: str):
         """
