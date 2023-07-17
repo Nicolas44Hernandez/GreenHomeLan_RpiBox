@@ -10,6 +10,7 @@ from server.managers.electrical_panel_manager import electrical_panel_manager_se
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.live_objects import live_objects_service
+from server.orchestrator.commands import orchestrator_commands_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 
@@ -20,23 +21,30 @@ class OrchestratorRequests:
     """OrchestratorRequests service"""
 
     # Attributes
-    def init_requests_module(self, mqtt_alarm_notif_topic: str):
+    def init_requests_module(self, mqtt_alarm_notif_topic: str, mqtt_command_topic: str):
         """Initialize the requests callbacks for the orchestrator"""
         logger.info("initializing Orchestrator requests module")
 
-        # Set callback functions
+        # # Set callback functions
         thread_manager_service.set_msg_reception_callback(self.thread_msg_reception_callback)
 
-        alimelo_manager_service.set_live_objects_command_reception_callback(
-            self.live_objects_command_reception_callback
-        )
+        # alimelo_manager_service.set_live_objects_command_reception_callback(
+        #     self.live_objects_command_reception_callback
+        # )
 
-        live_objects_service.set_commands_reception_callback(
-            self.live_objects_command_reception_callback
-        )
+        # live_objects_service.set_commands_reception_callback(
+        #     self.live_objects_command_reception_callback
+        # )
 
-        live_objects_service.set_notifications_reception_callback(
-            self.live_objects_notification_reception_callback
+        # live_objects_service.set_notifications_reception_callback(
+        #     self.live_objects_notification_reception_callback
+        # )
+
+        # Subscribe to command reception MQTT topic
+        logger.info(f"Subscribe to MQTT topic: {mqtt_command_topic}")
+        mqtt_manager_service.subscribe_to_topic(
+            topic=mqtt_command_topic,
+            callback=self.command_reception_callback,
         )
 
         # Subscribe to alarm notification MQTT topic
@@ -75,7 +83,11 @@ class OrchestratorRequests:
                 alarm_type
             )
 
-        # Thread message is a command
+        # If Thread message is buttons a command
+        elif msg.startswith("cmd"):
+            self.command_reception_callback(msg)
+
+        # If Thread message is a direct wifi command
         else:
             try:
                 # Parse received message
@@ -184,6 +196,17 @@ class OrchestratorRequests:
             msg["type"]
         )
 
+    def command_reception_callback(self, msg):
+        """Callback for MQTT command reception"""
+        logger.info(f"Command received: {msg} ")
+        try:
+            command_number = int(msg.split("cmd_")[1])
+            if not orchestrator_commands_service.execute_predefined_command(command_number):
+                logger.error("Error in command format")
+                return
+        except:
+            logger.error("Error in command format")
+        logger.info("Command executed")
 
 orchestrator_requests_service: OrchestratorRequests = OrchestratorRequests()
 """ OrchestratorRequests service singleton"""
