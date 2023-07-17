@@ -106,6 +106,9 @@ class OrchestratorUseSituations:
         """Get available use situation list"""
         return list(self.use_situations_dict.keys())
 
+    def get_use_situation_to_switch(self):
+        """Get the use situation to switch for command"""
+        return self.use_situations_dict[self.current_use_situation]["SWITCH_TO"]
 
 orchestrator_use_situations_service: OrchestratorUseSituations = OrchestratorUseSituations()
 """ OrchestratorUseSituations service singleton"""

@@ -6,6 +6,7 @@ from server.orchestrator.polling import orchestrator_polling_service
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.live_objects import live_objects_service
+from server.orchestrator.commands import orchestrator_commands_service
 
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,13 @@ class Orchestrator:
 
             # Init requests module
             orchestrator_requests_service.init_requests_module(
-                mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"]
+                mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"],
+                mqtt_command_topic=app.config["MQTT_COMMAND_TOPIC"]
+            )
+
+            # Init commands module
+            orchestrator_commands_service.init_commands_module(
+                default_commands=app.config["DEFAULT_ORCHESTRATOR_COMMANDS"]
             )
 
 
