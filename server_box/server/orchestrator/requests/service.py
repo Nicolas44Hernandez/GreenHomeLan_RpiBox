@@ -69,6 +69,8 @@ class OrchestratorRequests:
                 alarm_type = "presence"
             elif _type == "em":
                 alarm_type = "emergency_btn"
+            elif _type == "bat": #al_bt1_bat
+                alarm_type = f"battery_btn_{_device}"
             else:
                 logger.error(f"Error in alarm received format {msg}")
                 return
@@ -86,6 +88,17 @@ class OrchestratorRequests:
         # If Thread message is buttons a command
         elif msg.startswith("cmd"):
             self.command_reception_callback(msg)
+
+        # If Thread message is a buttons battery status command
+        elif msg.startswith("bt"):
+            device_type = "button"
+            device, level = msg.split("_")[1:]
+            logger.info(f"Device {device} battery level received: {level}")
+            orchestrator_notification_service.transfer_device_battery_level_to_cloud_server(
+                device_type=device_type,
+                device=device,
+                batLevel=level
+            )
 
         # If Thread message is a direct wifi command
         else:

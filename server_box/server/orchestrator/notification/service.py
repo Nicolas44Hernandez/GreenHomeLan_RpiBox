@@ -274,5 +274,27 @@ class OrchestratorNotification:
             data = json.dumps(data_to_send).replace(" ", "")
             alimelo_manager_service.send_data_to_live_objects(data)
 
+
+    def transfer_device_battery_level_to_cloud_server(self, device_type:str, device:str, batLevel:str):
+        """Transfer device batery level to cloud server"""
+        data_to_send = {"device": device, "type": device_type, "batLevel": batLevel}
+        # Post alarm to rpi cloud
+        for port in self.server_cloud_ports:
+            post_url = (
+                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_device_path}"
+            )
+            try:
+                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+                rpi_cloud_response = requests.post(
+                    post_url, data=(data_to_send), headers=headers
+                )
+                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
+            except (ConnectionError, InvalidURL):
+                logger.error(
+                    f"Error when posting device battery level  notification to rpi cloud, check if rpi cloud"
+                    f" server is running"
+                )
+
 orchestrator_notification_service: OrchestratorNotification = OrchestratorNotification()
 """ OrchestratorNotification service singleton"""
