@@ -25,6 +25,7 @@ class OrchestratorNotification:
 
     server_cloud_notify_status_path: str
     server_cloud_notify_alarm_path: str
+    server_cloud_notify_device_path: str
     rpi_cloud_ip_addr: str
     server_cloud_ports: Iterable[int]
 
@@ -33,6 +34,7 @@ class OrchestratorNotification:
         rpi_cloud_ip_addr: str,
         server_cloud_notify_status_path: str,
         server_cloud_notify_alarm_path: str,
+        server_cloud_notify_device_path: str,
         server_cloud_ports: Iterable[int],
     ):
         """Initialize the polling service for the orchestrator"""
@@ -41,6 +43,7 @@ class OrchestratorNotification:
         self.rpi_cloud_ip_addr = rpi_cloud_ip_addr
         self.server_cloud_notify_status_path = server_cloud_notify_status_path
         self.server_cloud_notify_alarm_path = server_cloud_notify_alarm_path
+        self.server_cloud_notify_device_path = server_cloud_notify_device_path
         self.server_cloud_ports = server_cloud_ports
 
     def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):
