@@ -35,9 +35,11 @@ class Orchestrator:
             # Init notification module
             orchestrator_notification_service.init_notification_module(
                 rpi_cloud_ip_addr=app.config["RPI_CLOUD_IP"],
-                server_cloud_notify_alarm_path=app.config["RPI_CLOUD_NOTIFY_ALARM_PATH"],
                 server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
+                server_cloud_notify_alarm_path=app.config["RPI_CLOUD_NOTIFY_ALARM_PATH"],
+                server_cloud_notify_device_path=app.config["RPI_CLOUD_DEVICE_PATH"],
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
+
             )
 
             # Init LiveObjects module
