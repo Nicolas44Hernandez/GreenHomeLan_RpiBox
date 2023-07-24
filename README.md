@@ -28,7 +28,7 @@ Connected object composed a doorbell, a camera and a presence sensor. This smart
 ## **rpi_button**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButton)
 Connected object composed a emergency button. This smart emergency button sends an alarm via thread to the orchestrator if someone press the button. This alarm is forwarded to the cloud server.
 
-## **rpi_buttons**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButtons)
+## **rpi_buttons_actions**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButtons_Actions)
 Connected object composed a 2x2 matrix buttons. When a button is pressed, this object sends a message via thread to the orchestrator to request the execution of an specific command (the commands to run can be configured by the user).
 ## rpi_box installation and setup
 You can found the installation and setup in the iner [README.md](server_box/README.md) file
