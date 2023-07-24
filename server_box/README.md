@@ -234,6 +234,7 @@ sudo systemctl restart rpi-box
 
 ## TODO
 - [ ] Update readme file
+- [ ] Relays command management
 
 **Alimelo manager/interface**
 
