@@ -32,16 +32,11 @@ sudo apt install git
 git config --global user.name "Nicolas44Hernandez"
 git config --global user.email n44hernandezp@gmail.com
 ```
-
-## Create and add ssh key to your github account
-
-Complete ssh key setup is explained in the following [link](https://docs.github.com/es/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
-
 ## Clone rpi_box repository
 
 ```bash
 mkdir workspace
-git clone git@github.com:Nicolas44Hernandez/GreenHomeLan_RpiBox.git
+git clone https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiBox.git
 ```
 
 ## Install the dependencies
@@ -233,12 +228,4 @@ sudo systemctl restart rpi-box
 ```
 
 ## TODO
-- [ ] Update readme file
 - [ ] Relays command management
-
-**Alimelo manager/interface**
-
-- [ ] Manage serial com exceptions
-- [X] Send periodically Orchestrator status to Alimelo to be sent to LO
-- [ ] Review notification to cloud to print Alimelo state
-- [X] Callback and traitment for commands received from alimelo (LO)
