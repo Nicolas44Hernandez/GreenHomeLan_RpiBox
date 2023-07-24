@@ -131,9 +131,12 @@ class OrchestratorCommands:
     def execute_electrical_pannel_switch_commmand(self, command: str):
         """
         Execute electrical pannel switch command, returns true if command executed
-        Command format: {R0}{R1}{R2}{R3}{R4}{R5}
+        Command format: {R#}
         """
         #TODO: retreive current relays status and switch
+        relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(int(command))
+        #TODO: is it possible to modify a single relay ?
+        # Maybe take all relays status, switch for relay and post MQTT message
         logger.error("Command not already implemented")
         return True
 
