@@ -25,31 +25,10 @@ This module is not part of the local network, it simulates a cloud web service.
 ## **rpi_camera**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiCamera)
 Connected object composed a doorbell, a camera and a presence sensor. This smart doorbell sends a notification and the live video stream to the cloud server (rpi_cloud) if someone rings the bell or the presence sensor detects something unusual.
 
+## **rpi_button**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButton)
+Connected object composed a emergency button. This smart emergency button sends an alarm via thread to the orchestrator if someone press the button. This alarm is forwarded to the cloud server.
 
-## **Demostration scenario**
-1. The next morning, Pauline leaves her house: no one is home anymore
-The orchestrator triggers the use situation "absence low consumption"=> **Wi-Fi = OFF**
-
-2. Someone rings the doorbell / Someone is detectected by the sensor: the rpi_camera asks for the Wi-Fi reactivation to send a notification and the video to Paulines terminal.
-To achieve this, the rpi_camera sends a Thread message to the rpi_box requesting to turn on the 2.4GHz Wi-Fi band.
-
-3. The rpi_box sends a telnet command to the box to activate the 2.4GHz Wi-Fi band. The livebox activates the 2.4GHz Wi-Fi band
-
-4. The orchestrator (rpi_box) detects the Wi-Fi band activation and requests to turn on the associated lamp to the connected electrical panel (rpi_relays).
-
-5. The rpi_camera connects to the Wi-Fi network and notifies the cloud server that someone has rang at the door.
-
-6. Pauline can see on her terminal the live video stream of her house and she can know who is at the door.
-
-7. At the end of the video transmission, the rpi_camera asks the rpi_box via a Thread message to turn off the Wi-Fi.
-
-8. The rpi_box sends a telnet command to the box to desactivate the 2.4GHz Wi-Fi band. The livebox desactivates the 2.4GHz Wi-Fi band
-
-9. The orchestrator (rpi_box) detects the Wi-Fi band desactivation and requests to turn off the associated lamp to the connected electrical panel (rpi_relays).
-
-10. Pauline is back home.
-The orchestrator triggers the use situation "presence low consumption"=> **Wi-Fi = ON**
-
-
+## **rpi_buttons**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButtons)
+Connected object composed a 2x2 matrix buttons. When a button is pressed, this object sends a message via thread to the orchestrator to request the execution of an specific command (the commands to run can be configured by the user).
 ## rpi_box installation and setup
 You can found the installation and setup in the iner [README.md](server_box/README.md) file
