@@ -25,10 +25,10 @@ This module is not part of the local network, it simulates a cloud web service.
 ## **rpi_camera**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiCamera)
 Connected object composed a doorbell, a camera and a presence sensor. This smart doorbell sends a notification and the live video stream to the cloud server (rpi_cloud) if someone rings the bell or the presence sensor detects something unusual.
 
-## **rpi_button**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButton)
+## [**rpi_button**](https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButton)
 Connected object composed a emergency button. This smart emergency button sends an alarm via thread to the orchestrator if someone press the button. This alarm is forwarded to the cloud server.
 
-## **rpi_buttons_actions**(https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButtons_Actions)
+## [**rpi_buttons_actions**](https://github.com/Nicolas44Hernandez/GreenHomeLan_RpiButtons_Actions)
 Connected object composed a 2x2 matrix buttons. When a button is pressed, this object sends a message via thread to the orchestrator to request the execution of an specific command (the commands to run can be configured by the user).
 ## rpi_box installation and setup
 You can found the installation and setup in the iner [README.md](server_box/README.md) file
