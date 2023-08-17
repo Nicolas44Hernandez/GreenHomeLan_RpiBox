@@ -45,6 +45,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  orchestrator_commands:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/orchestrator/orchestrator_commands.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   orchestrator_requests:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -171,6 +178,11 @@ loggers:
     propagate: no
 
   server.orchestrator.notification:
+    level: INFO
+    handlers: [console]
+    propagate: no
+
+  server.orchestrator.commands:
     level: INFO
     handlers: [console]
     propagate: no

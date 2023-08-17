@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable
+import yaml
 from datetime import datetime
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
@@ -8,30 +8,51 @@ from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 logger = logging.getLogger(__name__)
 
+BANDS = ["2.4GHz", "5GHz", "6GHz"]
 
 class OrchestratorCommands:
     """OrchestratorCommands service"""
 
     # Attributes
-    predefined_commands: dict = {}
+    current_commands: dict = {}
+    commands_list: dict = {}
 
-    def init_commands_module(self, default_commands: Iterable[str]):
+    def init_commands_module(self, orchestrator_commands_file: str):
         """Initialize the requests callbacks for the orchestrator"""
         logger.info("initializing Orchestrator commands module")
+        self.commands_dict = {}
+        self.current_commands = {}
 
-        # Load default commands
-        self.predefined_commands = default_commands
+        # Load commands file
+        with open(orchestrator_commands_file) as stream:
+            try:
+                configuration = yaml.safe_load(stream)
+                for command in configuration["COMMANDS_LIST"]:
+                    self.commands_dict[command["id"]] = {
+                        "name" : command["name"],
+                        "command": command["command"],
+                    }
+
+                # Set predefined commands
+                for idx, command_id in enumerate(configuration["DEFAULT_COMMANDS"]):
+                    command = self.commands_dict[command_id]
+                    self.current_commands[idx] = command
+
+            except (yaml.YAMLError, KeyError):
+                logger.error("Error in orchestrator commands configuration load, check file")
+
+            logger.info(f"current commands: {self.current_commands}")
 
     def execute_predefined_command(self, command_number: int):
         """Execute a predefined command"""
         command_number = command_number -1
-        if command_number not in range(0,len(self.predefined_commands)):
+        if command_number not in self.current_commands:
             logger.error("Error in predefined command execution")
             logger.error(f"Command {command_number} is not defined")
             return False
 
         # Retrieve command to execute
-        command = self.predefined_commands[command_number]
+        command = self.current_commands[command_number]["command"]
         logger.info(f"Executing command: {command}")
 
         # Execute command
@@ -50,11 +71,14 @@ class OrchestratorCommands:
             return self.execute_wifi_commmand(command)
         if ressource == "wifisw":
             return self.execute_wifi_switch_status_commmand()
+        if ressource == "wifiswb":
+            return self.execute_wifi_switch_band_status_commmand(command)
         if ressource == "ep":
             return self.execute_electrical_pannel_commmand(command)
         if ressource == "epsw":
             return self.execute_electrical_pannel_switch_commmand(command)
         if ressource == "us":
+            command = command.replace("-", "_")
             return self.execute_use_situations_commmand(command)
         if ressource == "prs":
             return self.execute_presence_commmand()
@@ -90,6 +114,25 @@ class OrchestratorCommands:
         current_wifi_status = wifi_bands_manager_service.get_current_wifi_status()
         try:
             wifi_bands_manager_service.set_wifi_status(not current_wifi_status.status)
+            return True
+        except:
+            logger.error("Error in wifi status command execution")
+            return False
+
+    def execute_wifi_switch_band_status_commmand(self, band: str):
+        """
+        Execute wifi switch band status command, returns true if command executed
+        If band current status is ON set OFF
+        If band current status is OFF set ON
+        """
+        # Check band exists
+        if band not in BANDS:
+            logger.error(f"Error, the band {band} doesnt exist")
+            return False
+        current_wifi_band_status = wifi_bands_manager_service.get_band_status(band)
+
+        try:
+            wifi_bands_manager_service.set_band_status(band=band, status=not current_wifi_band_status)
             return True
         except:
             logger.error("Error in wifi status command execution")

@@ -66,7 +66,7 @@ class Orchestrator:
 
             # Init commands module
             orchestrator_commands_service.init_commands_module(
-                default_commands=app.config["DEFAULT_ORCHESTRATOR_COMMANDS"]
+                orchestrator_commands_file=app.config["ORCHESTRATOR_COMMANDS"]
             )
 
 
