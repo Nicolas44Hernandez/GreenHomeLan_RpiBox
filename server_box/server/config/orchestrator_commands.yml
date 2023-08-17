@@ -1,0 +1,53 @@
+COMMANDS_LIST:
+  - id: 0
+    name: wifi status switch
+    command: wifisw_0
+  - id: 1
+    name: wifi 2.4GHz switch
+    command: wifiswb_2.4GHz
+  - id: 2
+    name: wifi 5GHz switch
+    command: wifiswb_5GHz
+  - id: 3
+    name: wifi 6GHz switch
+    command: wifiswb_6GHz
+  - id: 4
+    name: electrical pannel switch TODO_test
+    command: epsw_0
+  - id: 5
+    name: electrical pannel all on TODO_test
+    command: ep_111111
+  - id: 6
+    name: electrical pannel all off TODO_test
+    command: ep_000000
+  - id: 7
+    name: electrical pannel outlet 1 switch TODO_test
+    command: TODO_command
+  - id: 8
+    name: electrical pannel outlet 1 switch TODO_test
+    command: TODO_command
+  - id: 9
+    name: electrical pannel outlet 1 switch TODO_test
+    command: TODO_command
+  - id: 10
+    name: use situation PRESENCE_DAY_LOW_CONSUMPTION
+    command: us_PRESENCE-DAY-LOW-CONSUMPTION
+  - id: 11
+    name: use situation PRESENCE_HOME_OFFICE
+    command: us_PRESENCE-HOME-OFFICE
+  - id: 12
+    name: use situation PRESENCE_NIGHT_LOW_CONSUMPTION
+    command: us_PRESENCE-NIGHT-LOW-CONSUMPTION
+  - id: 13
+    name: use situation ABSENCE_LOW_CONSUMPTION
+    command: us_ABSENCE-LOW-CONSUMPTION
+  - id: 14
+    name: presence switch
+    command: prs_0
+
+
+DEFAULT_COMMANDS:
+  - 14
+  - 11
+  - 12
+  - 13
