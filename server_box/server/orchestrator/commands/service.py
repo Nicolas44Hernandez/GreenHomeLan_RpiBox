@@ -1,4 +1,5 @@
 import logging
+from typing import Iterable
 import yaml
 from datetime import datetime
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
@@ -15,7 +16,7 @@ class OrchestratorCommands:
 
     # Attributes
     current_commands: dict = {}
-    commands_list: dict = {}
+    commands_dict: dict = {}
 
     def init_commands_module(self, orchestrator_commands_file: str):
         """Initialize the requests callbacks for the orchestrator"""
@@ -36,12 +37,14 @@ class OrchestratorCommands:
                 # Set predefined commands
                 for idx, command_id in enumerate(configuration["DEFAULT_COMMANDS"]):
                     command = self.commands_dict[command_id]
+                    command["id"] = command_id
                     self.current_commands[idx] = command
 
             except (yaml.YAMLError, KeyError):
                 logger.error("Error in orchestrator commands configuration load, check file")
 
             logger.info(f"current commands: {self.current_commands}")
+
 
     def execute_predefined_command(self, command_number: int):
         """Execute a predefined command"""
@@ -76,7 +79,9 @@ class OrchestratorCommands:
         if ressource == "ep":
             return self.execute_electrical_pannel_commmand(command)
         if ressource == "epsw":
-            return self.execute_electrical_pannel_switch_commmand(command)
+            return self.execute_electrical_pannel_switch_commmand()
+        if ressource == "resw":
+            return self.execute_relay_switch_commmand(command)
         if ressource == "us":
             command = command.replace("-", "_")
             return self.execute_use_situations_commmand(command)
@@ -171,17 +176,61 @@ class OrchestratorCommands:
             logger.error("Error in electrical pannel command")
             return False
 
-    def execute_electrical_pannel_switch_commmand(self, command: str):
+    def execute_electrical_pannel_switch_commmand(self):
         """
         Execute electrical pannel switch command, returns true if command executed
+        """
+        relays_statuses = electrical_panel_manager_service.get_relays_last_received_status().relay_statuses
+        new_status = True
+        for relay_status in relays_statuses:
+            if relay_status.status:
+                new_status = False
+                break
+
+        if new_status:
+            orchestrator_use_situations_service.set_use_situation_electrical_panel_status(
+                orchestrator_use_situations_service.use_situations_dict[
+                    orchestrator_use_situations_service.current_use_situation
+                ]["ELECTRICAL_OUTLETS"]
+            )
+            return True
+        else:
+            return self.execute_electrical_pannel_commmand("000000")
+
+    def execute_relay_switch_commmand(self, command: str):
+        """
+        Execute sinfgle relay switch command, returns true if command executed
         Command format: {R#}
         """
-        #TODO: retreive current relays status and switch
-        relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(int(command))
-        #TODO: is it possible to modify a single relay ?
-        # Maybe take all relays status, switch for relay and post MQTT message
-        logger.error("Command not already implemented")
-        return True
+        relay_number = int(command)
+        relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(relay_number).status
+        new_status = not relay_status
+
+        # Build RelayStatus instance
+        relays_status = []
+        for relay_nb in range(6):
+            relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(relay_nb).status
+
+            if relay_nb == relay_number:
+                new_status = not relay_status
+            else:
+                new_status = relay_status
+            relays_status.append(
+                SingleRelayStatus(
+                    relay_number=relay_nb,
+                    status=new_status,
+                    powered=False,
+                ),
+            )
+
+        relays_statuses = RelaysStatus(
+            relay_statuses=relays_status, command=True, timestamp=datetime.now()
+        )
+        logger.info(f"{relays_statuses.to_json()}")
+
+        # Call electrical panel manager service to publish relays status command
+        electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
+
 
     def execute_use_situations_commmand(self, command: str):
         """
@@ -211,6 +260,37 @@ class OrchestratorCommands:
         except:
             logger.error(f"Error settting use situation {new_use_situation}")
             return False
+        return True
+
+    def get_commands_list(self):
+        """Get commands list """
+        commands_list = [{"id":command_id, "name": self.commands_dict[command_id]["name"] } for command_id in self.commands_dict]
+        return commands_list
+
+    def get_current_commands(self):
+        """Get current commands"""
+        current_commands_list = [{"id":self.current_commands[command_id]["id"] , "name": self.current_commands[command_id]["name"] } for command_id in self.current_commands]
+        return current_commands_list
+
+    def set_commands(self, commands_id_list: Iterable[int]):
+        """Set new current commmands from an id list, returns True if commands correctly setted"""
+        # Check that args are ok
+        if len(commands_id_list) != len(self.current_commands):
+            logger.error(f"Error setting commands {commands_id_list}")
+            return False
+
+        # Check that all the received ids match a command in the list
+        for received_id in commands_id_list:
+            if received_id not in self.commands_dict:
+                logger.error(f"Error setting commands, command {received_id} doesnt exist")
+                return False
+
+        # Set new commands
+        for idx, command_id in enumerate(commands_id_list):
+            command = self.commands_dict[command_id]
+            command["id"] = command_id
+            self.current_commands[idx] = command
+
         return True
 
 orchestrator_commands_service: OrchestratorCommands = OrchestratorCommands()

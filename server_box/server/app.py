@@ -20,6 +20,7 @@ from .rest_api.alimelo_controler import bp as alimelo_controler_bp
 from .rest_api.camera_controler import bp as camera_controler_bp
 from .rest_api.electrical_panel_controler import bp as electrical_panel_controler_bp
 from .rest_api.use_situations_controler import bp as use_situations_controler_bp
+from .rest_api.commands_controler import bp as commands_controler_bp
 from .rest_api.system_version_controler import bp as system_version_controler_bp
 from .rest_api.wifi_5GHz_on_off_controler import bp as wifi_5GHz_on_off_controler_bp
 from .orchestrator import orchestrator_service
@@ -118,4 +119,5 @@ def register_blueprints(app: Flask):
     api.register_blueprint(electrical_panel_controler_bp)
     api.register_blueprint(wifi_5GHz_on_off_controler_bp)
     api.register_blueprint(use_situations_controler_bp)
+    api.register_blueprint(commands_controler_bp)
     api.register_blueprint(system_version_controler_bp)
