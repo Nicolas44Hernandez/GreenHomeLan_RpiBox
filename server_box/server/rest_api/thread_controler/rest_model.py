@@ -7,9 +7,8 @@ from marshmallow.fields import Str, Bool
 class NodeSchema(Schema):
     """REST ressource for Thread node"""
 
-    name = Str(required=True, allow_none=False)
-    _id = Str(required=True, allow_none=False)
-    connected = Bool(required=True, allow_none=False)
+    id = Str(required=True, allow_none=False)
+    last_seen = Str(required=True, allow_none=False)
 
 
 class ThreadNetworkSetupSchema(Schema):

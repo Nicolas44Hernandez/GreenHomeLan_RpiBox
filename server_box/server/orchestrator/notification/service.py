@@ -11,6 +11,7 @@ from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
+from server.managers.alimelo_manager import AlimeloRessources
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.common import ServerBoxException
 
@@ -26,6 +27,7 @@ class OrchestratorNotification:
     server_cloud_notify_status_path: str
     server_cloud_notify_alarm_path: str
     server_cloud_notify_device_path: str
+    server_cloud_notify_connected_nodes_path: str
     rpi_cloud_ip_addr: str
     server_cloud_ports: Iterable[int]
 
@@ -35,6 +37,7 @@ class OrchestratorNotification:
         server_cloud_notify_status_path: str,
         server_cloud_notify_alarm_path: str,
         server_cloud_notify_device_path: str,
+        server_cloud_notify_connected_nodes_path: str,
         server_cloud_ports: Iterable[int],
     ):
         """Initialize the polling service for the orchestrator"""
@@ -44,6 +47,7 @@ class OrchestratorNotification:
         self.server_cloud_notify_status_path = server_cloud_notify_status_path
         self.server_cloud_notify_alarm_path = server_cloud_notify_alarm_path
         self.server_cloud_notify_device_path = server_cloud_notify_device_path
+        self.server_cloud_notify_connected_nodes_path = server_cloud_notify_connected_nodes_path
         self.server_cloud_ports = server_cloud_ports
 
     def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):
@@ -296,6 +300,29 @@ class OrchestratorNotification:
             except (ConnectionError, InvalidURL):
                 logger.error(
                     f"Error when posting device battery level  notification to rpi cloud, check if rpi cloud"
+                    f" server is running"
+                )
+
+    def notify_thread_connected_nodes_to_cloud_server(self, connected_nodes:dict):
+        """Transfer connected nodes to to cloud server"""
+        # Post connected nodes to rpi cloud
+        data_to_send = {}
+        for node_id in connected_nodes.keys():
+            data_to_send[node_id]=connected_nodes[node_id].strftime("%H:%M:%S")
+        for port in self.server_cloud_ports:
+            post_url = (
+                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_connected_nodes_path}"
+            )
+            try:
+                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+                rpi_cloud_response = requests.post(
+                    post_url, data=(data_to_send), headers=headers
+                )
+                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
+            except (ConnectionError, InvalidURL):
+                logger.error(
+                    f"Error when posting conected nodes notification to rpi cloud, check if rpi cloud"
                     f" server is running"
                 )
 

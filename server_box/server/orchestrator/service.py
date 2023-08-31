@@ -38,8 +38,8 @@ class Orchestrator:
                 server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
                 server_cloud_notify_alarm_path=app.config["RPI_CLOUD_NOTIFY_ALARM_PATH"],
                 server_cloud_notify_device_path=app.config["RPI_CLOUD_DEVICE_PATH"],
+                server_cloud_notify_connected_nodes_path=app.config["RPI_CLOUD_THREAD_NODES_PATH"],
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
-
             )
 
             # Init LiveObjects module
@@ -54,6 +54,9 @@ class Orchestrator:
                 wifi_counters_polling_period_in_secs=app.config["WIFI_COUNTERS_POLLING_PERIOD_IN_SECS"],
                 alimelo_status_check_period_in_secs=app.config[
                     "ALIMELO_STATUS_CHECK_PERIOD_IN_SECS"
+                ],
+                connected_thread_nodes_notification_period_in_secs=app.config[
+                    "THREAD_NODES_CHECK_PERIOD_IN_SECS"
                 ],
                 home_office_mac_addr=app.config["HOME_OFFICE_MAC_ADDR"],
             )
