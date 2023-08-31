@@ -38,5 +38,8 @@ class ThreadNodesApi(MethodView):
     def get(self):
         """Get configured thread nodes"""
         logger.info(f"GET thread/nodes")
-        nodes = thread_manager_service.get_thread_nodes()
-        return nodes
+        nodes = thread_manager_service.get_connected_nodes()
+        resp = []
+        for node_id in nodes.keys():
+            resp.append({"id":node_id, "last_seen": nodes[node_id].strftime("%H:%M:%S")})
+        return resp

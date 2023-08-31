@@ -6,35 +6,17 @@ import logging
 import yaml
 import subprocess
 import threading
-from typing import Iterable
 from server.common import ServerBoxException, ErrorCode
 from queue import Queue, Empty
 
 
 logger = logging.getLogger(__name__)
 
-
-class ThreadNode:
-    """Thread nodes model"""
-
-    name: str
-    _id: str
-    connected: bool
-
-    def __init__(self, name: str, _id: str):
-        self.name = name
-        self._id = _id
-        self.connected = False
-
-    # TODO: modify connected status
-
-
 class ThreadBoarderRouter(threading.Thread):
     """Service class for thread network setup management"""
 
     sudo_password: str
     thread_network_setup: dict = {}
-    nodes = Iterable[ThreadNode]
     running: bool
     network_set_up_is_ok: bool
     msg_callback: callable
@@ -118,13 +100,6 @@ class ThreadBoarderRouter(threading.Thread):
         with open(thread_network_config_file) as stream:
             try:
                 configuration = yaml.safe_load(stream)
-                self.nodes = [
-                    ThreadNode(
-                        name=node["name"],
-                        _id=node["id"],
-                    )
-                    for node in configuration["THREAD"]["NODES"]
-                ]
             except (yaml.YAMLError, KeyError):
                 logger.error("Error in Thread configuration load, check file")
                 self.network_set_up_is_ok = False
@@ -163,17 +138,12 @@ class ThreadBoarderRouter(threading.Thread):
 
         self.network_set_up_is_ok = True
 
-        # Run dedicated thread
+        # Thread interface dedicated thread
         if self.network_set_up_is_ok:
             self.running = True
             # Call Super constructor
             super(ThreadBoarderRouter, self).__init__(name="ThreadBorderRouterThread")
             self.setDaemon(True)
 
-        logger.info(f"Thread network is running")
         logger.info(f"Thread network config: {self.thread_network_setup}")
         return True
-
-    def getNodes(self) -> Iterable[ThreadNode]:
-        """Returns the configured nodes"""
-        return self.nodes

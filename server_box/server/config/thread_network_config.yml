@@ -1,0 +1,6 @@
+THREAD:
+    NETWORK_SETUP_COMMANDS:
+      - "ot-ctl ifconfig up"
+      - "ot-ctl thread start"
+      - "ot-ctl udp open"
+      - "ot-ctl udp bind :: 45"
