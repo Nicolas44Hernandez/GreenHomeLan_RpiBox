@@ -29,12 +29,6 @@ class ThreadManager:
             self.thread_config_file = app.config["THREAD_NETWORK_CONFIG"]
             self.nodes_ka_dict = {}
 
-            #TEMP
-            self.nodes_ka_dict["cam"] = datetime.now()
-            self.nodes_ka_dict["1"] = datetime.now()
-            self.nodes_ka_dict["2"] = datetime.now()
-
-
             # setup thread interface
             self.thread_interface = ThreadInterface(
                 sudo_password=app.config["SUDO_PASSWORD"],
