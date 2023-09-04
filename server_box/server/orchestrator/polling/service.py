@@ -5,7 +5,6 @@ from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
-from server.managers.wifi_5GHz_on_off_manager import wifi_5GHz_on_off_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 
@@ -83,17 +82,6 @@ class OrchestratorPolling:
                 relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
             logger.info(f"Polling wifi done")
-
-        # 5GHz on/off management
-        @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.wifi_counters_polling_period_in_secs)
-        )
-        def poll_wifi_counters_and_perform_inference():
-            # Launch RTT prediction
-            logger.info(f"Launch 5GHz prediction")
-            wifi_5GHz_on_off_manager_service.perform_prediction()
-            logger.info(f"5GHz prediction done")
-
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(

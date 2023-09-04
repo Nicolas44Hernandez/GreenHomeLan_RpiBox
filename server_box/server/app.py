@@ -9,7 +9,6 @@ from flask_cors import CORS
 
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
-from server.managers.wifi_5GHz_on_off_manager import wifi_5GHz_on_off_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
 from .managers.camera_manager import camera_manager_service
@@ -22,7 +21,6 @@ from .rest_api.electrical_panel_controler import bp as electrical_panel_controle
 from .rest_api.use_situations_controler import bp as use_situations_controler_bp
 from .rest_api.commands_controler import bp as commands_controler_bp
 from .rest_api.system_version_controler import bp as system_version_controler_bp
-from .rest_api.wifi_5GHz_on_off_controler import bp as wifi_5GHz_on_off_controler_bp
 from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
@@ -90,8 +88,6 @@ def register_extensions(app: Flask):
     mqtt_manager_service.init_app(app=app)
     # Wifi bands manager extension
     wifi_bands_manager_service.init_app(app=app)
-    # Wifi 5GHz on/off manager extension
-    wifi_5GHz_on_off_manager_service.init_app(app=app)
     # Thread manager extension
     thread_manager_service.init_app(app=app)
     # Camera manager service
@@ -117,7 +113,6 @@ def register_blueprints(app: Flask):
     api.register_blueprint(alimelo_controler_bp)
     api.register_blueprint(camera_controler_bp)
     api.register_blueprint(electrical_panel_controler_bp)
-    api.register_blueprint(wifi_5GHz_on_off_controler_bp)
     api.register_blueprint(use_situations_controler_bp)
     api.register_blueprint(commands_controler_bp)
     api.register_blueprint(system_version_controler_bp)
