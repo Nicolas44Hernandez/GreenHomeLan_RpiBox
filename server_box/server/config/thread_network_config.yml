@@ -1,5 +1,8 @@
 THREAD:
     NETWORK_SETUP_COMMANDS:
+      - "ot-ctl udp close"
+      - "ot-ctl thread stop"
+      - "ot-ctl ifconfig down"
       - "ot-ctl ifconfig up"
       - "ot-ctl thread start"
       - "ot-ctl udp open"
