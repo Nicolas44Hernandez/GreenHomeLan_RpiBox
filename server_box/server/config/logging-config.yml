@@ -80,13 +80,6 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_camera:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/manager/camera.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
   manager_electrical_panel:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -210,11 +203,6 @@ loggers:
   server.managers.mqtt_manager:
     level: INFO
     handlers: [manager_mqtt]
-    propagate: no
-
-  server.managers.camera_manager:
-    level: INFO
-    handlers: [manager_camera]
     propagate: no
 
   server.managers.electrical_panel_manager:
