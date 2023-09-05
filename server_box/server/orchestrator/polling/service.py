@@ -109,6 +109,7 @@ class OrchestratorPolling:
         def notify_thread_connected_nodes_to_cloud():
             # retrieve connected nodes
             logger.info(f"Polling thread connected nodes and notify cloud")
+            thread_manager_service.update_connected_nodes()
             connected_nodes = thread_manager_service.get_connected_nodes()
 
             # Notify connected nodes to cloud
