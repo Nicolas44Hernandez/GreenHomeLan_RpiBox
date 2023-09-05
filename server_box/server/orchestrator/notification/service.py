@@ -5,7 +5,6 @@ from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
 from timeloop import Timeloop
-from server.orchestrator.live_objects import live_objects_service
 from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
@@ -193,61 +192,9 @@ class OrchestratorNotification:
         else:
             logger.error(f"Imposible to post notification, box is disconnected from internet")
 
-    def notify_status_to_liveobjects(
-        self,
-        wifi_status: WifiStatus,
-        connected_to_internet: bool,
-        relay_statuses: RelaysStatus,
-        use_situation: str,
-    ):
-        """Notify current status to LiveObjects"""
-        logger.info(f"Notify status to Live Objects")
 
-        # Format wifi bands status
-        w = wifi_status.status
-        connected_to_internet = connected_to_internet
-        for band_status in wifi_status.bands_status:
-            if band_status.band == "2.4GHz":
-                w2 = band_status.status
-            if band_status.band == "5GHz":
-                w5 = band_status.status
-            if band_status.band == "6GHz":
-                w6 = band_status.status
-
-        # Format electrical panel relays status
-        ep = ""
-        if relay_statuses is not None:
-            for idx in range(0, 6):
-                if relay_statuses.relay_statuses[idx].status:
-                    ep += "1"
-                else:
-                    ep += "0"
-
-        # Format use situation
-        us = use_situation
-
-        data_to_send = {
-            "wf": {
-                "w": w,
-                "ci": connected_to_internet,
-                "w2": w2,
-                "w5": w5,
-                "w6": w6,
-            },
-            "ep": ep,
-            "us": us,
-        }
-        # If connnected to internet send via internet, else send via Alimelo
-        if connected_to_internet:
-            logger.info("Connected to internet, sending notification via internet")
-            live_objects_service.publish_data(topic="orch", data=data_to_send)
-        else:
-            logger.info("Not connected to internet, sending notification via Alimelo")
-            data = json.dumps(data_to_send).replace(" ", "")
-            alimelo_manager_service.send_data_to_live_objects(data)
-
-    def transfer_alarm_to_cloud_server_and_liveobjects(self, alarm_type: str):
-        """Transfer alarm notification to cloud server and Live objects"""
+    def transfer_alarm_to_cloud_server(self, alarm_type: str):
+        """Transfer alarm notification to cloud server"""
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
@@ -273,13 +220,6 @@ class OrchestratorNotification:
                         f"Error when posting alarm notification to rpi cloud, check if rpi cloud"
                         f" server is running"
                     )
-        if not connected_to_internet:
-            logger.info(
-                f"Box is disconnected from internet. Posting notify alarm to LiveObects via Alimelo"
-            )
-            data_to_send = {"al": {alarm_type: 1}}
-            data = json.dumps(data_to_send).replace(" ", "")
-            alimelo_manager_service.send_data_to_live_objects(data)
 
 
     def transfer_device_battery_level_to_cloud_server(self, device_type:str, device:str, batLevel:str):

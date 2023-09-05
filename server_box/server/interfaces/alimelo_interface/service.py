@@ -154,19 +154,3 @@ class AlimeloSerialCom(threading.Thread):
             logger.error("Exception in serial connection")
             logger.error(e)
         self.setup_serial_communication()
-
-    def send_data_to_live_objects(self, data_to_send: str):
-        """Send data to liveobjects"""
-        logger.info(f"Sending data to liveobjects: {data_to_send}")
-        try:
-            if self.connected:
-                self.serial.write(data_to_send.encode())
-            else:
-                logger.error("Serial connection is down")
-        except (
-            serial.SerialException,
-            AttributeError,
-        ) as e:
-            logger.error("Exception in serial connection")
-            logger.error(e)
-            self.restart_serial_connection()

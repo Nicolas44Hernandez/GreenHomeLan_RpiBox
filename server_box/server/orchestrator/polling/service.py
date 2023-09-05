@@ -18,8 +18,6 @@ class OrchestratorPolling:
 
     # Attributes
     wifi_status_polling_period_in_secs: int
-    live_objects_notification_period: int
-    wifi_counters_polling_period_in_secs: int
     alimelo_status_check_period_in_secs: int
     connected_thread_nodes_notification_period_in_secs: int
     home_office_mac_addr: str
@@ -27,8 +25,6 @@ class OrchestratorPolling:
     def init_polling_module(
         self,
         wifi_status_polling_period_in_secs: int,
-        live_objects_notification_period: int,
-        wifi_counters_polling_period_in_secs: int,
         alimelo_status_check_period_in_secs: int,
         connected_thread_nodes_notification_period_in_secs: int,
         home_office_mac_addr: str,
@@ -37,9 +33,7 @@ class OrchestratorPolling:
         logger.info("initializing Orchestrator polling module")
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
-        self.live_objects_notification_period = live_objects_notification_period
         self.connected_thread_nodes_notification_period_in_secs = connected_thread_nodes_notification_period_in_secs
-        self.wifi_counters_polling_period_in_secs = wifi_counters_polling_period_in_secs
         self.alimelo_status_check_period_in_secs = alimelo_status_check_period_in_secs
         self.home_office_mac_addr = home_office_mac_addr
 
@@ -83,26 +77,6 @@ class OrchestratorPolling:
             )
             logger.info(f"Polling wifi done")
 
-        # Start ressources polling and live objects notification
-        @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.live_objects_notification_period)
-        )
-        def poll_ressources_and_notify_live_objects():
-            # retrieve wifi status
-            logger.info(f"Polling ressources status and send to LiveObjects")
-            wifi_status = wifi_bands_manager_service.get_current_wifi_status()
-            relay_statuses = electrical_panel_manager_service.get_relays_last_received_status()
-            use_situation = orchestrator_use_situations_service.get_current_use_situation()
-            connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
-
-            # Notify wifi status and relays status to LiveObjects via Alimelo
-            orchestrator_notification_service.notify_status_to_liveobjects(
-                wifi_status=wifi_status,
-                connected_to_internet=connected_to_internet,
-                relay_statuses=relay_statuses,
-                use_situation=use_situation,
-            )
-
         @resources_status_timeloop.job(
             interval=timedelta(seconds=self.connected_thread_nodes_notification_period_in_secs)
         )
@@ -134,7 +108,7 @@ class OrchestratorPolling:
         #         # if electric socket is not power supplied and low battery level, send alarm
         #         if not alimelo_vs and bat_level < 10:
         #             logger.info("Alimelo low power alarm")
-        #             orchestrator_notification_service.transfer_alarm_to_cloud_server_and_liveobjects(
+        #             orchestrator_notification_service.transfer_alarm_to_cloud_server(
         #                 alarm_type="low_power"
         #             )
 
