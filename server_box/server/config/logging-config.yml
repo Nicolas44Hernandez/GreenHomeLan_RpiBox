@@ -20,42 +20,7 @@ handlers:
   orchestrator:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/orchestrator/orchestrator.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  orchestrator_notification:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/orchestrator/orchestrator_notification.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  orchestrator_polling:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/orchestrator/orchestrator_polling.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  orchestrator_commands:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/orchestrator/orchestrator_commands.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  orchestrator_requests:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/orchestrator/orchestrator_requests.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  orchestrator_use_situations:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/orchestrator/orchestrator_use_situations.log
+    filename: logs/orchestrator.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
@@ -66,73 +31,45 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_mqtt:
+  mqtt:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/mqtt.log
+    filename: logs/mqtt.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_electrical_panel:
+  electrical_panel:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/electrical_panel.log
+    filename: logs/electrical_panel.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_thread:
+  thread:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/thread.log
+    filename: logs/thread.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_wifi_bands:
+  wifi:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/wifi_bands.log
+    filename: logs/wifi.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  wifi_5GHz_on_off:
+  alimelo:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/wifi_5GHz_on_off.log
+    filename: logs/alimelo.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  manager_alimelo:
+  telnet:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: logs/manager/alimelo.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  interface_mqtt:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/interface/mqtt.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  interface_thread:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/interface/thread.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  interface_telnet:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/interface/telnet.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 1
-
-  interface_alimelo:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: logs/interface/alimelo.log
+    filename: logs/telnet.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
@@ -183,27 +120,22 @@ loggers:
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [manager_mqtt]
+    handlers: [mqtt]
     propagate: no
 
   server.managers.electrical_panel_manager:
     level: INFO
-    handlers: [manager_electrical_panel]
+    handlers: [electrical_panel]
     propagate: no
 
-  server.managers.thread_manager:
+  server.managers.thread:
     level: INFO
     handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_manager:
     level: INFO
-    handlers: [manager_wifi_bands]
-    propagate: no
-
-  server.managers.wifi_5GHz_on_off_manager:
-    level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.managers.alimelo_manager:
@@ -218,16 +150,16 @@ loggers:
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [interface_mqtt]
+    handlers: [mqtt]
     propagate: no
 
   server.interfaces.wifi_interface:
     level: INFO
-    handlers: [interface_telnet]
+    handlers: [telnet]
     propagate: no
 
   server.interfaces.alimelo_interface:
     level: DEBUG
-    handlers: [interface_alimelo]
+    handlers: [alimelo]
     propagate: no
 
