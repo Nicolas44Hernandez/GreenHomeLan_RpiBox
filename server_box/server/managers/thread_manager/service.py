@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask
 from timeloop import Timeloop
 from server.interfaces.thread_interface import ThreadInterface
@@ -58,6 +58,20 @@ class ThreadManager:
     def get_connected_nodes(self):
         """Return the connected nodes and the last time seen"""
         return self.nodes_ka_dict
+
+    def update_connected_nodes(self):
+        """Update connected nodes"""
+        nodes_to_delete = []
+        now = datetime.now()
+
+        # Get nodes to delete
+        for node in self.nodes_ka_dict:
+            if self.nodes_ka_dict[node] < (now - timedelta(minutes=1)):
+                nodes_to_delete.append(node)
+
+        # Update connected nodes dictionary
+        for node_to_delete_id in nodes_to_delete:
+            del self.nodes_ka_dict[node_to_delete_id]
 
 thread_manager_service: ThreadManager = ThreadManager()
 """ Thread manager service singleton"""
