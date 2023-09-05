@@ -44,10 +44,6 @@ class AlimeloManager:
                 self.ressources_notification_callback
             )
 
-    def set_live_objects_command_reception_callback(self, callback: callable):
-        """Set command reception callback, used in the orchestrator"""
-        self.alimelo_interface.set_command_reception_callback(callback=callback)
-
     def ressources_notification_callback(self, notification: str):
         """Ressources notification serial reception callback"""
         logger.info(f"Serial notification received :{notification}")
@@ -65,10 +61,6 @@ class AlimeloManager:
             isChargingBattery=alimelo_notification_dict["ch"],
         )
         logger.info(f"alim: {alimelo_notification_dict}")
-
-    def send_data_to_live_objects(self, data: str):
-        """Send data to LiveObjects"""
-        self.alimelo_interface.send_data_to_live_objects(data)
 
     def get_battery_level(self):
         """Get alimelo batery level in percentage"""
