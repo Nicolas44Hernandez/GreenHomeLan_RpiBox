@@ -11,21 +11,6 @@ bp = Blueprint("thread", __name__, url_prefix="/thread")
 """ The api blueprint. Should be registered in app main api object """
 
 
-@bp.route("/setup")
-class SetupThreadNetworkAllNodes(MethodView):
-    """API to get the Thread network info"""
-
-    @bp.doc(
-        security=[{"tokenAuth": []}],
-        responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
-    )
-    @bp.response(status_code=200, schema=ThreadNetworkSetupSchema)
-    def get(self):
-        """Get Thread network setup parameters"""
-        logger.info(f"GET thread/setup")
-        return thread_manager_service.get_connection_parameters()
-
-
 @bp.route("/nodes")
 class ThreadNodesApi(MethodView):
     """API to retrieve thread configured nodes"""
@@ -41,5 +26,7 @@ class ThreadNodesApi(MethodView):
         nodes = thread_manager_service.get_connected_nodes()
         resp = []
         for node_id in nodes.keys():
-            resp.append({"id":node_id, "last_seen": nodes[node_id].strftime("%H:%M:%S")})
+            resp.append(
+                {"id": node_id, "last_seen": nodes[node_id].strftime("%H:%M:%S")}
+            )
         return resp
