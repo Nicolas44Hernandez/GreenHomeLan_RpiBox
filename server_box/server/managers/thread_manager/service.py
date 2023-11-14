@@ -44,7 +44,7 @@ class ThreadManager:
 
     def set_msg_reception_callback(self, callback: callable):
         """Set message reception callback"""
-        self.thread_interface.set_msg_reception_callback(callback)
+        self.thread_dongle_interface.set_msg_reception_callback(callback)
 
     def keep_alive_reception_callback(self, node_id: str):
         """Callback for node keep alive reception"""
