@@ -2,8 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from flask import Flask
 from timeloop import Timeloop
-from server.interfaces.thread_interface import ThreadInterface
-from server.common import ServerBoxException, ErrorCode
+from server.interfaces.thread_dongle_interface import ThreadInterface
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +12,7 @@ thread_network_info_timeloop = Timeloop()
 class ThreadManager:
     """Manager for thread interface"""
 
-    thread_interface: ThreadInterface
-    thread_config_file: str
+    thread_dongle_interface: ThreadInterface
     nodes_ka_dict: dict
 
     def __init__(self, app: Flask = None) -> None:
@@ -26,19 +24,23 @@ class ThreadManager:
         if app is not None:
             logger.info("initializing the ThreadManager")
 
-            self.thread_config_file = app.config["THREAD_NETWORK_CONFIG"]
+            self.serial_interface = app.config["THREAD_SERIAL_INTERFACE"]
+            self.serial_speed = app.config["THREAD_SERIAL_SPEED"]
             self.nodes_ka_dict = {}
 
             # setup thread interface
-            self.thread_interface = ThreadInterface(
-                sudo_password=app.config["SUDO_PASSWORD"],
-                thread_network_config_file=self.thread_config_file,
+            self.thread_dongle_interface = ThreadInterface(
+                thread_serial_port=self.serial_interface,
+                serial_speed=self.serial_speed,
             )
-            self.thread_interface.run_dedicated_thread()
 
-            self.thread_interface.set_keep_alive_reception_callback(
+            # Set keep alive callback
+            self.thread_dongle_interface.set_keep_alive_reception_callback(
                 self.keep_alive_reception_callback
             )
+
+            # Run thread donfgle interface in dedicated thread
+            self.thread_dongle_interface.run_dedicated_thread()
 
     def set_msg_reception_callback(self, callback: callable):
         """Set message reception callback"""
@@ -47,13 +49,6 @@ class ThreadManager:
     def keep_alive_reception_callback(self, node_id: str):
         """Callback for node keep alive reception"""
         self.nodes_ka_dict[node_id] = datetime.now()
-
-    def get_connection_parameters(self):
-        """Return thread network setup parameters"""
-        try:
-            return self.thread_interface.thread_network_setup
-        except:
-            raise ServerBoxException(ErrorCode.THREAD_NETWORK_NOT_RUNNING)
 
     def get_connected_nodes(self):
         """Return the connected nodes and the last time seen"""
@@ -72,6 +67,7 @@ class ThreadManager:
         # Update connected nodes dictionary
         for node_to_delete_id in nodes_to_delete:
             del self.nodes_ka_dict[node_to_delete_id]
+
 
 thread_manager_service: ThreadManager = ThreadManager()
 """ Thread manager service singleton"""
