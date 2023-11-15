@@ -115,8 +115,9 @@ class OrchestratorRequests:
         """Callback for MQTT command reception"""
         logger.info(f"Command received: {msg} ")
         logger.info(f"received:'{msg}'   type(msg): {type(msg)}    len(msg):{len(msg)}")
-        test = "cmd_5"
-        logger.info(f"test:'{msg}'   type(test): {type(test)}    len(test):{len(test)}")
+        for c in msg:
+            logger.info(f"{c}")
+
         if type(msg) == dict:
             msg = msg["command"]
         try:
