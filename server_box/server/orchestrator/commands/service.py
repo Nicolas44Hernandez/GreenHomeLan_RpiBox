@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 BANDS = ["2.4GHz", "5GHz", "6GHz"]
 
+
 class OrchestratorCommands:
     """OrchestratorCommands service"""
 
@@ -30,7 +31,7 @@ class OrchestratorCommands:
                 configuration = yaml.safe_load(stream)
                 for command in configuration["COMMANDS_LIST"]:
                     self.commands_dict[command["id"]] = {
-                        "name" : command["name"],
+                        "name": command["name"],
                         "command": command["command"],
                     }
 
@@ -41,14 +42,15 @@ class OrchestratorCommands:
                     self.current_commands[idx] = command
 
             except (yaml.YAMLError, KeyError):
-                logger.error("Error in orchestrator commands configuration load, check file")
+                logger.error(
+                    "Error in orchestrator commands configuration load, check file"
+                )
 
             logger.info(f"current commands: {self.current_commands}")
 
-
     def execute_predefined_command(self, command_number: int):
         """Execute a predefined command"""
-        command_number = command_number -1
+        command_number = command_number - 1
         if command_number not in self.current_commands:
             logger.error("Error in predefined command execution")
             logger.error(f"Command {command_number} is not defined")
@@ -64,6 +66,8 @@ class OrchestratorCommands:
     def execute_command(self, msg: str):
         """Execute a command in the orchestrator"""
         try:
+            logger.info(f"Executing command: {msg}")
+            msg = str(msg)
             ressource, command = msg.split("_")
         except:
             logger.error("Error in command format")
@@ -137,7 +141,9 @@ class OrchestratorCommands:
         current_wifi_band_status = wifi_bands_manager_service.get_band_status(band)
 
         try:
-            wifi_bands_manager_service.set_band_status(band=band, status=not current_wifi_band_status)
+            wifi_bands_manager_service.set_band_status(
+                band=band, status=not current_wifi_band_status
+            )
             return True
         except:
             logger.error("Error in wifi status command execution")
@@ -163,11 +169,15 @@ class OrchestratorCommands:
                     ),
                 )
             relays_statuses = RelaysStatus(
-                relay_statuses=statuses_from_query, command=True, timestamp=datetime.now()
+                relay_statuses=statuses_from_query,
+                command=True,
+                timestamp=datetime.now(),
             )
 
             # Call electrical panel manager service to publish relays status command
-            electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
+            electrical_panel_manager_service.publish_mqtt_relays_status_command(
+                relays_statuses
+            )
 
             logger.info(f"Electrical pannel command:  {relays_statuses}")
 
@@ -180,7 +190,9 @@ class OrchestratorCommands:
         """
         Execute electrical pannel switch command, returns true if command executed
         """
-        relays_statuses = electrical_panel_manager_service.get_relays_last_received_status().relay_statuses
+        relays_statuses = (
+            electrical_panel_manager_service.get_relays_last_received_status().relay_statuses
+        )
         new_status = True
         for relay_status in relays_statuses:
             if relay_status.status:
@@ -203,13 +215,21 @@ class OrchestratorCommands:
         Command format: {R#}
         """
         relay_number = int(command)
-        relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(relay_number).status
+        relay_status = (
+            electrical_panel_manager_service.get_single_relay_last_received_status(
+                relay_number
+            ).status
+        )
         new_status = not relay_status
 
         # Build RelayStatus instance
         relays_status = []
         for relay_nb in range(6):
-            relay_status = electrical_panel_manager_service.get_single_relay_last_received_status(relay_nb).status
+            relay_status = (
+                electrical_panel_manager_service.get_single_relay_last_received_status(
+                    relay_nb
+                ).status
+            )
 
             if relay_nb == relay_number:
                 new_status = not relay_status
@@ -229,8 +249,9 @@ class OrchestratorCommands:
         logger.info(f"{relays_statuses.to_json()}")
 
         # Call electrical panel manager service to publish relays status command
-        electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
-
+        electrical_panel_manager_service.publish_mqtt_relays_status_command(
+            relays_statuses
+        )
 
     def execute_use_situations_commmand(self, command: str):
         """
@@ -253,23 +274,36 @@ class OrchestratorCommands:
         """
         Execute presence command, returns true if command executed
         """
-        new_use_situation = orchestrator_use_situations_service.get_use_situation_to_switch()
+        new_use_situation = (
+            orchestrator_use_situations_service.get_use_situation_to_switch()
+        )
         logger.info(f"Setting use situation: {new_use_situation}")
         try:
-            orchestrator_use_situations_service.set_use_situation(use_situation=new_use_situation)
+            orchestrator_use_situations_service.set_use_situation(
+                use_situation=new_use_situation
+            )
         except:
             logger.error(f"Error settting use situation {new_use_situation}")
             return False
         return True
 
     def get_commands_list(self):
-        """Get commands list """
-        commands_list = [{"id":command_id, "name": self.commands_dict[command_id]["name"] } for command_id in self.commands_dict]
+        """Get commands list"""
+        commands_list = [
+            {"id": command_id, "name": self.commands_dict[command_id]["name"]}
+            for command_id in self.commands_dict
+        ]
         return commands_list
 
     def get_current_commands(self):
         """Get current commands"""
-        current_commands_list = [{"id":self.current_commands[command_id]["id"] , "name": self.current_commands[command_id]["name"] } for command_id in self.current_commands]
+        current_commands_list = [
+            {
+                "id": self.current_commands[command_id]["id"],
+                "name": self.current_commands[command_id]["name"],
+            }
+            for command_id in self.current_commands
+        ]
         return current_commands_list
 
     def set_commands(self, commands_id_list: Iterable[int]):
@@ -282,7 +316,9 @@ class OrchestratorCommands:
         # Check that all the received ids match a command in the list
         for received_id in commands_id_list:
             if received_id not in self.commands_dict:
-                logger.error(f"Error setting commands, command {received_id} doesnt exist")
+                logger.error(
+                    f"Error setting commands, command {received_id} doesnt exist"
+                )
                 return False
 
         # Set new commands
@@ -292,6 +328,7 @@ class OrchestratorCommands:
             self.current_commands[idx] = command
 
         return True
+
 
 orchestrator_commands_service: OrchestratorCommands = OrchestratorCommands()
 """ OrchestratorCommands service singleton"""
