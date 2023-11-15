@@ -72,7 +72,7 @@ class ThreadManager:
         """Update wifi and presence status in dongle"""
         logger.info(f"WIFI_STATUS: {wifi_status}  USE_SITUATION: {use_situation}")
         presence = "PRESENCE" in use_situation
-        msg_wifi = "wifi:" "1" if wifi_status else "0"
+        msg_wifi = "wifi:" + "1" if wifi_status else "0"
         msg_prs = "prs:" + "1" if presence else "0" + "#"
         message = msg_wifi + msg_prs
 
