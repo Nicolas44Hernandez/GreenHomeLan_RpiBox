@@ -66,8 +66,6 @@ class OrchestratorCommands:
     def execute_command(self, msg: str):
         """Execute a command in the orchestrator"""
         try:
-            logger.info(f"Executing command: {msg}")
-            msg = str(msg)
             ressource, command = msg.split("_")
         except:
             logger.error("Error in command format")
