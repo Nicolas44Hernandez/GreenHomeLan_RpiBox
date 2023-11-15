@@ -79,10 +79,17 @@ class OrchestratorPolling:
             )
 
             # Notify current wifi and presence status to thread dongle
+            # TODO: only for test
+            ####################
             thread_manager_service.update_status_in_dongle(
-                wifi_status=wifi_status.status,
+                wifi_status=True,
                 use_situation=orchestrator_use_situations_service.get_current_use_situation(),
             )
+            ####################
+            # thread_manager_service.update_status_in_dongle(
+            #     wifi_status=wifi_status.status,
+            #     use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+            # )
 
             logger.info(f"Polling wifi done")
 
