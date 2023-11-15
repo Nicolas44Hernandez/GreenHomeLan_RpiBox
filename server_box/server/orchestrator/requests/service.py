@@ -56,7 +56,7 @@ class OrchestratorRequests:
             _device, _type = msg.split("_")[1:]
             logger.info(f"alarm received device:{_device}  type:{_type}")
             logger.info(f"type(_device):{type(_device)}  t_pe(_type):{type(_type)}")
-
+            _type = "em"
             alarm_type = None
             if _type == "db":
                 alarm_type = "doorbell"
