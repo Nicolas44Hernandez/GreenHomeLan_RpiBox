@@ -68,6 +68,20 @@ class ThreadManager:
         for node_to_delete_id in nodes_to_delete:
             del self.nodes_ka_dict[node_to_delete_id]
 
+    def update_status_in_dongle(self, wifi_status: bool, use_situation: str):
+        """Update wifi and presence status in dongle"""
+        presence = "PRESENCE" in use_situation
+        message = (
+            "~wifi:" + "1"
+            if wifi_status
+            else "0" + "prs:" + "1"
+            if presence
+            else "0" + "#"
+        )
+
+        if not self.thread_dongle_interface.write_message_to_dongle(message):
+            logger.error(f"Error sending status to dongle")
+
 
 thread_manager_service: ThreadManager = ThreadManager()
 """ Thread manager service singleton"""
