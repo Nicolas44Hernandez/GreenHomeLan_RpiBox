@@ -120,10 +120,11 @@ class OrchestratorRequests:
             msg = str(msg)
             logger.info(f"Executing command: {msg}")
             command_number = int(msg.split("cmd_")[1])
+            logger.info(f"Command number: {command_number}")
             if not orchestrator_commands_service.execute_predefined_command(
                 command_number
             ):
-                logger.error("Error in command format")
+                logger.error("Exception: Error in command format")
                 return
         except:
             logger.error("Error in command format")
