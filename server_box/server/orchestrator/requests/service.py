@@ -54,7 +54,7 @@ class OrchestratorRequests:
         # Thread message is an alarm
         if msg.startswith("al"):
             _device, _type = msg.split("_")[1:]
-            logger.inf(f"alarm received device:{_device}  type:{_type}")
+            logger.info(f"alarm received device:{_device}  type:{_type}")
             if _type == "db":
                 alarm_type = "doorbell"
             elif _type == "pd":
