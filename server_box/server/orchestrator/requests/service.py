@@ -54,16 +54,18 @@ class OrchestratorRequests:
         # Thread message is an alarm
         if msg.startswith("al"):
             _device, _type = msg.split("_")[1:]
-            logger.info(f"alarm received device:{_device}  type:{_type}||||")
+            logger.info(f"alarm received device:{_device}  type:{_type}")
+
+            alarm_type = None
             if _type == "db":
                 alarm_type = "doorbell"
-            elif _type == "pd":
+            if _type == "pd":
                 alarm_type = "presence"
-            elif _type == "em":
+            if _type == "em":
                 alarm_type = "emergency_btn"
-            elif _type == "bat":  # al_bt1_bat
+            if _type == "bat":  # al_bt1_bat
                 alarm_type = f"battery_btn_{_device}"
-            else:
+            if alarm_type is None:
                 logger.error(f"Error in alarm received format {msg}")
                 return
             logger.info(f"Alarm received {alarm_type}")
