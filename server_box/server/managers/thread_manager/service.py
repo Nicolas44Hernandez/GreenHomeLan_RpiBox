@@ -72,10 +72,10 @@ class ThreadManager:
         """Update wifi and presence status in dongle"""
         logger.info(f"WIFI_STATUS: {wifi_status}  USE_SITUATION: {use_situation}")
         presence = "PRESENCE" in use_situation
-        msg_wifi = "wifi:" + "1" if wifi_status else "0"
-        msg_prs = "prs:" + "1" if presence else "0" + "#"
+        msg_wifi = "wifi:1" if wifi_status else "wifi:0"
+        msg_prs = "prs:1" if presence else "prs:1"
         message = msg_wifi + msg_prs
-
+        logger.info(f"MSG: {message}")
         if not self.thread_dongle_interface.write_message_to_dongle(message):
             logger.error(f"Error sending status to dongle")
 
