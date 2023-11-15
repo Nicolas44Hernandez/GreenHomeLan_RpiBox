@@ -114,7 +114,9 @@ class OrchestratorRequests:
     def command_reception_callback(self, msg):
         """Callback for MQTT command reception"""
         logger.info(f"Command received: {msg} ")
-        logger.info(f"received: {msg}    type(msg): {type(msg)}    len(msg):{len(msg)}")
+        logger.info(f"received:'{msg}'   type(msg): {type(msg)}    len(msg):{len(msg)}")
+        test = "cmd_5"
+        logger.info(f"test:'{msg}'   type(test): {type(test)}    len(test):{len(test)}")
         if type(msg) == dict:
             msg = msg["command"]
         try:
