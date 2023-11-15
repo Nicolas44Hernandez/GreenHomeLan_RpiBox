@@ -69,3 +69,14 @@ class ThreadServerDongle(threading.Thread):
     def set_keep_alive_reception_callback(self, callback: callable):
         """Set Thread keep_alive reception callback"""
         self.keep_alive_callback = callback
+
+    def write_message_to_dongle(self, msg: str):
+        """Write message to dongle"""
+        message = "~" + msg + "#"
+        logger.info(f"Sending msg: %s", message)
+        ret = self.serial_interface.write(message.encode("utf-8"))
+        # TODO: manage return values and exceptions
+
+        if ret != 0:
+            return True
+        return False

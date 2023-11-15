@@ -33,7 +33,9 @@ class OrchestratorPolling:
         logger.info("initializing Orchestrator polling module")
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
-        self.connected_thread_nodes_notification_period_in_secs = connected_thread_nodes_notification_period_in_secs
+        self.connected_thread_nodes_notification_period_in_secs = (
+            connected_thread_nodes_notification_period_in_secs
+        )
         self.alimelo_status_check_period_in_secs = alimelo_status_check_period_in_secs
         self.home_office_mac_addr = home_office_mac_addr
 
@@ -66,7 +68,7 @@ class OrchestratorPolling:
             orchestrator_notification_service.notify_wifi_status(
                 bands_status=wifi_status.bands_status
             )
-            logger.info(f"Polling wifi: RPI relas wifi notification ok")
+            logger.info(f"Polling wifi: RPI wifi notification ok")
 
             # Notify current wifi status and use situation to rpi cloud
             orchestrator_notification_service.notify_cloud_server(
@@ -75,10 +77,19 @@ class OrchestratorPolling:
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
                 relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
+
+            # Notify current wifi and presence status to thread dongle
+            thread_manager_service.update_status_in_dongle(
+                wifi_status=wifi_status.status,
+                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+            )
+
             logger.info(f"Polling wifi done")
 
         @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.connected_thread_nodes_notification_period_in_secs)
+            interval=timedelta(
+                seconds=self.connected_thread_nodes_notification_period_in_secs
+            )
         )
         def notify_thread_connected_nodes_to_cloud():
             # retrieve connected nodes
@@ -90,8 +101,6 @@ class OrchestratorPolling:
             orchestrator_notification_service.notify_thread_connected_nodes_to_cloud_server(
                 connected_nodes=connected_nodes
             )
-
-
 
         # @resources_status_timeloop.job(
         #     interval=timedelta(seconds=self.alimelo_status_check_period_in_secs)
