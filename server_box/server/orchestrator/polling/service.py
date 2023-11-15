@@ -83,7 +83,7 @@ class OrchestratorPolling:
             # TODO: only for test
             ####################
             thread_manager_service.update_status_in_dongle(
-                wifi_status=True,
+                wifi_status=False,
                 use_situation=orchestrator_use_situations_service.get_current_use_situation(),
             )
             ####################
