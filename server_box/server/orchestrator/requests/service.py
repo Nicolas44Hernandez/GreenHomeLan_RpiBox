@@ -55,23 +55,21 @@ class OrchestratorRequests:
         if msg.startswith("al"):
             _device, _type = msg.split("_")[1:]
             logger.info(f"alarm received device:{_device}  type:{_type}")
-            if "em" in _type:
-                logger.info("em in Type")
             alarm_type = None
-            if _type == "db":
+            if "db" in _type:
                 alarm_type = "doorbell"
-            if _type == "pd":
+            if "pd" in _type:
                 alarm_type = "presence"
-            if _type == "em":
+            if "em" in _type:
                 alarm_type = "emergency_btn"
-            if _type == "bat":  # al_bt1_bat
+            if "bat" in _type:  # al_bt1_bat
                 alarm_type = f"battery_btn_{_device}"
             if alarm_type is None:
                 logger.error(f"Error in alarm received format {msg}")
                 return
             logger.info(f"Alarm received {alarm_type}")
 
-            if _device == "cam":
+            if "cam" in _device:
                 # Turn wifi ON if alarm from camera
                 wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
 
