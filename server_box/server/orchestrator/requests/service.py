@@ -117,6 +117,8 @@ class OrchestratorRequests:
         if type(msg) == dict:
             msg = msg["command"]
         try:
+            msg = str(msg)
+            logger.info(f"Executing command: {msg}")
             command_number = int(msg.split("cmd_")[1])
             if not orchestrator_commands_service.execute_predefined_command(
                 command_number
