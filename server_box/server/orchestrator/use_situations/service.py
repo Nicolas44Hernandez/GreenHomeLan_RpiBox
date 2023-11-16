@@ -41,7 +41,9 @@ class OrchestratorUseSituations:
                 configuration = yaml.safe_load(stream)
                 self.use_situations_dict = {}
                 for situation in configuration["USE_SITUATIONS"]:
-                    self.use_situations_dict[situation] = configuration["USE_SITUATIONS"][situation]
+                    self.use_situations_dict[situation] = configuration[
+                        "USE_SITUATIONS"
+                    ][situation]
             except (yaml.YAMLError, KeyError) as exc:
                 raise ServerBoxException(ErrorCode.USE_SITUATIONS_CONFIG_FILE_ERROR)
 
@@ -70,7 +72,12 @@ class OrchestratorUseSituations:
         for band in wifi_bands_status:
             band_status = wifi_bands_status[band]
             logger.info(f"Setting wifi band {band} to {band_status}")
-            wifi_bands_manager_service.set_band_status(band=band, status=band_status)
+            ret = wifi_bands_manager_service.set_band_status(
+                band=band, status=band_status
+            )
+            if ret is None:
+                logger.error("Error in wifi band status command execution")
+                return False
 
     def set_use_situation_electrical_panel_status(self, electrical_panel_status: dict):
         """Set electrical panel status"""
@@ -96,7 +103,9 @@ class OrchestratorUseSituations:
         logger.info(f"{relays_statuses.to_json()}")
 
         # Call electrical panel manager service to publish relays status command
-        electrical_panel_manager_service.publish_mqtt_relays_status_command(relays_statuses)
+        electrical_panel_manager_service.publish_mqtt_relays_status_command(
+            relays_statuses
+        )
 
     def get_current_use_situation(self):
         """Get current use situation"""
@@ -110,5 +119,8 @@ class OrchestratorUseSituations:
         """Get the use situation to switch for command"""
         return self.use_situations_dict[self.current_use_situation]["SWITCH_TO"]
 
-orchestrator_use_situations_service: OrchestratorUseSituations = OrchestratorUseSituations()
+
+orchestrator_use_situations_service: OrchestratorUseSituations = (
+    OrchestratorUseSituations()
+)
 """ OrchestratorUseSituations service singleton"""

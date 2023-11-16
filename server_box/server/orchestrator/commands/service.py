@@ -103,9 +103,14 @@ class OrchestratorCommands:
 
             status = status == "on"
             if band == "all":
-                wifi_bands_manager_service.set_wifi_status(status=status)
+                ret = wifi_bands_manager_service.set_wifi_status(status=status)
             else:
-                wifi_bands_manager_service.set_band_status(band=band, status=status)
+                ret = wifi_bands_manager_service.set_band_status(
+                    band=band, status=status
+                )
+            if ret is None:
+                logger.error("Error in wifi command excecution")
+                return False
             return True
         except:
             logger.error("Error in wifi command format")
@@ -120,7 +125,12 @@ class OrchestratorCommands:
 
         current_wifi_status = wifi_bands_manager_service.get_current_wifi_status()
         try:
-            wifi_bands_manager_service.set_wifi_status(not current_wifi_status.status)
+            ret = wifi_bands_manager_service.set_wifi_status(
+                not current_wifi_status.status
+            )
+            if ret is None:
+                logger.error("Error in wifi status command execution")
+                return False
             return True
         except:
             logger.error("Error in wifi status command execution")
@@ -137,11 +147,16 @@ class OrchestratorCommands:
             logger.error(f"Error, the band {band} doesnt exist")
             return False
         current_wifi_band_status = wifi_bands_manager_service.get_band_status(band)
-
+        if current_wifi_band_status is None:
+            logger.error("Error in wifi band status command execution")
+            return False
         try:
-            wifi_bands_manager_service.set_band_status(
+            ret = wifi_bands_manager_service.set_band_status(
                 band=band, status=not current_wifi_band_status
             )
+            if ret is None:
+                logger.error("Error in wifi band status command execution")
+                return False
             return True
         except:
             logger.error("Error in wifi status command execution")

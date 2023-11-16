@@ -197,9 +197,8 @@ class OrchestratorNotification:
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
-        # connected_to_internet = True
-        # if connected_to_internet:
-        if True:
+        connected_to_internet = True
+        if connected_to_internet:
             logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
             data = {"alarm_type": alarm_type}
             # Post alarm to rpi cloud

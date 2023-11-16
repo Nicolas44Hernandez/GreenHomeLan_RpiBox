@@ -54,13 +54,17 @@ class OrchestratorPolling:
             logger.info(f"Polling wifi status")
 
             wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
-            # TODO: uncoment
-            # connected_stations = (
-            #     wifi_bands_manager_service.get_connected_stations_mac_list()
-            # )
-            ### ONLY FOR TEST
-            connected_stations = []
-            #######################
+            if wifi_status is None:
+                logger.error("Impossible to get wifi status")
+                return
+
+            # Get connected stations list
+            connected_stations = (
+                wifi_bands_manager_service.get_connected_stations_mac_list()
+            )
+            if connected_stations is None:
+                logger.error("Impossible to get wifi status")
+                return
 
             if self.home_office_mac_addr in connected_stations:
                 logger.info(

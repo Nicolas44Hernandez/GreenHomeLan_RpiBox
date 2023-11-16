@@ -5,6 +5,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from .rest_model import WifiStatusSchema, MacAdressListSchema
+from server.common import ServerBoxException, ErrorCode
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,8 @@ class WifiStatusApi(MethodView):
         """Get livebox wifi status"""
         logger.info(f"GET wifi/")
         status = wifi_bands_manager_service.get_wifi_status()
+        if status is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
         return {"status": status}
 
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
@@ -39,7 +42,8 @@ class WifiStatusApi(MethodView):
         logger.info(f"status: {args}")
 
         new_status = wifi_bands_manager_service.set_wifi_status(args["status"])
-
+        if new_status is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
         return {"status": new_status}
 
 
@@ -57,6 +61,8 @@ class WifiBandsStatusApi(MethodView):
         logger.info(f"GET wifi/bands/{band}")
 
         status = wifi_bands_manager_service.get_band_status(band)
+        if status is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
         return {"status": status}
 
@@ -71,6 +77,8 @@ class WifiBandsStatusApi(MethodView):
         logger.info(f"satus: {args}")
 
         new_status = wifi_bands_manager_service.set_band_status(band, args["status"])
+        if new_status is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
         return {"status": new_status}
 
@@ -89,6 +97,8 @@ class WifiConnectedStationsApi(MethodView):
         logger.info(f"GET wifi/stations/")
 
         stations = wifi_bands_manager_service.get_connected_stations_mac_list()
+        if stations is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
         return {"mac_list": stations}
 
@@ -107,5 +117,7 @@ class WifiConnectedStationsApi(MethodView):
         logger.info(f"GET wifi/stations/{band}")
 
         stations = wifi_bands_manager_service.get_connected_stations_mac_list(band)
+        if stations is None:
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
         return {"mac_list": stations}

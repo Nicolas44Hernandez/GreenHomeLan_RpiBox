@@ -135,7 +135,7 @@ loggers:
 
   server.managers.wifi_bands_manager:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.managers.alimelo_manager:
@@ -155,7 +155,7 @@ loggers:
 
   server.interfaces.wifi_interface:
     level: INFO
-    handlers: [telnet]
+    handlers: [console]
     propagate: no
 
   server.interfaces.alimelo_interface:
