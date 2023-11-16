@@ -62,10 +62,10 @@ class Orchestrator:
             )
 
             # Init requests module
-            # orchestrator_requests_service.init_requests_module(
-            #     mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"],
-            #     mqtt_command_topic=app.config["MQTT_COMMAND_TOPIC"]
-            # )
+            orchestrator_requests_service.init_requests_module(
+                mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"],
+                mqtt_command_topic=app.config["MQTT_COMMAND_TOPIC"],
+            )
 
             # Init commands module
             orchestrator_commands_service.init_commands_module(
