@@ -1,10 +1,9 @@
 import logging
 import requests
-import json
+import threading
 from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
-from timeloop import Timeloop
 from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
@@ -17,7 +16,7 @@ from server.common import ServerBoxException
 
 logger = logging.getLogger(__name__)
 
-resources_status_timeloop = Timeloop()
+POST_TIMEOUT_IN_SECS = 2
 
 
 class OrchestratorNotification:
@@ -46,7 +45,9 @@ class OrchestratorNotification:
         self.server_cloud_notify_status_path = server_cloud_notify_status_path
         self.server_cloud_notify_alarm_path = server_cloud_notify_alarm_path
         self.server_cloud_notify_device_path = server_cloud_notify_device_path
-        self.server_cloud_notify_connected_nodes_path = server_cloud_notify_connected_nodes_path
+        self.server_cloud_notify_connected_nodes_path = (
+            server_cloud_notify_connected_nodes_path
+        )
         self.server_cloud_ports = server_cloud_ports
 
     def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):
@@ -69,7 +70,9 @@ class OrchestratorNotification:
                     break
 
         relays_statuses = RelaysStatus(
-            relay_statuses=relays_statuses_in_command, command=True, timestamp=datetime.now()
+            relay_statuses=relays_statuses_in_command,
+            command=True,
+            timestamp=datetime.now(),
         )
 
         # Call wifi bands manager service to publish relays status command
@@ -89,7 +92,9 @@ class OrchestratorNotification:
     ):
         """Notify current wifi status and use situation to cloud server"""
 
-        logger.info("Posting HTTP to notify current wifi status and use situation to RPI cloud")
+        logger.info(
+            "Posting HTTP to notify current wifi status and use situation to RPI cloud"
+        )
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
@@ -129,7 +134,9 @@ class OrchestratorNotification:
                 alimelo_current_mA = alimelo_ressources.current_mA
                 alimelo_power_mW = alimelo_ressources.power_mW
                 alimelo_battery_level = alimelo_manager_service.get_battery_level()
-                alimelo_power_supplied = alimelo_ressources.electricSocketIsPowerSupplied
+                alimelo_power_supplied = (
+                    alimelo_ressources.electricSocketIsPowerSupplied
+                )
                 alimelo_is_powered_by_battery = alimelo_ressources.isPowredByBattery
                 alimelo_is_charging = alimelo_ressources.isChargingBattery
 
@@ -154,44 +161,36 @@ class OrchestratorNotification:
 
             # Post status to rpi cloud
             for port in self.server_cloud_ports:
-                post_url = (
-                    f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
-                )
-                try:
-                    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-                    data = {
-                        "wifi_status": wifi_status,
-                        "band_2GHz_status": band_status_2GHz,
-                        "band_5GHz_status": band_status_5GHz,
-                        "band_6GHz_status": band_status_6GHz,
-                        "use_situation": use_situation,
-                        "alimelo_busvoltage": alimelo_busvoltage,
-                        "alimelo_shuntvoltage": alimelo_shuntvoltage,
-                        "alimelo_loadvoltage": alimelo_loadvoltage,
-                        "alimelo_current_mA": alimelo_current_mA,
-                        "alimelo_power_mW": alimelo_power_mW,
-                        "alimelo_battery_level": alimelo_battery_level,
-                        "alimelo_power_supplied": alimelo_power_supplied,
-                        "alimelo_is_powered_by_battery": alimelo_is_powered_by_battery,
-                        "alimelo_is_charging": alimelo_is_charging,
-                        "po0_status": po0_status,
-                        "po0_powered": po0_powered,
-                        "po1_status": po1_status,
-                        "po1_powered": po1_powered,
-                        "po2_status": po2_status,
-                        "po2_powered": po2_powered,
-                    }
+                post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
+                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+                data = {
+                    "wifi_status": wifi_status,
+                    "band_2GHz_status": band_status_2GHz,
+                    "band_5GHz_status": band_status_5GHz,
+                    "band_6GHz_status": band_status_6GHz,
+                    "use_situation": use_situation,
+                    "alimelo_busvoltage": alimelo_busvoltage,
+                    "alimelo_shuntvoltage": alimelo_shuntvoltage,
+                    "alimelo_loadvoltage": alimelo_loadvoltage,
+                    "alimelo_current_mA": alimelo_current_mA,
+                    "alimelo_power_mW": alimelo_power_mW,
+                    "alimelo_battery_level": alimelo_battery_level,
+                    "alimelo_power_supplied": alimelo_power_supplied,
+                    "alimelo_is_powered_by_battery": alimelo_is_powered_by_battery,
+                    "alimelo_is_charging": alimelo_is_charging,
+                    "po0_status": po0_status,
+                    "po0_powered": po0_powered,
+                    "po1_status": po1_status,
+                    "po1_powered": po1_powered,
+                    "po2_status": po2_status,
+                    "po2_powered": po2_powered,
+                }
 
-                    rpi_cloud_response = requests.post(post_url, data=(data), headers=headers)
-                    logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-                except (ConnectionError, InvalidURL):
-                    logger.error(
-                        f"Error when posting wifi info to rpi cloud, check if rpi cloud server is"
-                        f" running"
-                    )
+                self.http_post_in_dedicated_thread(url=post_url, data=data)
         else:
-            logger.error(f"Imposible to post notification, box is disconnected from internet")
-
+            logger.error(
+                f"Imposible to post notification, box is disconnected from internet"
+            )
 
     def transfer_alarm_to_cloud_server(self, alarm_type: str):
         """Transfer alarm notification to cloud server"""
@@ -202,73 +201,57 @@ class OrchestratorNotification:
         # if connected_to_internet:
         if True:
             logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
-            data_to_send = {"alarm_type": alarm_type}
+            data = {"alarm_type": alarm_type}
             # Post alarm to rpi cloud
             for port in self.server_cloud_ports:
-                post_url = (
-                    f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
-                )
-                try:
-                    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+                post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
+                self.http_post_in_dedicated_thread(url=post_url, data=data)
 
-                    rpi_cloud_response = requests.post(
-                        post_url, data=(data_to_send), headers=headers
-                    )
-                    logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-                except (ConnectionError, InvalidURL):
-                    logger.error(
-                        f"Error when posting alarm notification to rpi cloud, check if rpi cloud"
-                        f" server is running"
-                    )
-
-
-    def transfer_device_battery_level_to_cloud_server(self, device_type:str, device:str, batLevel:str):
+    def transfer_device_battery_level_to_cloud_server(
+        self, device_type: str, device: str, batLevel: str
+    ):
         """Transfer device batery level to cloud server"""
-        data_to_send = {"device": device, "type": device_type, "batLevel": batLevel}
+        data = {"device": device, "type": device_type, "batLevel": batLevel}
         # Post alarm to rpi cloud
         for port in self.server_cloud_ports:
-            post_url = (
-                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_device_path}"
-            )
+            post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_device_path}"
             logger.info(f"Post battery device to: {post_url}")
-            try:
-                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            self.http_post_in_dedicated_thread(url=post_url, data=data)
 
-                rpi_cloud_response = requests.post(
-                    post_url, data=(data_to_send), headers=headers, timeout=2
-                )
-                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-            except Exception as e:
-                logger.error("Error in post")
-                logger.error(e)
-            # except (ConnectionError, InvalidURL):
-            #     logger.error(
-            #         f"Error when posting device battery level  notification to rpi cloud, check if rpi cloud"
-            #         f" server is running"
-            #     )
-
-    def notify_thread_connected_nodes_to_cloud_server(self, connected_nodes:dict):
+    def notify_thread_connected_nodes_to_cloud_server(self, connected_nodes: dict):
         """Transfer connected nodes to to cloud server"""
         # Post connected nodes to rpi cloud
-        data_to_send = {}
+        data = {}
         for node_id in connected_nodes.keys():
-            data_to_send[node_id]=connected_nodes[node_id].strftime("%H:%M:%S")
+            data[node_id] = connected_nodes[node_id].strftime("%H:%M:%S")
         for port in self.server_cloud_ports:
-            post_url = (
-                f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_connected_nodes_path}"
-            )
-            try:
-                headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_connected_nodes_path}"
+            self.http_post_in_dedicated_thread(url=post_url, data=data)
 
-                rpi_cloud_response = requests.post(
-                    post_url, data=(data_to_send), headers=headers
-                )
-                logger.info(f"RPI cloud server response: {rpi_cloud_response.text}")
-            except (ConnectionError, InvalidURL):
-                logger.error(
-                    f"Error when posting conected nodes notification to rpi cloud, check if rpi cloud"
-                    f" server is running"
-                )
+    def http_post(self, url: str, data: dict, timeout: int = POST_TIMEOUT_IN_SECS):
+        """HTTP Post"""
+        try:
+            server_response = requests.post(
+                url,
+                data=(data),
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+                timeout=timeout,
+            )
+            logger.info(f"Server response: {server_response.text}")
+        except (ConnectionError, InvalidURL):
+            logger.error(
+                f"Error when posting conected nodes notification to rpi cloud, check if rpi cloud"
+                f" server is running"
+            )
+
+    def http_post_in_dedicated_thread(
+        self, url: str, data: dict, timeout: int = POST_TIMEOUT_IN_SECS
+    ):
+        """HTTP Post in dedicated thread"""
+
+        post_thread = threading.Thread(target=self.http_post, args=[url, data, timeout])
+        post_thread.start()
+
 
 orchestrator_notification_service: OrchestratorNotification = OrchestratorNotification()
 """ OrchestratorNotification service singleton"""
