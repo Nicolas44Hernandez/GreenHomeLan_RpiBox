@@ -19,8 +19,6 @@ logger = logging.getLogger(__name__)
 BANDS = ["2.4GHz", "5GHz", "6GHz"]
 STATUS_CHANGE_TIMEOUT_IN_SECS = 15
 
-# TODO: logs
-
 
 class WifiBandsManager:
     """Manager for wifi control"""
@@ -149,6 +147,8 @@ class WifiBandsManager:
             except:
                 raise ServerBoxException(ErrorCode.MODULE_NOT_FOUND)
 
+    # TODO: Return None if telnet exception
+    # Contiene execute_telnet_commands
     def get_wifi_status(self):
         """Execute get wifi status command in the livebox using telnet service"""
         commands_response = self.execute_telnet_commands(["WIFI", "status"])
@@ -156,6 +156,7 @@ class WifiBandsManager:
         wifi_status = True if "up" in commands_response else False
         return wifi_status
 
+    # Contiene execute_telnet_commands
     def set_wifi_status(self, status: bool):
         """Execute set wifi status command in the livebox using telnet service"""
 
@@ -195,6 +196,7 @@ class WifiBandsManager:
 
         raise ServerBoxException(ErrorCode.STATUS_CHANGE_TIMER)
 
+    # Contiene execute_telnet_commands
     def get_band_status(self, band: str):
         """Execute get wifi band status command in the livebox using telnet service"""
         # Check if band number exists
@@ -210,6 +212,7 @@ class WifiBandsManager:
             band_status = True if "up" in commands_response else False
         return band_status
 
+    # Contiene execute_telnet_commands
     def set_band_status(self, band: str, status: bool):
         """Execute set wifi band status command in the livebox using telnet service"""
         # TODO: log times
@@ -253,6 +256,7 @@ class WifiBandsManager:
             status_change_trys += 1
         logger.error(f"Wifi status change is taking too long, verify wifi status")
 
+    # Contiene execute_telnet_commands
     def get_connected_stations_mac_list(self, band=None) -> Iterable[str]:
         """Execute get connected stations in the livebox using telnet service"""
         # TODO: log times
@@ -296,6 +300,7 @@ class WifiBandsManager:
         )
         return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
 
+    # Contiene execute_telnet_commands
     def get_stations_connected_to_band(self, band: str):
         """Returns the MAC list of stations connected to the band WiFi"""
         # Input check
@@ -313,21 +318,14 @@ class WifiBandsManager:
 
     def update_wifi_status_attribute(self) -> WifiStatus:
         """Retrieve wifi status and update wifi_status attribute"""
-        # TODO: uncoment
-        # status = wifi_bands_manager_service.get_wifi_status()
-        ### ONLY FOR TEST
-        status = True
-        ##################
+        status = wifi_bands_manager_service.get_wifi_status()
+
         bands_status = []
 
         for band in BANDS:
-            # TODO: uncoment
-            # band_status = WifiBandStatus(
-            #     band=band, status=wifi_bands_manager_service.get_band_status(band=band)
-            # )
-            ### ONLY FOR TEST
-            band_status = WifiBandStatus(band=band, status=True)
-            ########################################################################
+            band_status = WifiBandStatus(
+                band=band, status=wifi_bands_manager_service.get_band_status(band=band)
+            )
             bands_status.append(band_status)
 
         self.wifi_status = WifiStatus(status=status, bands_status=bands_status)
