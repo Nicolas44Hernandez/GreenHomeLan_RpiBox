@@ -313,14 +313,21 @@ class WifiBandsManager:
 
     def update_wifi_status_attribute(self) -> WifiStatus:
         """Retrieve wifi status and update wifi_status attribute"""
-
-        status = wifi_bands_manager_service.get_wifi_status()
+        # TODO: uncoment
+        # status = wifi_bands_manager_service.get_wifi_status()
+        ### ONLY FOR TEST
+        status = True
+        ##################
         bands_status = []
 
         for band in BANDS:
-            band_status = WifiBandStatus(
-                band=band, status=wifi_bands_manager_service.get_band_status(band=band)
-            )
+            # TODO: uncoment
+            # band_status = WifiBandStatus(
+            #     band=band, status=wifi_bands_manager_service.get_band_status(band=band)
+            # )
+            ### ONLY FOR TEST
+            band_status = WifiBandStatus(band=band, status=True)
+            ########################################################################
             bands_status.append(band_status)
 
         self.wifi_status = WifiStatus(status=status, bands_status=bands_status)
