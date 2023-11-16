@@ -46,6 +46,7 @@ class ThreadServerDongle(threading.Thread):
                     self.serial_interface.inWaiting()
                 )
                 msg = received_data.decode("utf-8")
+                msg = str(msg[: len(msg) - 1])
                 logger.info(f"Thread Message received: {msg}")
                 if msg.startswith("ka"):
                     node = msg.split("_")[1]

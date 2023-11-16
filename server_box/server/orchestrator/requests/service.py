@@ -48,10 +48,7 @@ class OrchestratorRequests:
     def thread_msg_reception_callback(self, msg: str):
         """Callback for thread request message reception"""
 
-        # TODO: add message format (BSON)
         logger.info(f"Thread received message: {msg} len(msg): {len(msg)}")
-
-        # msg = str(msg[: len(msg) - 1])
 
         # Thread message is an alarm
         if msg.startswith("al"):
