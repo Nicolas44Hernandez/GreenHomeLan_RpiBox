@@ -27,9 +27,9 @@ class OrchestratorRequests:
         logger.info("initializing Orchestrator requests module")
 
         # # Set callback functions
-        thread_manager_service.set_msg_reception_callback(
-            self.thread_msg_reception_callback
-        )
+        # thread_manager_service.set_msg_reception_callback(
+        #     self.thread_msg_reception_callback
+        # )
 
         # Subscribe to command reception MQTT topic
         logger.info(f"Subscribe to MQTT topic: {mqtt_command_topic}")
