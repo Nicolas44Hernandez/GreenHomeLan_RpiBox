@@ -249,7 +249,11 @@ class OrchestratorNotification:
     ):
         """HTTP Post in dedicated thread"""
 
-        post_thread = threading.Thread(target=self.http_post, args=[url, data, timeout])
+        post_thread = threading.Thread(
+            target=self.http_post,
+            args=[url, data, timeout],
+            name="NotificationHttpPost",
+        )
         post_thread.start()
 
 
