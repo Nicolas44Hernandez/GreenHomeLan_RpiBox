@@ -97,11 +97,13 @@ class OrchestratorRequests:
                 if ressource == "wifi":
                     status = status == "on"
                     if band == "all":
-                        wifi_bands_manager_service.set_wifi_status(status=status)
+                        ret = wifi_bands_manager_service.set_wifi_status(status=status)
                     else:
-                        wifi_bands_manager_service.set_band_status(
+                        ret = wifi_bands_manager_service.set_band_status(
                             band=band, status=status
                         )
+                    if ret is None:
+                        logger.error("Error in wifi status command execution")
         except:
             logger.error(f"Error in message received format {msg}")
 

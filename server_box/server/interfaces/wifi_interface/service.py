@@ -43,39 +43,22 @@ class Telnet:
             tn_connection.write(login.encode("utf-8"))
 
             if self.password:
-                tn_connection.read_until(b"Password: ", timeout=self.telnet_timeout_in_secs)
+                tn_connection.read_until(
+                    b"Password: ", timeout=self.telnet_timeout_in_secs
+                )
                 password = self.password + "\n"
                 # Enter password
                 tn_connection.write(password.encode("utf-8"))
         except (socket.timeout, socket.error):
-            logger.error("Telnet connection creation failed")
-            return None
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
 
         logger.info(f"Telnet connection established with host: %s", self.host)
         return tn_connection
 
-    def create_super_user_session(self):
-        """Create superuser session in connected host (~$sudo su)"""
-        try:
-            if not self.connection:
-                logger.error("Telnet connection not stablished")
-                return None
-            self.connection.write("sudo su\n".encode("utf-8"))
-            flag = self.login + ":"
-            self.connection.read_until(flag.encode("utf-8"), timeout=self.telnet_timeout_in_secs)
-            password = self.password + "\n"
-            # Enter password
-            self.connection.write(password.encode("utf-8"))
-        except (socket.timeout, socket.error):
-            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
-
-        self.super_user_session = True
-        logger.debu("Super user session created")
-
     def close(self):
         try:
             if not self.connection:
-                logger.error("Telnet connection not stablished")
+                logger.error("in close: Telnet connection not stablished")
                 return None
             self.connection.write(b"exit\n")
         except (socket.timeout, socket.error):
@@ -85,12 +68,10 @@ class Telnet:
 
     def send_command(self, command: str) -> str:
         """Send command to telnet host"""
-        if "sudo " in command:
-            self.create_super_user_session()
         try:
             if not self.connection:
-                logger.error("Telnet connection not stablished")
-                return None
+                logger.error("in send_command: Telnet connection not stablished")
+                raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
             command = f"echo -n 'EE''EE '; {command}; echo 'FF''FF'\n"
             self.connection.write(command.encode("ascii"))
             return self.get_command_output()
@@ -100,17 +81,18 @@ class Telnet:
     def send_fast_command(self, command: str):
         """Send command without waiting for response"""
         if not self.connection:
-            logger.error("Telnet connection not stablished")
-            return None
+            logger.error("in send_fast_command: Telnet connection not stablished")
+            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
         command = command + "\n"
         self.connection.write(command.encode("ascii"))
         time.sleep(0.1)
-        return "OK"
 
     def parse_telnet_output(self, raw_output: str):
         """Parse the output of the sent command"""
         _splitted_patern = raw_output.split("EEEE")
-        return _splitted_patern[len(_splitted_patern) - 1].split("FFFF")[0].lstrip()[:-2]
+        return (
+            _splitted_patern[len(_splitted_patern) - 1].split("FFFF")[0].lstrip()[:-2]
+        )
 
     def get_command_output(self):
         """retrieve and parse command output"""

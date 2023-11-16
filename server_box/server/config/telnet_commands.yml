@@ -1,5 +1,3 @@
-SYSTEM:
-    livebox_fw version: echo LIVEBOX VERSION NOT IMPLEMENTED
 WIFI:
     status:
         - wl -i wl2 bss
