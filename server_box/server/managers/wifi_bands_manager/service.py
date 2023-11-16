@@ -51,7 +51,9 @@ class WifiBandsManager:
             self.livebox_login = app.config["LIVEBOX_LOGIN"]
             self.livebox_ip_password = app.config["LIVEBOX_PASSWORD"]
             self.telnet_timeout_in_secs = app.config["TELNET_TIMOUT_IN_SECS"]
-            self.mqtt_wifi_status_relays_topic = app.config["MQTT_WIFI_STATUS_RELAYS_TOPIC"]
+            self.mqtt_wifi_status_relays_topic = app.config[
+                "MQTT_WIFI_STATUS_RELAYS_TOPIC"
+            ]
             self.load_telnet_commands(app.config["LIVEBOX_TELNET_COMMANDS"])
 
     def create_telnet_connection(self) -> Telnet:
@@ -75,7 +77,9 @@ class WifiBandsManager:
             except yaml.YAMLError as exc:
                 raise ServerBoxException(ErrorCode.TELNET_COMMANDS_FILE_ERROR)
 
-    def execute_telnet_commands(self, dictionary_keys: Iterable[str], station_mac: str=None):
+    def execute_telnet_commands(
+        self, dictionary_keys: Iterable[str], station_mac: str = None
+    ):
         """
         Create a telnet connection and execute a command or a group of commands
         in telnet host
@@ -86,7 +90,9 @@ class WifiBandsManager:
             try:
                 new_element = new_element[key]
             except:
-                logger.error("Item not found in tenlet commands: ", str[dictionary_keys])
+                logger.error(
+                    "Item not found in tenlet commands: ", str[dictionary_keys]
+                )
                 raise ServerBoxException(ErrorCode.TELNET_COMMAND_NOT_FOUND)
 
         commands = new_element
@@ -195,7 +201,9 @@ class WifiBandsManager:
         if band not in BANDS:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
 
-        commands_response = self.execute_telnet_commands(["WIFI", "bands", band, "status"])
+        commands_response = self.execute_telnet_commands(
+            ["WIFI", "bands", band, "status"]
+        )
         if not commands_response:
             band_status = False
         else:
@@ -253,9 +261,9 @@ class WifiBandsManager:
         # if band is None return all the connected stations
         if band is None:
             for band in BANDS:
-                _stations = self.execute_telnet_commands(["WIFI", "bands", band, "stations"]).split(
-                    "assoclist"
-                )
+                _stations = self.execute_telnet_commands(
+                    ["WIFI", "bands", band, "stations"]
+                ).split("assoclist")
                 for station in _stations:
                     if len(station) > 5:
                         station = " ".join(station.split())
@@ -269,9 +277,9 @@ class WifiBandsManager:
         # return stations connected to the band
         connected_stations = []
 
-        _stations = self.execute_telnet_commands(["WIFI", "bands", band, "stations"]).split(
-            "assoclist"
-        )
+        _stations = self.execute_telnet_commands(
+            ["WIFI", "bands", band, "stations"]
+        ).split("assoclist")
         for station in _stations:
             if len(station) > 12:
                 station = " ".join(station.split())
@@ -283,7 +291,9 @@ class WifiBandsManager:
         # Get connected stations
         connected_stations_2_4GHz = self.get_stations_connected_to_band(band="2.4GHz")
         connected_stations_5GHz = self.get_stations_connected_to_band(band="5GHz")
-        total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
+        total_connections = len(connected_stations_2_4GHz) + len(
+            connected_stations_5GHz
+        )
         return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
 
     def get_stations_connected_to_band(self, band: str):
@@ -300,7 +310,6 @@ class WifiBandsManager:
         for _station in connected_stations_raw:
             connected_stations.append(_station.split("assoclist ")[1])
         return connected_stations
-
 
     def update_wifi_status_attribute(self) -> WifiStatus:
         """Retrieve wifi status and update wifi_status attribute"""
