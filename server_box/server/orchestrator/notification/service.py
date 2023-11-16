@@ -230,6 +230,7 @@ class OrchestratorNotification:
             post_url = (
                 f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_device_path}"
             )
+            logger.info(f"Post battery device to: {post_url}")
             try:
                 headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
