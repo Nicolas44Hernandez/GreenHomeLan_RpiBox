@@ -90,32 +90,32 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.managers.mqtt_manager:
@@ -130,22 +130,22 @@ loggers:
 
   server.managers.thread:
     level: INFO
-    handlers: [console]
+    handlers: [thread]
     propagate: no
 
   server.managers.wifi_bands_manager:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [console]
+    handlers: [alimelo]
     propagate: no
 
   server.interfaces.thread_dongle_interface:
     level: DEBUG
-    handlers: [console]
+    handlers: [thread]
     propagate: no
 
   server.interfaces.mqtt_interface:
@@ -155,7 +155,7 @@ loggers:
 
   server.interfaces.wifi_interface:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.interfaces.alimelo_interface:
