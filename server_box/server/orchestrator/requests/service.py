@@ -49,26 +49,27 @@ class OrchestratorRequests:
         """Callback for thread request message reception"""
 
         # TODO: add message format (BSON)
-        logger.info(f"Thread received message: {msg}")
+        logger.info(f"Thread received message: {msg} len(msg): {len(msg)}")
+
+        # msg = str(msg[: len(msg) - 1])
 
         # Thread message is an alarm
         if msg.startswith("al"):
             _device, _type = msg.split("_")[1:]
-            alarm_type = None
-            if "db" in _type:
+            if _type == "db":
                 alarm_type = "doorbell"
-            if "pd" in _type:
+            elif _type == "pd":
                 alarm_type = "presence"
-            if "em" in _type:
+            elif _type == "em":
                 alarm_type = "emergency_btn"
-            if "bat" in _type:  # al_bt1_bat
+            elif _type == "bat":  # al_bt1_bat
                 alarm_type = f"battery_btn_{_device}"
-            if alarm_type is None:
+            else:
                 logger.error(f"Error in alarm received format {msg}")
                 return
             logger.info(f"Alarm received {alarm_type}")
 
-            if "cam" in _device:
+            if _device == "cam":
                 # Turn wifi ON if alarm from camera
                 wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
 
@@ -114,17 +115,14 @@ class OrchestratorRequests:
     def command_reception_callback(self, msg):
         """Callback for MQTT command reception"""
         logger.info(f"Command received: {msg} ")
-        msg = str(msg[: len(msg) - 1])
         if type(msg) == dict:
             msg = msg["command"]
         try:
-            logger.info(f"Executing command: {msg}")
             command_number = int(msg.split("cmd_")[1])
-            logger.info(f"Command number: {command_number}")
             if not orchestrator_commands_service.execute_predefined_command(
                 command_number
             ):
-                logger.error("Exception: Error in command format")
+                logger.error("Error in command format")
                 return
         except:
             logger.error("Error in command format")
