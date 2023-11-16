@@ -41,7 +41,6 @@ class ThreadServerDongle(threading.Thread):
     def run(self):
         """Run thread"""
         while True:
-            logger.info("THREAD LOOP")
             if self.serial_interface.inWaiting() > 0:
                 received_data = self.serial_interface.read(
                     self.serial_interface.inWaiting()
