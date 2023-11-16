@@ -70,6 +70,9 @@ class ThreadManager:
 
     def update_status_in_dongle(self, wifi_status: bool, use_situation: str):
         """Update wifi and presence status in dongle"""
+        logger.info(
+            f"Updating status in dongle  wifi_status:{wifi_status}  use_situation:{use_situation}"
+        )
         logger.info(f"WIFI_STATUS: {wifi_status}  USE_SITUATION: {use_situation}")
         presence = "PRESENCE" in use_situation
         msg_wifi = "wifi:1" if wifi_status else "wifi:0"
