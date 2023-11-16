@@ -52,31 +52,37 @@ class OrchestratorPolling:
         def poll_wifi_status():
             # retrieve wifi status
             logger.info(f"Polling wifi status")
-            # wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+
+            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+            # TODO: uncoment
             # connected_stations = (
             #     wifi_bands_manager_service.get_connected_stations_mac_list()
             # )
-            # if self.home_office_mac_addr in connected_stations:
-            #     logger.info(
-            #         f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
-            #     )
-            #     orchestrator_use_situations_service.set_use_situation(
-            #         use_situation="PRESENCE_HOME_OFFICE"
-            #     )
+            ### ONLY FOR TEST
+            connected_stations = []
+            #######################
 
-            # # Notify wifi status toi RPI relais
-            # orchestrator_notification_service.notify_wifi_status(
-            #     bands_status=wifi_status.bands_status
-            # )
-            # logger.info(f"Polling wifi: RPI wifi notification ok")
+            if self.home_office_mac_addr in connected_stations:
+                logger.info(
+                    f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
+                )
+                orchestrator_use_situations_service.set_use_situation(
+                    use_situation="PRESENCE_HOME_OFFICE"
+                )
 
-            # # Notify current wifi status and use situation to rpi cloud
-            # orchestrator_notification_service.notify_cloud_server(
-            #     bands_status=wifi_status.bands_status,
-            #     use_situation=orchestrator_use_situations_service.get_current_use_situation(),
-            #     alimelo_ressources=alimelo_manager_service.alimelo_ressources,
-            #     relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
-            # )
+            # Notify wifi status toi RPI relais
+            orchestrator_notification_service.notify_wifi_status(
+                bands_status=wifi_status.bands_status
+            )
+            logger.info(f"Polling wifi: RPI wifi notification ok")
+
+            # Notify current wifi status and use situation to rpi cloud
+            orchestrator_notification_service.notify_cloud_server(
+                bands_status=wifi_status.bands_status,
+                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+                alimelo_ressources=alimelo_manager_service.alimelo_ressources,
+                relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
+            )
 
             # TODO: manage read and write in multiple threads
             # Notify current wifi and presence status to thread dongle
