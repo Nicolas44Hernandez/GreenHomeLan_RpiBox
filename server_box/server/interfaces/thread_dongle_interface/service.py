@@ -49,19 +49,19 @@ class ThreadServerDongle(threading.Thread):
                 msg = str(msg[: len(msg) - 1])
 
                 logger.info(f"Thread Message received: {msg}")
-                if msg.startswith("ka"):
-                    node = msg.split("_")[1]
-                    logger.info(f"Keep alive message received for node {node}")
-                    if self.keep_alive_callback is None:
-                        logger.error("Keep alive reception callback is None")
-                    else:
-                        self.keep_alive_callback(node_id=node)
-                    continue
+                # if msg.startswith("ka"):
+                #     node = msg.split("_")[1]
+                #     logger.info(f"Keep alive message received for node {node}")
+                #     if self.keep_alive_callback is None:
+                #         logger.error("Keep alive reception callback is None")
+                #     else:
+                #         self.keep_alive_callback(node_id=node)
+                #     continue
 
-                if self.msg_callback is None:
-                    logger.error("Message reception callback is None")
-                    continue
-                self.msg_callback(msg)
+                # if self.msg_callback is None:
+                #     logger.error("Message reception callback is None")
+                #     continue
+                # self.msg_callback(msg)
             time.sleep(0.1)
 
     def set_msg_reception_callback(self, callback: callable):
