@@ -86,13 +86,13 @@ def register_extensions(app: Flask):
         },
     )
     # MQTT service
-    # mqtt_manager_service.init_app(app=app)
+    mqtt_manager_service.init_app(app=app)
     # Wifi bands manager extension
     # wifi_bands_manager_service.init_app(app=app)
     # Thread manager extension
     thread_manager_service.init_app(app=app)
     # Electrical panel manager service
-    # electrical_panel_manager_service.init_app(app=app)
+    electrical_panel_manager_service.init_app(app=app)
     # Alimelo manager extension
     # alimelo_manager_service.init_app(app=app)
 
