@@ -26,24 +26,32 @@ class Orchestrator:
             logger.info("initializing Orchestrator")
 
             # Init use situations module
-            orchestrator_use_situations_service.init_use_situations_module(
-                use_situations_config_file=app.config["USE_SITUATIONS_CONFIG"],
-                default_use_situation=app.config["DEFAULT_USE_SITUATION"],
-            )
+            # orchestrator_use_situations_service.init_use_situations_module(
+            #     use_situations_config_file=app.config["USE_SITUATIONS_CONFIG"],
+            #     default_use_situation=app.config["DEFAULT_USE_SITUATION"],
+            # )
 
             # Init notification module
             orchestrator_notification_service.init_notification_module(
                 rpi_cloud_ip_addr=app.config["RPI_CLOUD_IP"],
-                server_cloud_notify_status_path=app.config["RPI_CLOUD_NOTIFY_STATUS_PATH"],
-                server_cloud_notify_alarm_path=app.config["RPI_CLOUD_NOTIFY_ALARM_PATH"],
+                server_cloud_notify_status_path=app.config[
+                    "RPI_CLOUD_NOTIFY_STATUS_PATH"
+                ],
+                server_cloud_notify_alarm_path=app.config[
+                    "RPI_CLOUD_NOTIFY_ALARM_PATH"
+                ],
                 server_cloud_notify_device_path=app.config["RPI_CLOUD_DEVICE_PATH"],
-                server_cloud_notify_connected_nodes_path=app.config["RPI_CLOUD_THREAD_NODES_PATH"],
+                server_cloud_notify_connected_nodes_path=app.config[
+                    "RPI_CLOUD_THREAD_NODES_PATH"
+                ],
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
             )
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(
-                wifi_status_polling_period_in_secs=app.config["WIFI_STATUS_POLLING_PERIOD_IN_SECS"],
+                wifi_status_polling_period_in_secs=app.config[
+                    "WIFI_STATUS_POLLING_PERIOD_IN_SECS"
+                ],
                 alimelo_status_check_period_in_secs=app.config[
                     "ALIMELO_STATUS_CHECK_PERIOD_IN_SECS"
                 ],
@@ -54,10 +62,10 @@ class Orchestrator:
             )
 
             # Init requests module
-            orchestrator_requests_service.init_requests_module(
-                mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"],
-                mqtt_command_topic=app.config["MQTT_COMMAND_TOPIC"]
-            )
+            # orchestrator_requests_service.init_requests_module(
+            #     mqtt_alarm_notif_topic=app.config["MQTT_ALARM_NOTIFICATION_TOPIC"],
+            #     mqtt_command_topic=app.config["MQTT_COMMAND_TOPIC"]
+            # )
 
             # Init commands module
             orchestrator_commands_service.init_commands_module(

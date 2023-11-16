@@ -21,7 +21,7 @@ from .managers.electrical_panel_manager import electrical_panel_manager_service
 # from .rest_api.use_situations_controler import bp as use_situations_controler_bp
 # from .rest_api.commands_controler import bp as commands_controler_bp
 # from .rest_api.system_version_controler import bp as system_version_controler_bp
-# from .orchestrator import orchestrator_service
+from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
 
@@ -98,8 +98,7 @@ def register_extensions(app: Flask):
 
 def register_orchestrator(app: Flask):
     """Initialize Orchestrator"""
-    pass
-    # orchestrator_service.init_app(app=app)
+    orchestrator_service.init_app(app=app)
 
 
 def register_blueprints(app: Flask):
