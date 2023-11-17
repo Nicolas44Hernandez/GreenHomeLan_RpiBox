@@ -88,12 +88,11 @@ class OrchestratorPolling:
                 relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
 
-            # TODO: manage read and write in multiple threads
             # Notify current wifi and presence status to thread dongle
-            # thread_manager_service.update_status_in_dongle(
-            #     wifi_status=wifi_status.status,
-            #     use_situation=orchestrator_use_situations_service.get_current_use_situation(),
-            # )
+            thread_manager_service.update_status_in_dongle(
+                wifi_status=wifi_status.status,
+                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+            )
 
             logger.info(f"Polling wifi done")
 
