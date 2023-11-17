@@ -54,6 +54,9 @@ class OrchestratorPolling:
             logger.info(f"Polling wifi status")
 
             wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+            current_use_situation = (
+                orchestrator_use_situations_service.get_current_use_situation()
+            )
             if wifi_status is None:
                 logger.error("Impossible to get wifi status")
                 return
@@ -83,7 +86,7 @@ class OrchestratorPolling:
             # Notify current wifi status and use situation to rpi cloud
             orchestrator_notification_service.notify_cloud_server(
                 bands_status=wifi_status.bands_status,
-                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+                use_situation=current_use_situation,
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
                 relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
             )
@@ -91,7 +94,7 @@ class OrchestratorPolling:
             # Notify current wifi and presence status to thread dongle
             thread_manager_service.update_status_in_dongle(
                 wifi_status=wifi_status.status,
-                use_situation=orchestrator_use_situations_service.get_current_use_situation(),
+                use_situation=current_use_situation,
             )
 
             logger.info(f"Polling wifi done")
