@@ -130,7 +130,7 @@ loggers:
 
   server.managers.thread:
     level: INFO
-    handlers: [thread]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_manager:
@@ -145,7 +145,7 @@ loggers:
 
   server.interfaces.thread_dongle_interface:
     level: DEBUG
-    handlers: [thread]
+    handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_interface:
