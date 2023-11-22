@@ -1,6 +1,7 @@
 import logging
 import requests
 import threading
+import socket
 from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
@@ -159,11 +160,22 @@ class OrchestratorNotification:
                         po2_status = relay_status.status
                         po2_powered = relay_status.powered
 
+            # Get Orchestrator ip address
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("192.168.1.122", 80))
+                orchestrator_ip_addr = s.getsockname()[0]
+                orquestrator_base_url = f"http://{orchestrator_ip_addr}:5000/"
+                s.close()
+            except:
+                logger.error("Error retreiving orchestrator IP")
+                orquestrator_base_url = ""
+
             # Post status to rpi cloud
             for port in self.server_cloud_ports:
                 post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
-                headers = {"Content-Type": "application/x-www-form-urlencoded"}
                 data = {
+                    "orquestrator_base_url": orquestrator_base_url,
                     "wifi_status": wifi_status,
                     "band_2GHz_status": band_status_2GHz,
                     "band_5GHz_status": band_status_5GHz,
