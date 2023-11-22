@@ -4,7 +4,7 @@ After=network.target syslog.target auditd.service systemd-journald.socket basic.
 
 [Service]
 User=pi
-WorkingDirectory=/home/nico/workspace/GreenHomeLan_RpiBox
+WorkingDirectory=/home/pi/workspace/GreenHomeLan_RpiBox
 Environment=FLASK_CONFIG=production
 Environment=FLASK_APP="server_box/server/app:create_app()"
 ExecStart=/home/pi/.local/bin/flask run --host '0.0.0.0'
