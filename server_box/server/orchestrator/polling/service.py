@@ -61,6 +61,11 @@ class OrchestratorPolling:
                 logger.error("Impossible to get wifi status")
                 return
 
+            # Get relays status
+            relay_statuses = (
+                electrical_panel_manager_service.get_relays_last_received_status()
+            )
+
             # Get connected stations list
             connected_stations = (
                 wifi_bands_manager_service.get_connected_stations_mac_list()
@@ -88,13 +93,14 @@ class OrchestratorPolling:
                 bands_status=wifi_status.bands_status,
                 use_situation=current_use_situation,
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
-                relay_statuses=electrical_panel_manager_service.get_relays_last_received_status(),
+                relay_statuses=relay_statuses,
             )
 
             # Notify current wifi and presence status to thread dongle
             thread_manager_service.update_status_in_dongle(
                 wifi_status=wifi_status.status,
                 use_situation=current_use_situation,
+                relay_statuses=relay_statuses,
             )
 
             logger.info(f"Polling wifi done")

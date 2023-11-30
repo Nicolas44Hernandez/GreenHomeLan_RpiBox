@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from flask import Flask
 from timeloop import Timeloop
 from server.interfaces.thread_dongle_interface import ThreadInterface
+from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 
 logger = logging.getLogger(__name__)
 
@@ -68,16 +69,34 @@ class ThreadManager:
         for node_to_delete_id in nodes_to_delete:
             del self.nodes_ka_dict[node_to_delete_id]
 
-    def update_status_in_dongle(self, wifi_status: bool, use_situation: str):
+    def update_status_in_dongle(
+        self,
+        wifi_status: bool,
+        use_situation: str,
+        relay_statuses: RelaysStatus,
+    ):
         """Update wifi and presence status in dongle"""
         logger.info(
-            f"Updating status in dongle  wifi_status:{wifi_status}  use_situation:{use_situation}"
+            f"Updating status in dongle  wifi_status:{wifi_status}  use_situation:{use_situation}  relay_statuses: {relay_statuses}"
         )
-        logger.info(f"WIFI_STATUS: {wifi_status}  USE_SITUATION: {use_situation}")
+
+        # Get electricity status
+        electrycity_status = False
+        if relay_statuses is not None:
+            for relay_status in relay_statuses.relay_statuses:
+                if relay_status.relay_number in [0, 1, 2]:
+                    if relay_status.status:
+                        electrycity_status = True
+                        break
+
+        # Get presence status from us
         presence = "PRESENCE" in use_situation
+
+        # Build message
         msg_wifi = "wifi:1" if wifi_status else "wifi:0"
         msg_prs = "prs:1" if presence else "prs:0"
-        message = msg_wifi + msg_prs
+        msg_ele = "ele:1" if electrycity_status else "ele:0"
+        message = msg_wifi + msg_prs + msg_ele
         logger.info(f"MSG: {message}")
         if not self.thread_dongle_interface.write_message_to_dongle(message):
             logger.error(f"Error sending status to dongle")
