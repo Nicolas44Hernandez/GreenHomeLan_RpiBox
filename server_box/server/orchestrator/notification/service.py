@@ -250,10 +250,7 @@ class OrchestratorNotification:
             )
             logger.info(f"Server response: {server_response.text}")
         except (ConnectionError, InvalidURL):
-            logger.error(
-                f"Error when posting conected nodes notification to rpi cloud, check if rpi cloud"
-                f" server is running"
-            )
+            logger.error(f"Error when posting to rpi cloud")
 
     def http_post_in_dedicated_thread(
         self, url: str, data: dict, timeout: int = POST_TIMEOUT_IN_SECS

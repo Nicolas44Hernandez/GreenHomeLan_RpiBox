@@ -88,22 +88,11 @@ class OrchestratorRequests:
                     device_type=device_type, device=device, batLevel=level
                 )
 
-            # If Thread message is a direct wifi command
+            # If Thread message is a direct command
             else:
-                # Parse received message
-                ressource, band, status = msg.split("-")
-
-                # set wifi status
-                if ressource == "wifi":
-                    status = status == "on"
-                    if band == "all":
-                        ret = wifi_bands_manager_service.set_wifi_status(status=status)
-                    else:
-                        ret = wifi_bands_manager_service.set_band_status(
-                            band=band, status=status
-                        )
-                    if ret is None:
-                        logger.error("Error in wifi status command execution")
+                if not orchestrator_commands_service.execute_command(msg):
+                    logger.error("Error in command format")
+                    return
         except:
             logger.error(f"Error in message received format {msg}")
 
