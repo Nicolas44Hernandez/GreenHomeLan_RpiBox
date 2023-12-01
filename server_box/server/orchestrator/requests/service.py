@@ -68,7 +68,9 @@ class OrchestratorRequests:
 
                 if _device == "cam":
                     # Turn wifi ON if alarm from camera
-                    wifi_bands_manager_service.set_band_status(band="5GHz", status=True)
+                    wifi_bands_manager_service.set_band_status(
+                        band="2.4GHz", status=True
+                    )
 
                 # Transfer alarm to cloud server and liveobjects
                 orchestrator_notification_service.transfer_alarm_to_cloud_server(
