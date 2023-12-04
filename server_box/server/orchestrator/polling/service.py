@@ -131,7 +131,13 @@ class OrchestratorPolling:
         def poll_ressources_and_notify_live_objects():
             # retrieve wifi status
             logger.info(f"Polling ressources status and send to LiveObjects")
-            wifi_status = wifi_bands_manager_service.get_current_wifi_status()
+
+            # TEMP
+            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+            # wifi_status = wifi_bands_manager_service.get_current_wifi_status()
+            if wifi_status is None:
+                logger.error("Impossible to get wifi status")
+                return
             relay_statuses = (
                 electrical_panel_manager_service.get_relays_last_received_status()
             )

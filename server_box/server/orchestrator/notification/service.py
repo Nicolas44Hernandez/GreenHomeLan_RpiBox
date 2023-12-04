@@ -216,6 +216,8 @@ class OrchestratorNotification:
         """Notify current status to LiveObjects"""
         logger.info(f"Notify status to Live Objects")
 
+        # TODO: Try catch
+
         # Format wifi bands status
         w = wifi_status.status
         connected_to_internet = connected_to_internet
