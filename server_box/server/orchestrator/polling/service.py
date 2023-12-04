@@ -48,81 +48,81 @@ class OrchestratorPolling:
     def schedule_resources_status_polling(self):
         """Schedule the resources polling"""
 
-        # Start wifi status polling service
-        @resources_status_timeloop.job(
-            interval=timedelta(seconds=self.wifi_status_polling_period_in_secs)
-        )
-        def poll_wifi_status():
-            # retrieve wifi status
-            logger.info(f"Polling wifi status")
+        # # Start wifi status polling service
+        # @resources_status_timeloop.job(
+        #     interval=timedelta(seconds=self.wifi_status_polling_period_in_secs)
+        # )
+        # def poll_wifi_status():
+        #     # retrieve wifi status
+        #     logger.info(f"Polling wifi status")
 
-            wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
-            current_use_situation = (
-                orchestrator_use_situations_service.get_current_use_situation()
-            )
-            if wifi_status is None:
-                logger.error("Impossible to get wifi status")
-                return
+        #     wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
+        #     current_use_situation = (
+        #         orchestrator_use_situations_service.get_current_use_situation()
+        #     )
+        #     if wifi_status is None:
+        #         logger.error("Impossible to get wifi status")
+        #         return
 
-            # Get relays status
-            relay_statuses = (
-                electrical_panel_manager_service.get_relays_last_received_status()
-            )
+        #     # Get relays status
+        #     relay_statuses = (
+        #         electrical_panel_manager_service.get_relays_last_received_status()
+        #     )
 
-            # Get connected stations list
-            connected_stations = (
-                wifi_bands_manager_service.get_connected_stations_mac_list()
-            )
-            if connected_stations is None:
-                logger.error("Impossible to get wifi status")
-                return
+        #     # Get connected stations list
+        #     connected_stations = (
+        #         wifi_bands_manager_service.get_connected_stations_mac_list()
+        #     )
+        #     if connected_stations is None:
+        #         logger.error("Impossible to get wifi status")
+        #         return
 
-            if self.home_office_mac_addr in connected_stations:
-                logger.info(
-                    f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
-                )
-                orchestrator_use_situations_service.set_use_situation(
-                    use_situation="PRESENCE_HOME_OFFICE"
-                )
+        #     if self.home_office_mac_addr in connected_stations:
+        #         logger.info(
+        #             f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
+        #         )
+        #         orchestrator_use_situations_service.set_use_situation(
+        #             use_situation="PRESENCE_HOME_OFFICE"
+        #         )
 
-            # Notify wifi status toi RPI relais
-            orchestrator_notification_service.notify_wifi_status(
-                bands_status=wifi_status.bands_status
-            )
-            logger.info(f"Polling wifi: RPI wifi notification ok")
+        #     # Notify wifi status toi RPI relais
+        #     orchestrator_notification_service.notify_wifi_status(
+        #         bands_status=wifi_status.bands_status
+        #     )
+        #     logger.info(f"Polling wifi: RPI wifi notification ok")
 
-            # Notify current wifi status and use situation to rpi cloud
-            orchestrator_notification_service.notify_cloud_server(
-                bands_status=wifi_status.bands_status,
-                use_situation=current_use_situation,
-                alimelo_ressources=alimelo_manager_service.alimelo_ressources,
-                relay_statuses=relay_statuses,
-            )
+        #     # Notify current wifi status and use situation to rpi cloud
+        #     orchestrator_notification_service.notify_cloud_server(
+        #         bands_status=wifi_status.bands_status,
+        #         use_situation=current_use_situation,
+        #         alimelo_ressources=alimelo_manager_service.alimelo_ressources,
+        #         relay_statuses=relay_statuses,
+        #     )
 
-            # Notify current wifi and presence status to thread dongle
-            thread_manager_service.update_status_in_dongle(
-                wifi_status=wifi_status.status,
-                use_situation=current_use_situation,
-                relay_statuses=relay_statuses,
-            )
+        #     # Notify current wifi and presence status to thread dongle
+        #     thread_manager_service.update_status_in_dongle(
+        #         wifi_status=wifi_status.status,
+        #         use_situation=current_use_situation,
+        #         relay_statuses=relay_statuses,
+        #     )
 
-            logger.info(f"Polling wifi done")
+        #     logger.info(f"Polling wifi done")
 
-        @resources_status_timeloop.job(
-            interval=timedelta(
-                seconds=self.connected_thread_nodes_notification_period_in_secs
-            )
-        )
-        def notify_thread_connected_nodes_to_cloud():
-            # retrieve connected nodes
-            logger.info(f"Polling thread connected nodes and notify cloud")
-            thread_manager_service.update_connected_nodes()
-            connected_nodes = thread_manager_service.get_connected_nodes()
+        # @resources_status_timeloop.job(
+        #     interval=timedelta(
+        #         seconds=self.connected_thread_nodes_notification_period_in_secs
+        #     )
+        # )
+        # def notify_thread_connected_nodes_to_cloud():
+        #     # retrieve connected nodes
+        #     logger.info(f"Polling thread connected nodes and notify cloud")
+        #     thread_manager_service.update_connected_nodes()
+        #     connected_nodes = thread_manager_service.get_connected_nodes()
 
-            # Notify connected nodes to cloud
-            orchestrator_notification_service.notify_thread_connected_nodes_to_cloud_server(
-                connected_nodes=connected_nodes
-            )
+        #     # Notify connected nodes to cloud
+        #     orchestrator_notification_service.notify_thread_connected_nodes_to_cloud_server(
+        #         connected_nodes=connected_nodes
+        #     )
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(
