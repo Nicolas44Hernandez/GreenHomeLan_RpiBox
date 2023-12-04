@@ -31,7 +31,7 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
-  interface_live_objects:
+  live_objects:
     class: logging.handlers.RotatingFileHandler
     formatter: default
     filename: logs/live_objects.log
@@ -97,27 +97,27 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.use_situations:
@@ -152,7 +152,7 @@ loggers:
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [console]
+    handlers: [alimelo]
     propagate: no
 
   server.interfaces.thread_dongle_interface:
@@ -172,11 +172,11 @@ loggers:
 
   server.interfaces.alimelo_interface:
     level: DEBUG
-    handlers: [console]
+    handlers: [alimelo]
     propagate: no
 
   server.interfaces.live_objects_interface:
     level: INFO
-    handlers: [console]
+    handlers: [live_objects]
     propagate: no
 
