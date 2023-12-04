@@ -62,13 +62,18 @@ class AlimeloSerialCom(threading.Thread):
                         if notification_separator_start in serial_read:
                             reading_notification = True
                             while reading_notification:
-                                notification_segment_received = self.serial.readline().decode(
-                                    "utf-8"
+                                notification_segment_received = (
+                                    self.serial.readline().decode("utf-8")
                                 )
-                                if notification_separator_end in notification_segment_received:
+                                if (
+                                    notification_separator_end
+                                    in notification_segment_received
+                                ):
                                     reading_notification = False
                                     if self.notification_callback is None:
-                                        logger.error("Notification reception callback is None")
+                                        logger.error(
+                                            "Notification reception callback is None"
+                                        )
                                         break
                                     self.notification_callback(
                                         notification_received.replace("\r\n", "")
@@ -81,13 +86,19 @@ class AlimeloSerialCom(threading.Thread):
                         elif commannd_separator_start in serial_read:
                             reading_command = True
                             while reading_command:
-                                command_segment_received = self.serial.readline().decode("utf-8")
+                                command_segment_received = (
+                                    self.serial.readline().decode("utf-8")
+                                )
                                 if command_separator_end in command_segment_received:
                                     reading_command = False
                                     if self.command_callback is None:
-                                        logger.error("Command reception callback is None")
+                                        logger.error(
+                                            "Command reception callback is None"
+                                        )
                                         break
-                                    self.command_callback(command_received.replace("\r\n", ""))
+                                    self.command_callback(
+                                        command_received.replace("\r\n", "")
+                                    )
                                     command_received = ""
                                     continue
                                 command_received += command_segment_received
@@ -154,3 +165,19 @@ class AlimeloSerialCom(threading.Thread):
             logger.error("Exception in serial connection")
             logger.error(e)
         self.setup_serial_communication()
+
+    def send_data_to_live_objects(self, data_to_send: str):
+        """Send data to liveobjects"""
+        logger.info(f"Sending data to liveobjects: {data_to_send}")
+        try:
+            if self.connected:
+                self.serial.write(data_to_send.encode())
+            else:
+                logger.error("Serial connection is down")
+        except (
+            serial.SerialException,
+            AttributeError,
+        ) as e:
+            logger.error("Exception in serial connection")
+            logger.error(e)
+            self.restart_serial_connection()
