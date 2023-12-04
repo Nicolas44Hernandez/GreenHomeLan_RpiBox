@@ -275,13 +275,10 @@ class OrchestratorNotification:
                 post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_alarm_path}"
                 self.http_post_in_dedicated_thread(url=post_url, data=data)
 
-    # TODO: this method is not called
     def transfer_alarm_to_liveobjects(self, alarm_type: str):
         """Transfer alarm notification to cloud  Live objects"""
 
-        logger.info(
-            f"Box is disconnected from internet. Posting notify alarm to LiveObects via Alimelo"
-        )
+        logger.info(f"Posting notify alarm to LiveObects via Alimelo")
         data_to_send = {"al": {alarm_type: 1}}
         data = json.dumps(data_to_send).replace(" ", "")
         alimelo_manager_service.send_data_to_live_objects(data)

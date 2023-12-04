@@ -86,8 +86,13 @@ class OrchestratorRequests:
                         band="2.4GHz", status=True
                     )
 
-                # Transfer alarm to cloud server and liveobjects
+                # Transfer alarm to cloud server
                 orchestrator_notification_service.transfer_alarm_to_cloud_server(
+                    alarm_type
+                )
+
+                # Transfer alarm to Live Objects
+                orchestrator_notification_service.transfer_alarm_to_liveobjects(
                     alarm_type
                 )
 
@@ -115,8 +120,14 @@ class OrchestratorRequests:
     def alarm_notification_reception_callback(self, msg):
         """Callback for MQTT object alarm notification"""
         logger.info(f"Alarm notification received: {msg} ")
+
+        # Transfer alarm to Cloud server
         orchestrator_notification_service.transfer_alarm_to_cloud_server(msg["type"])
-        # TODO: trasnsger to liveobjects too
+
+        # Transfer alarm to Live Objects
+        orchestrator_notification_service.transfer_alarm_to_liveobjects(
+            alarm_type=msg["type"]
+        )
 
     def command_reception_callback(self, msg):
         """Callback for MQTT command reception"""
