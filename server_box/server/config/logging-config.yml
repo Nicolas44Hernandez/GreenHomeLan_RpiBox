@@ -97,27 +97,27 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.use_situations:
