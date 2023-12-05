@@ -52,6 +52,9 @@ class Orchestrator:
                 wifi_status_polling_period_in_secs=app.config[
                     "WIFI_STATUS_POLLING_PERIOD_IN_SECS"
                 ],
+                home_office_station_polling_period_in_secs=app.config[
+                    "HOME_OFFICE_STATION_POLLING_PERIOD_IN_SECS"
+                ],
                 alimelo_status_check_period_in_secs=app.config[
                     "ALIMELO_STATUS_CHECK_PERIOD_IN_SECS"
                 ],
