@@ -18,6 +18,7 @@ class OrchestratorPolling:
 
     # Attributes
     wifi_status_polling_period_in_secs: int
+    home_office_station_polling_period_in_secs: int
     alimelo_status_check_period_in_secs: int
     live_objects_notification_period: int
     connected_thread_nodes_notification_period_in_secs: int
@@ -26,6 +27,7 @@ class OrchestratorPolling:
     def init_polling_module(
         self,
         wifi_status_polling_period_in_secs: int,
+        home_office_station_polling_period_in_secs: int,
         live_objects_notification_period: int,
         alimelo_status_check_period_in_secs: int,
         connected_thread_nodes_notification_period_in_secs: int,
@@ -35,6 +37,9 @@ class OrchestratorPolling:
         logger.info("initializing Orchestrator polling module")
 
         self.wifi_status_polling_period_in_secs = wifi_status_polling_period_in_secs
+        self.home_office_station_polling_period_in_secs = (
+            home_office_station_polling_period_in_secs
+        )
         self.live_objects_notification_period = live_objects_notification_period
         self.connected_thread_nodes_notification_period_in_secs = (
             connected_thread_nodes_notification_period_in_secs
@@ -69,22 +74,6 @@ class OrchestratorPolling:
                 electrical_panel_manager_service.get_relays_last_received_status()
             )
 
-            # Get connected stations list
-            connected_stations = (
-                wifi_bands_manager_service.get_connected_stations_mac_list()
-            )
-            if connected_stations is None:
-                logger.error("Impossible to get wifi status")
-                return
-
-            if self.home_office_mac_addr in connected_stations:
-                logger.info(
-                    f"Home office PC connectedf, setting use situation PRESENCE_HOME_OFFICE"
-                )
-                orchestrator_use_situations_service.set_use_situation(
-                    use_situation="PRESENCE_HOME_OFFICE"
-                )
-
             # Notify wifi status toi RPI relais
             orchestrator_notification_service.notify_wifi_status(
                 bands_status=wifi_status.bands_status
@@ -107,6 +96,30 @@ class OrchestratorPolling:
             )
 
             logger.info(f"Polling wifi done")
+
+        @resources_status_timeloop.job(
+            interval=timedelta(seconds=self.home_office_station_polling_period_in_secs)
+        )
+        def poll_home_office_station():
+            # retrieve wifi status
+            logger.info(f"Polling home office station connection status")
+
+            # Get connected stations list
+            connected_stations = (
+                wifi_bands_manager_service.get_connected_stations_mac_list()
+            )
+            if connected_stations is None:
+                logger.error("Impossible to get connected stations list")
+                return
+
+            if self.home_office_mac_addr in connected_stations:
+                logger.info(
+                    f"Home office PC connected, setting use situation PRESENCE_HOME_OFFICE"
+                )
+                orchestrator_use_situations_service.set_use_situation(
+                    use_situation="PRESENCE_HOME_OFFICE"
+                )
+            logger.info(f"Polling home office connection status done")
 
         @resources_status_timeloop.job(
             interval=timedelta(
