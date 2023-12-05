@@ -101,8 +101,18 @@ class OrchestratorPolling:
             interval=timedelta(seconds=self.home_office_station_polling_period_in_secs)
         )
         def poll_home_office_station():
-            # retrieve wifi status
             logger.info(f"Polling home office station connection status")
+
+            # Get current use situation
+            current_use_situation = (
+                orchestrator_use_situations_service.get_current_use_situation()
+            )
+            logger.info(f"Current use situation: {current_use_situation}")
+
+            # If current use situation is PRESENCE_HOME_OFFICE nothing to do
+            if current_use_situation == "PRESENCE_HOME_OFFICE":
+                logger.info("Nothing to do")
+                return
 
             # Get connected stations list
             connected_stations = (
