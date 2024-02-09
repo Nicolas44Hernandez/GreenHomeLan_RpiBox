@@ -118,6 +118,11 @@ loggers:
     handlers: [orchestrator]
     propagate: no
 
+  server.orchestrator.energy_limitations:
+    level: INFO
+    handlers: [orchestrator]
+    propagate: no
+
   server.managers.mqtt_manager:
     level: INFO
     handlers: [mqtt]

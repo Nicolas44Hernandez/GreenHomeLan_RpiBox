@@ -1,5 +1,7 @@
 USE_SITUATIONS:
-    PRESENCE_HOME_OFFICE:
+  PRESENCE_HOME_OFFICE:
+    SWITCH_TO: ABSENCE_LOW_CONSUMPTION
+    100%:
       WIFI:
         2.4GHz: True
         5GHz: True
@@ -8,18 +10,27 @@ USE_SITUATIONS:
         0: True
         1: True
         2: True
-      SWITCH_TO: ABSENCE_LOW_CONSUMPTION
-    PRESENCE_DAY_HIGH_CONSUMPTION:
+    25%:
       WIFI:
         2.4GHz: True
         5GHz: True
         6GHz: True
       ELECTRICAL_OUTLETS:
-        0: True
+        0: False
         1: True
         2: True
-      SWITCH_TO: ABSENCE_HIGH_CONSUMPTION
-    PRESENCE_DAY_LOW_CONSUMPTION:
+    0%:
+      WIFI:
+        2.4GHz: True
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: True
+  PRESENCE_DAY_LOW_CONSUMPTION:
+    SWITCH_TO: ABSENCE_LOW_CONSUMPTION
+    100%:
       WIFI:
         2.4GHz: True
         5GHz: False
@@ -27,19 +38,17 @@ USE_SITUATIONS:
       ELECTRICAL_OUTLETS:
         0: True
         1: True
-        2: False
-      SWITCH_TO: ABSENCE_LOW_CONSUMPTION
-    PRESENCE_NIGHT_HIGH_CONSUMPTION:
+        2: True
+    25%:
       WIFI:
         2.4GHz: True
-        5GHz: True
+        5GHz: False
         6GHz: False
       ELECTRICAL_OUTLETS:
-        0: True
+        0: False
         1: True
-        2: False
-      SWITCH_TO: ABSENCE_LOW_CONSUMPTION
-    PRESENCE_NIGHT_LOW_CONSUMPTION:
+        2: True
+    0%:
       WIFI:
         2.4GHz: False
         5GHz: False
@@ -48,18 +57,38 @@ USE_SITUATIONS:
         0: False
         1: False
         2: True
-      SWITCH_TO: ABSENCE_LOW_CONSUMPTION
-    ABSENCE_HIGH_CONSUMPTION:
+  PRESENCE_NIGHT_LOW_CONSUMPTION:
+    SWITCH_TO: ABSENCE_LOW_CONSUMPTION
+    100%:
       WIFI:
-        2.4GHz: True
+        2.4GHz: False
         5GHz: False
         6GHz: False
       ELECTRICAL_OUTLETS:
-        0: True
+        0: False
         1: False
-        2: False
-      SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
-    ABSENCE_LOW_CONSUMPTION:
+        2: True
+    25%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: True
+    0%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: True
+  ABSENCE_LOW_CONSUMPTION:
+    SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
+    100%:
       WIFI:
         2.4GHz: False
         5GHz: False
@@ -68,14 +97,139 @@ USE_SITUATIONS:
         0: False
         1: False
         2: False
-      SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
-    ABSENCE_HIGH_CONSUMPTION_REMOTE_ACCESS:
+    25%:
       WIFI:
-        2.4GHz: True
-        5GHz: True
+        2.4GHz: False
+        5GHz: False
         6GHz: False
       ELECTRICAL_OUTLETS:
-        0: True
-        1: True
+        0: False
+        1: False
         2: False
-      SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
+    0%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: False
+
+  # # NOT USED
+  # PRESENCE_DAY_HIGH_CONSUMPTION:
+  #   SWITCH_TO: ABSENCE_HIGH_CONSUMPTION
+  #   100%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: True
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: True
+  #   25%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: True
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: True
+  #   0%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: True
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: True
+  # PRESENCE_NIGHT_HIGH_CONSUMPTION:
+  #   SWITCH_TO: ABSENCE_LOW_CONSUMPTION
+  #   100%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False
+  #   25%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False
+  #   0%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False
+  # ABSENCE_HIGH_CONSUMPTION:
+  #   SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
+  #   100%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: False
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: False
+  #       2: False
+  #   25%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: False
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: False
+  #       2: False
+  #   0%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: False
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: False
+  #       2: False
+  # ABSENCE_HIGH_CONSUMPTION_REMOTE_ACCESS:
+  #   SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
+  #   100%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False
+  #   25%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False
+  #   0%:
+  #     WIFI:
+  #       2.4GHz: True
+  #       5GHz: True
+  #       6GHz: False
+  #     ELECTRICAL_OUTLETS:
+  #       0: True
+  #       1: True
+  #       2: False

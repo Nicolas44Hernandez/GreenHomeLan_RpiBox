@@ -4,9 +4,11 @@ from timeloop import Timeloop
 from server.orchestrator.requests import orchestrator_requests_service
 from server.orchestrator.polling import orchestrator_polling_service
 from server.orchestrator.notification import orchestrator_notification_service
-from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.commands import orchestrator_commands_service
-
+from server.orchestrator.use_situations import orchestrator_use_situations_service
+from server.orchestrator.energy_limitations import (
+    orchestrator_energy_limitations_service,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,13 @@ class Orchestrator:
         """Initialize Orchestrator"""
         if app is not None:
             logger.info("initializing Orchestrator")
+
+            # Init Energy limitations module
+            orchestrator_energy_limitations_service.init_energy_limitations_module(
+                zone=app.config["ENERGY_ZONE"],
+                energy_supplier=app.config["ENERGY_SUPPLIER"],
+                energy_contract_class=app.config["ENERGY_CONTRACT_CLASS"],
+            )
 
             # Init use situations module
             orchestrator_use_situations_service.init_use_situations_module(
