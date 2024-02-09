@@ -5,6 +5,9 @@ from timeloop import Timeloop
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
+from server.orchestrator.energy_limitations import (
+    orchestrator_energy_limitations_service,
+)
 from server.common import ServerBoxException, ErrorCode
 
 
@@ -57,14 +60,24 @@ class OrchestratorUseSituations:
             self.current_use_situation = None
             raise ServerBoxException(ErrorCode.INVALID_USE_SITUATION)
 
+        # Get current energy limitation status
+        energy_limitation = (
+            orchestrator_energy_limitations_service.get_current_energy_limitations()
+        )
+        logger.info(f"Energy limitation: {energy_limitation}")
+
         # Set use situation wifi status
         self.set_use_situation_wifi_status(
-            self.use_situations_dict[self.current_use_situation]["WIFI"]
+            self.use_situations_dict[self.current_use_situation][energy_limitation][
+                "WIFI"
+            ]
         )
 
         # Set use situation Electrical panel
         self.set_use_situation_electrical_panel_status(
-            self.use_situations_dict[self.current_use_situation]["ELECTRICAL_OUTLETS"]
+            self.use_situations_dict[self.current_use_situation][energy_limitation][
+                "ELECTRICAL_OUTLETS"
+            ]
         )
 
     def set_use_situation_wifi_status(self, wifi_bands_status: dict):

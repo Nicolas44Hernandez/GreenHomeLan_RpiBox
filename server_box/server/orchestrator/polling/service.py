@@ -3,6 +3,9 @@ from datetime import timedelta
 from timeloop import Timeloop
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
+from server.orchestrator.energy_limitations import (
+    orchestrator_energy_limitations_service,
+)
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
@@ -71,6 +74,11 @@ class OrchestratorPolling:
                 electrical_panel_manager_service.get_relays_last_received_status()
             )
 
+            # Get energy limitations
+            energy_limitations = (
+                orchestrator_energy_limitations_service.get_current_energy_limitations()
+            )
+
             # Notify wifi status toi RPI relais
             orchestrator_notification_service.notify_wifi_status(
                 bands_status=wifi_status.bands_status
@@ -83,6 +91,7 @@ class OrchestratorPolling:
                 use_situation=current_use_situation,
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
                 relay_statuses=relay_statuses,
+                energy_limitations=energy_limitations,
             )
 
             # Notify current wifi and presence status to thread dongle

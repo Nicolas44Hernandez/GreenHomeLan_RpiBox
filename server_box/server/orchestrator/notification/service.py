@@ -90,6 +90,7 @@ class OrchestratorNotification:
         use_situation: str,
         alimelo_ressources: AlimeloRessources,
         relay_statuses: RelaysStatus,
+        energy_limitations: str,
     ):
         """Notify current wifi status and use situation to cloud server"""
 
@@ -181,6 +182,7 @@ class OrchestratorNotification:
                     "band_5GHz_status": band_status_5GHz,
                     "band_6GHz_status": band_status_6GHz,
                     "use_situation": use_situation,
+                    "energy_limitations": energy_limitations,
                     "alimelo_busvoltage": alimelo_busvoltage,
                     "alimelo_shuntvoltage": alimelo_shuntvoltage,
                     "alimelo_loadvoltage": alimelo_loadvoltage,
