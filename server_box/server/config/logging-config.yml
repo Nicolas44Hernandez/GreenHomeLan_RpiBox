@@ -31,6 +31,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  live_objects:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/live_objects.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   mqtt:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -121,6 +128,9 @@ loggers:
   server.orchestrator.energy_limitations:
     level: INFO
     handlers: [orchestrator]
+  server.orchestrator.live_objects:
+    level: INFO
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
@@ -166,5 +176,10 @@ loggers:
   server.interfaces.alimelo_interface:
     level: DEBUG
     handlers: [alimelo]
+    propagate: no
+
+  server.interfaces.live_objects_interface:
+    level: INFO
+    handlers: [live_objects]
     propagate: no
 
