@@ -3,6 +3,7 @@ from flask import Flask
 from timeloop import Timeloop
 from server.orchestrator.requests import orchestrator_requests_service
 from server.orchestrator.polling import orchestrator_polling_service
+from server.orchestrator.box_status import orchestrator_box_status_service
 from server.orchestrator.notification import orchestrator_notification_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.live_objects import live_objects_service
@@ -42,6 +43,15 @@ class Orchestrator:
                 default_use_situation=app.config["DEFAULT_USE_SITUATION"],
             )
 
+            # Init LiveObjects module
+            live_objects_service.init_live_objects_module(
+                commands_reception_topic=app.config["MQTT_LIVE_OBJECTS_COMMANDS_TOPIC"],
+                data_send_topic=app.config["MQTT_LIVE_OBJECTS_DATA_SEND_TOPIC"],
+            )
+
+            # Init Box status module
+            orchestrator_box_status_service.init_box_status_module()
+
             # Init notification module
             orchestrator_notification_service.init_notification_module(
                 rpi_cloud_ip_addr=app.config["RPI_CLOUD_IP"],
@@ -57,9 +67,6 @@ class Orchestrator:
                 ],
                 server_cloud_ports=app.config["RPI_CLOUD_PORTS"],
             )
-
-            # Init LiveObjects module
-            live_objects_service.init_live_objects_module()
 
             # Init ressources polling module
             orchestrator_polling_service.init_polling_module(

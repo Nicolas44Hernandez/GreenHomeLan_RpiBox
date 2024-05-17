@@ -4,7 +4,7 @@ MQTT messages model
 
 from datetime import datetime
 from typing import Iterable, TypeVar
-import bson
+import json
 import dateutil.parser
 
 Msg = TypeVar("Msg")
@@ -16,13 +16,13 @@ def serialize(msg: Msg) -> bytes:
         data_to_send = msg
     else:
         data_to_send = msg.to_json()
-    return bson.dumps(data_to_send)
+    return json.dumps(data_to_send)
 
 
 def deserialize(payload: bytes) -> Msg:
     """deserialize MQTT message"""
     # TODO: review for other messages
-    data = bson.loads(payload)
+    data = json.loads(payload)
     if "relay_statuses" in data:
         return RelaysStatus.from_json(data)
     else:

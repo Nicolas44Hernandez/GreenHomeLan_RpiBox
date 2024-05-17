@@ -8,7 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from server.managers.mqtt_manager import mqtt_manager_service
-
+from server.managers.mqtt_liveobjects_manager import mqtt_liveobjects_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
@@ -23,6 +23,7 @@ from .rest_api.commands_controler import bp as commands_controler_bp
 from .rest_api.energy_recommendations_controler import (
     bp as energy_recommendations_controler_bp,
 )
+from .rest_api.mqtt_test_controler import bp as mqtt_test_bp
 from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
@@ -88,6 +89,8 @@ def register_extensions(app: Flask):
     )
     # MQTT service
     mqtt_manager_service.init_app(app=app)
+    # MQTT LiveObjects service
+    mqtt_liveobjects_manager_service.init_app(app=app)
     # Wifi bands manager extension
     wifi_bands_manager_service.init_app(app=app)
     # Thread manager extension
@@ -115,3 +118,4 @@ def register_blueprints(app: Flask):
     api.register_blueprint(use_situations_controler_bp)
     api.register_blueprint(commands_controler_bp)
     api.register_blueprint(energy_recommendations_controler_bp)
+    api.register_blueprint(mqtt_test_bp)

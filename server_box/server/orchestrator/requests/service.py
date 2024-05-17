@@ -5,10 +5,10 @@ from server.managers.wifi_bands_manager import wifi_bands_manager_service
 
 from server.managers.thread_manager import thread_manager_service
 from server.managers.mqtt_manager import mqtt_manager_service
-from server.managers.alimelo_manager import alimelo_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.notification import orchestrator_notification_service
+from server.orchestrator.box_status import orchestrator_box_status_service
 from server.orchestrator.live_objects import live_objects_service
 from server.orchestrator.commands import orchestrator_commands_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
@@ -32,17 +32,9 @@ class OrchestratorRequests:
             self.thread_msg_reception_callback
         )
 
-        #
-        alimelo_manager_service.set_live_objects_command_reception_callback(
-            self.live_objects_command_reception_callback
-        )
-
+        # Set liveobjects command reception callback
         live_objects_service.set_commands_reception_callback(
             self.live_objects_command_reception_callback
-        )
-
-        live_objects_service.set_notifications_reception_callback(
-            self.live_objects_notification_reception_callback
         )
 
         # Subscribe to command reception MQTT topic
@@ -152,7 +144,7 @@ class OrchestratorRequests:
 
         try:
             if type(command) is dict:
-                alimelo_command_dict = command
+                alimelo_command_dict = command["arg"]["cmd"]
             else:
                 alimelo_command_dict = json.loads(command)["cmd"]
             cmd_dict = alimelo_command_dict["cmd"]
@@ -229,15 +221,20 @@ class OrchestratorRequests:
                     use_situation=new_use_situation
                 )
 
+            if ressource == "box_status":
+                new_status = cmd_dict["status"]
+
+                if new_status == "sleep":
+                    logger.error(f"UNIMPLEMENTED: call box status manager service")
+                    return
+
+                if new_status == "wakeup":
+                    orchestrator_box_status_service.wakeup_box()
+                    return
+
         except (Exception, ValueError) as e:
             logger.error(f"Error in message received format")
             return
-
-    def live_objects_notification_reception_callback(self, notification: str):
-        """Callback for alimelo notification reception"""
-
-        logger.info(f"Live objects received notification: {notification}")
-        # TODO: What to do with notifications
 
 
 orchestrator_requests_service: OrchestratorRequests = OrchestratorRequests()

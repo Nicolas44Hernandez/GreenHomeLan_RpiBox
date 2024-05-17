@@ -254,14 +254,8 @@ class OrchestratorNotification:
             "ep": ep,
             "us": us,
         }
-        # If connnected to internet send via internet, else send via Alimelo
-        if connected_to_internet:
-            logger.info("Connected to internet, sending notification via internet")
-            live_objects_service.publish_data(topic="orch", data=data_to_send)
-        else:
-            logger.info("Not connected to internet, sending notification via Alimelo")
-            data = json.dumps(data_to_send).replace(" ", "")
-            alimelo_manager_service.send_data_to_live_objects(data)
+
+        live_objects_service.publish_data(data_to_send=data_to_send, tags = ["status"])
 
     def transfer_alarm_to_cloud_server(self, alarm_type: str):
         """Transfer alarm notification to cloud server"""
@@ -282,8 +276,7 @@ class OrchestratorNotification:
 
         logger.info(f"Posting notify alarm to LiveObects via Alimelo")
         data_to_send = {"al": {alarm_type: 1}}
-        data = json.dumps(data_to_send).replace(" ", "")
-        alimelo_manager_service.send_data_to_live_objects(data)
+        live_objects_service.publish_data(data_to_send=data_to_send, tags=["alarm"])
 
     def transfer_device_battery_level_to_cloud_server(
         self, device_type: str, device: str, batLevel: str

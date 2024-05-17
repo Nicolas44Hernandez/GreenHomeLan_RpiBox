@@ -1,7 +1,9 @@
 import logging
+import time
 from datetime import timedelta
 from timeloop import Timeloop
 from server.orchestrator.notification import orchestrator_notification_service
+from server.orchestrator.box_status import orchestrator_box_status_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.energy_limitations import (
     orchestrator_energy_limitations_service,
@@ -10,6 +12,7 @@ from server.managers.wifi_bands_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
+from server.managers.mqtt_manager import mqtt_manager_service
 
 logger = logging.getLogger(__name__)
 
@@ -164,9 +167,7 @@ class OrchestratorPolling:
             # retrieve wifi status
             logger.info(f"Polling ressources status and send to LiveObjects")
 
-            # TEMP
             wifi_status = wifi_bands_manager_service.update_wifi_status_attribute()
-            # wifi_status = wifi_bands_manager_service.get_current_wifi_status()
             if wifi_status is None:
                 logger.error("Impossible to get wifi status")
                 return

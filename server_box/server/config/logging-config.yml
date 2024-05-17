@@ -128,12 +128,22 @@ loggers:
   server.orchestrator.energy_limitations:
     level: INFO
     handlers: [orchestrator]
+
+  server.orchestrator.box_status:
+    level: INFO
+    handlers: [console]
+
   server.orchestrator.live_objects:
     level: INFO
     handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
+    level: INFO
+    handlers: [mqtt]
+    propagate: no
+
+  server.managers.mqtt_liveobjects_manager:
     level: INFO
     handlers: [mqtt]
     propagate: no
@@ -164,6 +174,11 @@ loggers:
     propagate: no
 
   server.interfaces.mqtt_interface:
+    level: INFO
+    handlers: [mqtt]
+    propagate: no
+
+  server.interfaces.mqtt_liveobjects_interface:
     level: INFO
     handlers: [mqtt]
     propagate: no
