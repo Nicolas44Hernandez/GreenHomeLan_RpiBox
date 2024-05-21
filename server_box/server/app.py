@@ -7,6 +7,7 @@ import yaml
 from flask import Flask
 from flask_cors import CORS
 
+from server.common.authentication import ClientsRemoteAuth
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.managers.mqtt_liveobjects_manager import mqtt_liveobjects_manager_service
 from server.managers.wifi_bands_manager import wifi_bands_manager_service
@@ -55,6 +56,8 @@ def create_app(
 
     # Register extensions
     register_extensions(app)
+    # Register auth params
+    register_auth_params(secret_key=app.config["SECRET_KEY"])
     # register orchestrator
     register_orchestrator(app)
     # Register blueprints for REST API
@@ -105,6 +108,10 @@ def register_orchestrator(app: Flask):
     """Initialize Orchestrator"""
     orchestrator_service.init_app(app=app)
 
+
+def register_auth_params(secret_key: str):
+    """Register authentification params"""
+    ClientsRemoteAuth.set_secret_key(secret_key=secret_key)
 
 def register_blueprints(app: Flask):
     """Store App APIs blueprints."""

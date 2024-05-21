@@ -50,7 +50,9 @@ class Orchestrator:
             )
 
             # Init Box status module
-            orchestrator_box_status_service.init_box_status_module()
+            orchestrator_box_status_service.init_box_status_module(
+                internet_connection_waiting_time=app.config["WAKEUP_INTERNET_CONNECTION_WAITING_TIME_IN_SECS"]
+            )
 
             # Init notification module
             orchestrator_notification_service.init_notification_module(

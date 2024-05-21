@@ -115,6 +115,35 @@ USE_SITUATIONS:
         0: False
         1: False
         2: False
+  DEEP_SLEEP:
+    SWITCH_TO: PRESENCE_DAY_LOW_CONSUMPTION
+    100%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: False
+    25%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: False
+    0%:
+      WIFI:
+        2.4GHz: False
+        5GHz: False
+        6GHz: False
+      ELECTRICAL_OUTLETS:
+        0: False
+        1: False
+        2: False
 
   # # NOT USED
   # PRESENCE_DAY_HIGH_CONSUMPTION:

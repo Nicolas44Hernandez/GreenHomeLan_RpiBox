@@ -71,6 +71,11 @@ class ErrorCode(Enum):
         400,
         "Invalid energy recommendation arguments for this client",
     )
+    INTERNET_CONNECTION_TIMEOUT = (
+        20,
+        500,
+        "Timeout expired waiting for internet connection on box wakeup",
+    )
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):
