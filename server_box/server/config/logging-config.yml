@@ -95,6 +95,11 @@ loggers:
       handlers: [api_rest]
       propagate: no
 
+  server.remote_rest_api:
+      level: INFO
+      handlers: [api_rest]
+      propagate: no
+
   server.orchestrator.service:
     level: INFO
     handlers: [orchestrator]

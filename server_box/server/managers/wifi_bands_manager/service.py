@@ -135,6 +135,8 @@ class WifiBandsManager:
 
     def get_wifi_status(self):
         """Execute get wifi status command in the livebox using telnet service"""
+        #TODO: MOCK
+        return True
         try:
             commands_response = self.execute_telnet_commands(["WIFI", "status"])
         except Exception as e:
@@ -146,6 +148,8 @@ class WifiBandsManager:
     def set_wifi_status(self, status: bool):
         """Execute set wifi status command in the livebox using telnet service"""
 
+        # TODO: MOCK
+        return True
         # set max duration timmer
         start = datetime.now()
         status_change_timeout = start + timedelta(seconds=STATUS_CHANGE_TIMEOUT_IN_SECS)
@@ -181,6 +185,8 @@ class WifiBandsManager:
 
     def get_band_status(self, band: str):
         """Execute get wifi band status command in the livebox using telnet service"""
+        # TODO: MOCK
+        return True
         # Check if band number exists
         if band not in BANDS:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
@@ -201,7 +207,8 @@ class WifiBandsManager:
 
     def set_band_status(self, band: str, status: bool):
         """Execute set wifi band status command in the livebox using telnet service"""
-
+        #TODO: MOCK
+        return
         # Check if the band exists
         if band not in BANDS:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
@@ -243,6 +250,8 @@ class WifiBandsManager:
     def get_connected_stations_mac_list(self, band=None) -> Iterable[str]:
         """Execute get connected stations in the livebox using telnet service"""
         connected_stations = []
+        # TODO: MOCK
+        return connected_stations
 
         # if band is None return all the connected stations
         if band is None:
