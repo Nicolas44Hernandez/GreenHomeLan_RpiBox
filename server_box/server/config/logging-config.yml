@@ -136,11 +136,11 @@ loggers:
 
   server.orchestrator.box_status:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [console]
+    handlers: [live_objects]
     propagate: no
 
   server.managers.mqtt_manager:
@@ -150,7 +150,7 @@ loggers:
 
   server.managers.mqtt_liveobjects_manager:
     level: INFO
-    handlers: [mqtt]
+    handlers: [mqtt_liveobjects]
     propagate: no
 
   server.managers.electrical_panel_manager:
@@ -163,7 +163,12 @@ loggers:
     handlers: [thread]
     propagate: no
 
-  server.managers.wifi_bands_manager:
+  server.managers.wifi_bands_ssh_manager:
+    level: INFO
+    handlers: [wifi]
+    propagate: no
+
+  server.managers.wifi_bands_telnet_manager:
     level: INFO
     handlers: [wifi]
     propagate: no
@@ -185,10 +190,15 @@ loggers:
 
   server.interfaces.mqtt_liveobjects_interface:
     level: INFO
-    handlers: [mqtt]
+    handlers: [mqtt_liveobjects]
     propagate: no
 
-  server.interfaces.wifi_interface:
+  server.interfaces.wifi_interface_ssh:
+    level: INFO
+    handlers: [wifi]
+    propagate: no
+
+  server.interfaces.wifi_interface_telnet:
     level: INFO
     handlers: [wifi]
     propagate: no
@@ -196,10 +206,5 @@ loggers:
   server.interfaces.alimelo_interface:
     level: DEBUG
     handlers: [alimelo]
-    propagate: no
-
-  server.interfaces.live_objects_interface:
-    level: INFO
-    handlers: [live_objects]
     propagate: no
 
