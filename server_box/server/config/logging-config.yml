@@ -87,7 +87,7 @@ root:
 loggers:
   server.app:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.rest_api:
@@ -102,55 +102,55 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.energy_limitations:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
 
   server.orchestrator.box_status:
     level: INFO
-    handlers: [app]
+    handlers: [console]
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_liveobjects_manager:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.managers.electrical_panel_manager:
@@ -165,17 +165,17 @@ loggers:
 
   server.managers.wifi_bands_ssh_manager:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_telnet_manager:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.interfaces.thread_dongle_interface:
@@ -185,22 +185,22 @@ loggers:
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [mqtt]
+    handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_liveobjects_interface:
     level: INFO
-    handlers: [live_objects]
+    handlers: [console]
     propagate: no
 
   server.interfaces.wifi_interface_ssh:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.interfaces.wifi_interface_telnet:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.interfaces.alimelo_interface:
