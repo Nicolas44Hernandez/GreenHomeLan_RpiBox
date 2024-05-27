@@ -10,7 +10,7 @@ from flask_cors import CORS
 from server.common.authentication import ClientsRemoteAuth
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.managers.mqtt_liveobjects_manager import mqtt_liveobjects_manager_service
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
 from .managers.electrical_panel_manager import electrical_panel_manager_service

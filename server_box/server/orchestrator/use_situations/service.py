@@ -2,7 +2,7 @@ import logging
 import yaml
 from datetime import datetime
 from timeloop import Timeloop
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.orchestrator.energy_limitations import (

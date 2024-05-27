@@ -1,0 +1,37 @@
+WIFI:
+    status:
+        - wl -i wl2 bss
+        - wl -i wl0 bss
+        - wl -i wl1 bss
+    ON:
+        - wl -i wl0 radio on
+        - wl -i wl2 radio on
+        - wl -i wl1 radio on
+    OFF:
+        - wl -i wl0 radio off
+        - wl -i wl2 radio off
+        - wl -i wl1 radio off
+    bands:
+        2.4GHz:
+            status: wl -i wl2 bss
+            ON: wl -i wl2 radio on
+            OFF: wl -i wl2 radio off
+            stations: wl -i wl2 assoclist
+        5GHz:
+            status: wl -i wl0 bss
+            ON: wl -i wl0 radio on
+            OFF: wl -i wl0 radio off
+            stations: wl -i wl0 assoclist
+        6GHz:
+            status: wl -i wl1 bss
+            ON: wl -i wl1 radio on
+            OFF: wl -i wl1 radio off
+            stations: wl -i wl1 assoclist
+    counters:
+        2.4GHz: wl -i wl2 counters
+        5GHz: wl -i wl0 counters
+        6GHz: wl -i wl1 counters
+        station_info:
+            2.4GHz: wl -i wl2 sta_info STATION
+            5GHz: wl -i wl0 sta_info STATION
+            6GHz: wl -i wl1 sta_info STATION

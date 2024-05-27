@@ -1,7 +1,7 @@
 import logging
 import json
 from datetime import datetime
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 
 from server.managers.thread_manager import thread_manager_service
 from server.managers.mqtt_manager import mqtt_manager_service

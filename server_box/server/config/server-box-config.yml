@@ -10,12 +10,22 @@ OPENAPI_SWAGGER_UI_PATH: /docs
 OPENAPI_SWAGGER_UI_URL: https://cdn.jsdelivr.net/npm/swagger-ui-dist/
 
 # Telnet connection configuration
-LIVEBOX_IP_ADDRESS: 192.168.1.1 # LIVEBOX
-LIVEBOX_TELNET_PORT: 23
+# LIVEBOX_IP_ADDRESS: 192.168.1.1 # LIVEBOX TELNET
+# LIVEBOX_TELNET_PORT: 23
+# LIVEBOX_LOGIN: root
+# LIVEBOX_PASSWORD: sah
+# TELNET_TIMOUT_IN_SECS: 5
+# LIVEBOX_TELNET_COMMANDS: server_box/server/config/telnet_commands.yml
+#COMMANDS_PROTOCOL: telnet
+
+#SSH connection configuration
+LIVEBOX_IP_ADDRESS: 192.168.144.1 # LIVEBOX PRPL
+COMMANDS_PROTOCOL: ssh
+LIVEBOX_SSH_PORT: 22
 LIVEBOX_LOGIN: root
 LIVEBOX_PASSWORD: sah
-TELNET_TIMOUT_IN_SECS: 5
-LIVEBOX_TELNET_COMMANDS: server_box/server/config/telnet_commands.yml
+SSH_TIMOUT_IN_SECS: 5
+LIVEBOX_SSH_COMMANDS: server_box/server/config/ssh_commands.yml
 
 # Use situations configuration
 USE_SITUATIONS_CONFIG: server_box/server/config/use_situations.yml

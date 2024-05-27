@@ -7,7 +7,7 @@ import yaml
 import time
 from datetime import datetime, timedelta
 from telnetlib import Telnet
-from server.interfaces.wifi_interface import wifi_telnet_interface
+from server.interfaces.wifi_interface_telnet import wifi_telnet_interface
 from server.interfaces.mqtt_interface import RelaysStatus
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.common import ServerBoxException, ErrorCode
@@ -73,7 +73,7 @@ class WifiBandsManager:
             try:
                 self.telnet_commands = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
-                raise ServerBoxException(ErrorCode.TELNET_COMMANDS_FILE_ERROR)
+                raise ServerBoxException(ErrorCode.COMMANDS_FILE_ERROR)
 
     def execute_telnet_commands(
         self, dictionary_keys: Iterable[str], station_mac: str = None
@@ -91,13 +91,13 @@ class WifiBandsManager:
                 logger.error(
                     "Item not found in tenlet commands: ", str[dictionary_keys]
                 )
-                raise ServerBoxException(ErrorCode.TELNET_COMMAND_NOT_FOUND)
+                raise ServerBoxException(ErrorCode.COMMAND_NOT_FOUND)
 
         commands = new_element
 
         # If the command retrieved is not a str or a list command is wrong
         if not isinstance(commands, (str, list)):
-            raise ServerBoxException(ErrorCode.TELNET_COMMAND_NOT_FOUND)
+            raise ServerBoxException(ErrorCode.COMMAND_NOT_FOUND)
 
         # create telnet connection
         telnet = self.create_telnet_connection()
@@ -135,11 +135,9 @@ class WifiBandsManager:
 
     def get_wifi_status(self):
         """Execute get wifi status command in the livebox using telnet service"""
-        #TODO: MOCK
-        return True
         try:
             commands_response = self.execute_telnet_commands(["WIFI", "status"])
-        except Exception as e:
+        except:
             return None
 
         wifi_status = True if "up" in commands_response else False
@@ -148,8 +146,6 @@ class WifiBandsManager:
     def set_wifi_status(self, status: bool):
         """Execute set wifi status command in the livebox using telnet service"""
 
-        # TODO: MOCK
-        return True
         # set max duration timmer
         start = datetime.now()
         status_change_timeout = start + timedelta(seconds=STATUS_CHANGE_TIMEOUT_IN_SECS)
@@ -185,8 +181,6 @@ class WifiBandsManager:
 
     def get_band_status(self, band: str):
         """Execute get wifi band status command in the livebox using telnet service"""
-        # TODO: MOCK
-        return True
         # Check if band number exists
         if band not in BANDS:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
@@ -198,7 +192,6 @@ class WifiBandsManager:
         except ServerBoxException as e:
             logger.error(e.message)
             return None
-
         if not commands_response:
             band_status = False
         else:
@@ -207,8 +200,6 @@ class WifiBandsManager:
 
     def set_band_status(self, band: str, status: bool):
         """Execute set wifi band status command in the livebox using telnet service"""
-        #TODO: MOCK
-        return
         # Check if the band exists
         if band not in BANDS:
             raise ServerBoxException(ErrorCode.UNKNOWN_BAND_WIFI)
@@ -250,8 +241,6 @@ class WifiBandsManager:
     def get_connected_stations_mac_list(self, band=None) -> Iterable[str]:
         """Execute get connected stations in the livebox using telnet service"""
         connected_stations = []
-        # TODO: MOCK
-        return connected_stations
 
         # if band is None return all the connected stations
         if band is None:

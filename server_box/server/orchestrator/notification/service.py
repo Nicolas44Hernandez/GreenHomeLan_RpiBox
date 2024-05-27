@@ -6,10 +6,10 @@ import json
 from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
-from server.managers.wifi_bands_manager.model import WifiBandStatus, WifiStatus
-from server.managers.wifi_bands_manager import BANDS
+from server.managers.wifi_bands_ssh_manager.model import WifiBandStatus, WifiStatus
+from server.managers.wifi_bands_ssh_manager import BANDS
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 from server.managers.alimelo_manager import AlimeloRessources
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus

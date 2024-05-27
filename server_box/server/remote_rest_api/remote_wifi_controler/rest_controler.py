@@ -4,7 +4,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.common.authentication import token_required
 from server.common.box_status import box_sleeping
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.rest_api.wifi_controler.rest_model import WifiStatusSchema
 from server.common import ServerBoxException, ErrorCode
 

@@ -1,7 +1,7 @@
 import logging
 import time
 from server.managers.mqtt_liveobjects_manager import mqtt_liveobjects_manager_service
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.orchestrator.use_situations import orchestrator_use_situations_service
 from server.orchestrator.live_objects import live_objects_service
 from server.common.authentication import ClientsRemoteAuth

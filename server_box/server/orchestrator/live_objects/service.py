@@ -4,7 +4,7 @@ from queue import Queue
 from datetime import timedelta
 from timeloop import Timeloop
 from typing import Iterable
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.mqtt_liveobjects_manager import mqtt_liveobjects_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
 

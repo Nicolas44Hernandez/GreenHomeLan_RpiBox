@@ -1,7 +1,7 @@
 """Wifi interface unit tests"""
 import logging
 import pytest
-from server.interfaces.wifi_interface import wifi_telnet_interface
+from server.interfaces.wifi_interface_telnet import wifi_telnet_interface
 from server.common import ServerBoxException
 
 HOST_LOGIN = "nicolas"

@@ -8,7 +8,7 @@ from server.orchestrator.use_situations import orchestrator_use_situations_servi
 from server.orchestrator.energy_limitations import (
     orchestrator_energy_limitations_service,
 )
-from server.managers.wifi_bands_manager import wifi_bands_manager_service
+from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources

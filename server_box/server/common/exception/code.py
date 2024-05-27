@@ -9,12 +9,12 @@ class ErrorCode(Enum):
     # Please enrich this enumeration in order to handle other kind of errors
     UNEXPECTED_ERROR = (0, 500, "Unexpected error occurs")
     TELNET_CONNECTION_ERROR = (1, 500, "Error in Telnet connection")
-    TELNET_COMMANDS_FILE_ERROR = (
+    COMMANDS_FILE_ERROR = (
         2,
         500,
         "Error in telnet commands load, check commands file",
     )
-    TELNET_COMMAND_NOT_FOUND = (3, 500, "Telnet command not found, check config")
+    COMMAND_NOT_FOUND = (3, 500, "Telnet command not found, check config")
     UNKNOWN_BAND_WIFI = (4, 400, "Wifi band doesnt exist")
     MODULE_NOT_FOUND = (5, 400, "Module not found in RPI box")
     STATUS_CHANGE_TIMER = (
@@ -76,6 +76,7 @@ class ErrorCode(Enum):
         500,
         "Timeout expired waiting for internet connection on box wakeup",
     )
+    SSH_CONNECTION_ERROR = (1, 500, "Error in SSH connection")
 
     # pylint: disable=unused-argument
     def __new__(cls, *args, **kwds):

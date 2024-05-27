@@ -50,7 +50,8 @@ class Telnet:
                 # Enter password
                 tn_connection.write(password.encode("utf-8"))
         except (socket.timeout, socket.error):
-            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
+            logger.error("Telnet connection creation failed")
+            return None
 
         logger.info(f"Telnet connection established with host: %s", self.host)
         return tn_connection
@@ -58,7 +59,7 @@ class Telnet:
     def close(self):
         try:
             if not self.connection:
-                logger.error("in close: Telnet connection not stablished")
+                logger.error("Telnet connection not stablished")
                 return None
             self.connection.write(b"exit\n")
         except (socket.timeout, socket.error):
@@ -70,8 +71,8 @@ class Telnet:
         """Send command to telnet host"""
         try:
             if not self.connection:
-                logger.error("in send_command: Telnet connection not stablished")
-                raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
+                logger.error("Telnet connection not stablished")
+                return None
             command = f"echo -n 'EE''EE '; {command}; echo 'FF''FF'\n"
             self.connection.write(command.encode("ascii"))
             return self.get_command_output()
@@ -81,11 +82,12 @@ class Telnet:
     def send_fast_command(self, command: str):
         """Send command without waiting for response"""
         if not self.connection:
-            logger.error("in send_fast_command: Telnet connection not stablished")
-            raise ServerBoxException(ErrorCode.TELNET_CONNECTION_ERROR)
+            logger.error("Telnet connection not stablished")
+            return None
         command = command + "\n"
         self.connection.write(command.encode("ascii"))
         time.sleep(0.1)
+        return "OK"
 
     def parse_telnet_output(self, raw_output: str):
         """Parse the output of the sent command"""
