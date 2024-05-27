@@ -190,7 +190,7 @@ loggers:
 
   server.interfaces.mqtt_liveobjects_interface:
     level: INFO
-    handlers: [mqtt_liveobjects]
+    handlers: [live_objects]
     propagate: no
 
   server.interfaces.wifi_interface_ssh:
