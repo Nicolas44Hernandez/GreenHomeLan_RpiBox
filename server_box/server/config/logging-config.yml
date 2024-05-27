@@ -102,7 +102,7 @@ loggers:
 
   server.orchestrator.service:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
@@ -117,7 +117,7 @@ loggers:
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
@@ -127,7 +127,7 @@ loggers:
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.energy_limitations:
@@ -136,26 +136,26 @@ loggers:
 
   server.orchestrator.box_status:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [live_objects]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [mqtt]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_liveobjects_manager:
     level: INFO
-    handlers: [mqtt_liveobjects]
+    handlers: [console]
     propagate: no
 
   server.managers.electrical_panel_manager:
     level: INFO
-    handlers: [electrical_panel]
+    handlers: [console]
     propagate: no
 
   server.managers.thread:
@@ -165,17 +165,17 @@ loggers:
 
   server.managers.wifi_bands_ssh_manager:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_telnet_manager:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [alimelo]
+    handlers: [console]
     propagate: no
 
   server.interfaces.thread_dongle_interface:
