@@ -141,7 +141,6 @@ class OrchestratorRequests:
         """Callback for alimelo command reception"""
 
         logger.info(f"Live Objects received command: {command}")
-
         try:
             if type(command) is dict:
                 alimelo_command_dict = command["arg"]["cmd"]
@@ -149,6 +148,8 @@ class OrchestratorRequests:
                 alimelo_command_dict = json.loads(command)["cmd"]
             cmd_dict = alimelo_command_dict["cmd"]
             ressource = alimelo_command_dict["ress"]
+
+            logger.info(f"Received command for ressource:{ressource} cmd:{cmd_dict}")
 
             # Wifi command
             if ressource == "wifi":
