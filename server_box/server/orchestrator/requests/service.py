@@ -230,9 +230,7 @@ class OrchestratorRequests:
                     return
 
                 if new_status == "wakeup":
-                    logger.info("WAKE UP BOX!!!")
                     orchestrator_box_status_service.wakeup_box()
-                    logger.info("BOX UP")
                     return
 
         except (Exception, ValueError) as e:

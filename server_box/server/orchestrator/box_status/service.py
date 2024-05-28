@@ -51,6 +51,7 @@ class BoxStatusManager:
         # Generate token
         client_id = mqtt_liveobjects_manager_service.client_id
         token = ClientsRemoteAuth.generate_token(client_id=client_id)
+        logger.info(f"Token generated: {token}")
 
         # Generate data to send
         data_to_send = {
@@ -77,6 +78,7 @@ class BoxStatusManager:
             return False
 
         # Wait for internet connection
+        logger.info(f"Waitting for internet connection ...")
         start = time.time()
         elapsed_time = time.time() - start
         while not wifi_bands_manager_service.is_connected_to_internet():
