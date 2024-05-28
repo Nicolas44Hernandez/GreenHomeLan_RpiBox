@@ -85,12 +85,11 @@ class OrchestratorPolling:
                 orchestrator_energy_limitations_service.get_current_energy_limitations()
             )
 
-            # TODO: reactivate
-            # # Notify wifi status toi RPI relais
-            # orchestrator_notification_service.notify_wifi_status(
-            #     bands_status=wifi_status.bands_status
-            # )
-            # logger.info(f"Polling wifi: RPI electrical paneil wifi notification ok")
+            # Notify wifi status toi RPI relais
+            orchestrator_notification_service.notify_wifi_status(
+                bands_status=wifi_status.bands_status
+            )
+            logger.info(f"Polling wifi: RPI electrical paneil wifi notification ok")
 
             # Notify current wifi status and use situation to rpi cloud
             orchestrator_notification_service.notify_cloud_server(
@@ -144,22 +143,21 @@ class OrchestratorPolling:
                 )
             logger.info(f"Polling home office connection status done")
 
-        # TODO: reactivate
-        # @resources_status_timeloop.job(
-        #     interval=timedelta(
-        #         seconds=self.connected_thread_nodes_notification_period_in_secs
-        #     )
-        # )
-        # def notify_thread_connected_nodes_to_cloud():
-        #     # retrieve connected nodes
-        #     logger.info(f"Polling thread connected nodes and notify cloud")
-        #     # thread_manager_service.update_connected_nodes()
-        #     # connected_nodes = thread_manager_service.get_connected_nodes()
+        @resources_status_timeloop.job(
+            interval=timedelta(
+                seconds=self.connected_thread_nodes_notification_period_in_secs
+            )
+        )
+        def notify_thread_connected_nodes_to_cloud():
+            # retrieve connected nodes
+            logger.info(f"Polling thread connected nodes and notify cloud")
+            # thread_manager_service.update_connected_nodes()
+            # connected_nodes = thread_manager_service.get_connected_nodes()
 
-        #     # Notify connected nodes to cloud
-        #     # orchestrator_notification_service.notify_thread_connected_nodes_to_cloud_server(
-        #     #     connected_nodes=connected_nodes
-        #     # )
+            # Notify connected nodes to cloud
+            # orchestrator_notification_service.notify_thread_connected_nodes_to_cloud_server(
+            #     connected_nodes=connected_nodes
+            # )
 
         # Start ressources polling and live objects notification
         @resources_status_timeloop.job(
