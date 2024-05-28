@@ -100,9 +100,9 @@ class OrchestratorNotification:
             "Posting HTTP to notify current wifi status and use situation to RPI cloud"
         )
 
-        # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
-        connected_to_internet = True
+        #connected_to_internet = True
         if connected_to_internet:
             # Get wifi status from bands status
             wifi_status = False
@@ -119,9 +119,6 @@ class OrchestratorNotification:
                     band_status_6GHz = band_status.status
                 if band_status.status:
                     wifi_status = True
-
-            #TODO: remove
-            logger.info(f"WiFi bands ok")
 
             # get Alimelo values
             alimelo_busvoltage = "unknown"
@@ -147,9 +144,6 @@ class OrchestratorNotification:
                 alimelo_is_powered_by_battery = alimelo_ressources.isPowredByBattery
                 alimelo_is_charging = alimelo_ressources.isChargingBattery
 
-            #TODO: remove
-            logger.info(f"Alimelo ok")
-
             # Get electrical panel power outlet status
             po0_status = False
             po1_status = False
@@ -169,9 +163,6 @@ class OrchestratorNotification:
                         po2_status = relay_status.status
                         po2_powered = relay_status.powered
 
-            #TODO: remove
-            logger.info(f"Relays ok")
-
             # Get Orchestrator ip address
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -179,7 +170,6 @@ class OrchestratorNotification:
                 orchestrator_ip_addr = s.getsockname()[0]
                 orquestrator_base_url = f"http://{orchestrator_ip_addr}:5000/"
                 s.close()
-                logger.info(f"Orchestrrator base url: {orquestrator_base_url}")
             except:
                 logger.error("Error retreiving orchestrator IP")
                 orquestrator_base_url = ""
@@ -187,7 +177,6 @@ class OrchestratorNotification:
             # Post status to rpi cloud
             for port in self.server_cloud_ports:
                 post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
-                logger.info(f"Posting to: {post_url}")
                 data = {
                     "orquestrator_base_url": orquestrator_base_url,
                     "wifi_status": wifi_status,
@@ -273,7 +262,7 @@ class OrchestratorNotification:
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
-        connected_to_internet = True
+        # connected_to_internet = True
         if connected_to_internet:
             logger.info(f"Posting HTTP to notify alarm {alarm_type} to RPI cloud")
             data = {"alarm_type": alarm_type}
@@ -327,7 +316,7 @@ class OrchestratorNotification:
         self, url: str, data: dict, timeout: int = POST_TIMEOUT_IN_SECS
     ):
         """HTTP Post in dedicated thread"""
-        logger.info(f"Posting data in dedicated thread data: {data}")
+
         post_thread = threading.Thread(
             target=self.http_post,
             args=[url, data, timeout],

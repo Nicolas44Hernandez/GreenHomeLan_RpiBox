@@ -1,6 +1,5 @@
 import logging
-import subprocess
-import urllib.request
+import http.client as httplib
 from typing import Iterable
 from flask import Flask
 import yaml
@@ -289,11 +288,14 @@ class WifiBandsManager:
 
     def is_connected_to_internet(self) -> bool:
         """Check internet connection"""
+        conn = httplib.HTTPSConnection("8.8.8.8", timeout=5)
         try:
-            urllib.request.urlopen("http://google.com")
+            conn.request("HEAD", "/")
             return True
-        except:
+        except Exception:
             return False
+        finally:
+            conn.close()
 
     def publish_wifi_status_mqtt_relays(self, relays_status: RelaysStatus):
         """publish MQTT relays status command"""
