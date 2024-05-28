@@ -85,11 +85,12 @@ class OrchestratorPolling:
                 orchestrator_energy_limitations_service.get_current_energy_limitations()
             )
 
-            # Notify wifi status toi RPI relais
-            orchestrator_notification_service.notify_wifi_status(
-                bands_status=wifi_status.bands_status
-            )
-            logger.info(f"Polling wifi: RPI wifi notification ok")
+            # TODO: reactivate
+            # # Notify wifi status toi RPI relais
+            # orchestrator_notification_service.notify_wifi_status(
+            #     bands_status=wifi_status.bands_status
+            # )
+            # logger.info(f"Polling wifi: RPI electrical paneil wifi notification ok")
 
             # Notify current wifi status and use situation to rpi cloud
             orchestrator_notification_service.notify_cloud_server(
