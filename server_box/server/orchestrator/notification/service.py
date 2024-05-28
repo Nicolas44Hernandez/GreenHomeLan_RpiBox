@@ -120,6 +120,9 @@ class OrchestratorNotification:
                 if band_status.status:
                     wifi_status = True
 
+            #TODO: remove
+            logger.info(f"WiFi bands ok")
+
             # get Alimelo values
             alimelo_busvoltage = "unknown"
             alimelo_shuntvoltage = "unknown"
@@ -144,6 +147,9 @@ class OrchestratorNotification:
                 alimelo_is_powered_by_battery = alimelo_ressources.isPowredByBattery
                 alimelo_is_charging = alimelo_ressources.isChargingBattery
 
+            #TODO: remove
+            logger.info(f"Alimelo ok")
+
             # Get electrical panel power outlet status
             po0_status = False
             po1_status = False
@@ -162,6 +168,9 @@ class OrchestratorNotification:
                     if relay_status.relay_number == 2:
                         po2_status = relay_status.status
                         po2_powered = relay_status.powered
+
+            #TODO: remove
+            logger.info(f"Relays ok")
 
             # Get Orchestrator ip address
             try:
