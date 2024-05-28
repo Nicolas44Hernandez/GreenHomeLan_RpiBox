@@ -50,6 +50,7 @@ class BoxStatusManager:
 
         # Generate token
         client_id = mqtt_liveobjects_manager_service.client_id
+        logger.info(f"client_id: {client_id}")
         token = ClientsRemoteAuth.generate_token(client_id=client_id)
         logger.info(f"Token generated: {token}")
 
