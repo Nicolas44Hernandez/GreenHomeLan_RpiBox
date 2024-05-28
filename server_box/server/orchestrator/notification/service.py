@@ -100,9 +100,9 @@ class OrchestratorNotification:
             "Posting HTTP to notify current wifi status and use situation to RPI cloud"
         )
 
-        connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
+        # connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
-        # connected_to_internet = True
+        connected_to_internet = True
         if connected_to_internet:
             # Get wifi status from bands status
             wifi_status = False
