@@ -316,7 +316,7 @@ class OrchestratorNotification:
         self, url: str, data: dict, timeout: int = POST_TIMEOUT_IN_SECS
     ):
         """HTTP Post in dedicated thread"""
-
+        logger.info(f"Posting data in dedicated thread data: {data}")
         post_thread = threading.Thread(
             target=self.http_post,
             args=[url, data, timeout],
