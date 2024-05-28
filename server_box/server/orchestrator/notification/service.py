@@ -102,7 +102,7 @@ class OrchestratorNotification:
 
         connected_to_internet = wifi_bands_manager_service.is_connected_to_internet()
         # TODO: MOCK for test REMOVE
-        connected_to_internet = True
+        # connected_to_internet = True
         if connected_to_internet:
             # Get wifi status from bands status
             wifi_status = False
@@ -170,6 +170,7 @@ class OrchestratorNotification:
                 orchestrator_ip_addr = s.getsockname()[0]
                 orquestrator_base_url = f"http://{orchestrator_ip_addr}:5000/"
                 s.close()
+                logger.info(f"Orchestrrator base url: {orquestrator_base_url}")
             except:
                 logger.error("Error retreiving orchestrator IP")
                 orquestrator_base_url = ""
@@ -177,6 +178,7 @@ class OrchestratorNotification:
             # Post status to rpi cloud
             for port in self.server_cloud_ports:
                 post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
+                logger.info(f"Posting to: {post_url}")
                 data = {
                     "orquestrator_base_url": orquestrator_base_url,
                     "wifi_status": wifi_status,
