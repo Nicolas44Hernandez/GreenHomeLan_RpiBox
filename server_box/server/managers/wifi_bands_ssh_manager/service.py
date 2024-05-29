@@ -5,7 +5,7 @@ from flask import Flask
 import yaml
 import time
 from datetime import datetime, timedelta
-from server.interfaces.wifi_interface_ssh import wifi_ssh_interface
+from server.interfaces.box_interface_ssh import box_ssh_interface
 from server.interfaces.mqtt_interface import RelaysStatus
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.common import ServerBoxException, ErrorCode
@@ -54,10 +54,10 @@ class WifiBandsManager:
             ]
             self.load_commands(app.config["LIVEBOX_SSH_COMMANDS"])
 
-    def create_ssh_connection(self) -> wifi_ssh_interface:
+    def create_ssh_connection(self) -> box_ssh_interface:
         """Create wifi ssh interface object for commands"""
         # Create ssh connection
-        return wifi_ssh_interface(
+        return box_ssh_interface(
             host=self.livebox_ip_address,
             port=self.livebox_ssh_port,
             user=self.livebox_login,

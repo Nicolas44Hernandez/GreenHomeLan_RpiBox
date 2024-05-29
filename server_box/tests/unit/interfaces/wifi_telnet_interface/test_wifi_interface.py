@@ -1,7 +1,7 @@
 """Wifi interface unit tests"""
 import logging
 import pytest
-from server.interfaces.wifi_interface_telnet import wifi_telnet_interface
+from server.interfaces.box_interface_telnet import box_telnet_interface
 from server.common import ServerBoxException
 
 HOST_LOGIN = "nicolas"
@@ -10,7 +10,7 @@ HOST_PASSWORD = "Nico44"
 
 @pytest.fixture(scope="function")
 def telnet():
-    telnet_service = wifi_telnet_interface(
+    telnet_service = box_telnet_interface(
         host="localhost",
         port=23,
         login=HOST_LOGIN,
@@ -33,7 +33,7 @@ def test_create_telnet_connection():
     telnet_timeout_in_secs = 5
 
     # WHEN
-    telnet = wifi_telnet_interface(host, port, login, password, telnet_timeout_in_secs)
+    telnet = box_telnet_interface(host, port, login, password, telnet_timeout_in_secs)
 
     # THEN
     assert not telnet.connection.sock._closed
@@ -50,7 +50,7 @@ def test_create_telnet_connection_KO():
 
     # WHEN / THEN
     with pytest.raises(ServerBoxException):
-        wifi_telnet_interface(host, port, login, password, telnet_timeout_in_secs)
+        box_telnet_interface(host, port, login, password, telnet_timeout_in_secs)
 
 
 def test_create_superuser_session(telnet):

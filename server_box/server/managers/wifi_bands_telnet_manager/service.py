@@ -7,7 +7,7 @@ import yaml
 import time
 from datetime import datetime, timedelta
 from telnetlib import Telnet
-from server.interfaces.wifi_interface_telnet import wifi_telnet_interface
+from server.interfaces.box_interface_telnet import box_telnet_interface
 from server.interfaces.mqtt_interface import RelaysStatus
 from server.managers.mqtt_manager import mqtt_manager_service
 from server.common import ServerBoxException, ErrorCode
@@ -57,7 +57,7 @@ class WifiBandsManager:
     def create_telnet_connection(self) -> Telnet:
         """Create wifi telnet interface object for telnet commands"""
         # Create telnet connection
-        return wifi_telnet_interface(
+        return box_telnet_interface(
             host=self.livebox_ip_address,
             port=self.livebox_telnet_port,
             login=self.livebox_login,
