@@ -193,12 +193,12 @@ loggers:
     handlers: [console]
     propagate: no
 
-  server.interfaces.wifi_interface_ssh:
+  server.interfaces.box_interface_ssh:
     level: INFO
     handlers: [console]
     propagate: no
 
-  server.interfaces.wifi_interface_telnet:
+  server.interfaces.box_interface_telnet:
     level: INFO
     handlers: [console]
     propagate: no
