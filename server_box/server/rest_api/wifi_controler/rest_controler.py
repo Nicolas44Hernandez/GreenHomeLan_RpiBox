@@ -5,7 +5,10 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from .rest_model import WifiStatusSchema, MacAdressListSchema
+from server.common.box_status import box_sleeping
+from server.common.authentication import token_required
 from server.common import ServerBoxException, ErrorCode
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +19,8 @@ bp = Blueprint("wifi", __name__, url_prefix="/wifi")
 @bp.route("/")
 class WifiStatusApi(MethodView):
     """API to retrieve wifi general status"""
-
+    @token_required
+    @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
@@ -30,6 +34,8 @@ class WifiStatusApi(MethodView):
             raise ServerBoxException(ErrorCode.SSH_CONNECTION_ERROR)
         return {"status": status}
 
+    @token_required
+    @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(WifiStatusSchema, location="query")
     @bp.response(status_code=200, schema=WifiStatusSchema)
@@ -51,6 +57,8 @@ class WifiStatusApi(MethodView):
 class WifiBandsStatusApi(MethodView):
     """API to retrieve wifi band status"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
@@ -66,6 +74,8 @@ class WifiBandsStatusApi(MethodView):
 
         return {"status": status}
 
+    @token_required
+    @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(WifiStatusSchema, location="query")
     @bp.response(status_code=200, schema=WifiStatusSchema)
@@ -87,6 +97,8 @@ class WifiBandsStatusApi(MethodView):
 class WifiConnectedStationsApi(MethodView):
     """API to connected stations list"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
@@ -107,6 +119,8 @@ class WifiConnectedStationsApi(MethodView):
 class WifiConnectedStationsApi(MethodView):
     """API to connected stations list for a band"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},

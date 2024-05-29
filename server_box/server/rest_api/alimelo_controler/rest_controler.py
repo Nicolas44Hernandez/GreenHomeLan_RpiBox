@@ -4,6 +4,8 @@ from flask.views import MethodView
 from flask_smorest import Blueprint
 from .rest_model import AlimeloRessourcesSchema
 from server.managers.alimelo_manager import alimelo_manager_service
+from server.common.box_status import box_sleeping
+from server.common.authentication import token_required
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,8 @@ bp = Blueprint("alimelo", __name__, url_prefix="/alimelo")
 class AlimeloRessources(MethodView):
     """API to retrieve the alimelo ressources"""
 
+    @token_required
+    @box_sleeping
     @bp.response(status_code=200, schema=AlimeloRessourcesSchema)
     def get(self):
         """Get Alimelo ressources"""

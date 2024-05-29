@@ -6,6 +6,8 @@ from flask_smorest import Blueprint
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from .rest_model import SingleRelayStatusSchema, RelaysStatusResponseSchema, RelaysStatusQuerySchema
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
+from server.common.box_status import box_sleeping
+from server.common.authentication import token_required
 from server.common import ServerBoxException, ErrorCode
 
 
@@ -21,6 +23,8 @@ bp = Blueprint("electrical_panel", __name__, url_prefix="/electrical_panel")
 class RelaysStatusApi(MethodView):
     """API to retrieve or set electrical panel status"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
     )
@@ -35,6 +39,8 @@ class RelaysStatusApi(MethodView):
 
         return relays_status
 
+    @token_required
+    @box_sleeping
     @bp.doc(responses={400: "BAD_REQUEST"})
     @bp.arguments(RelaysStatusQuerySchema, location="query")
     @bp.response(status_code=200, schema=RelaysStatusResponseSchema)
@@ -70,6 +76,8 @@ class RelaysStatusApi(MethodView):
 class WifiBandsStatusApi(MethodView):
     """API to retrieve single relay status"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
     )

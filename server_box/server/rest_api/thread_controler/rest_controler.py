@@ -2,8 +2,10 @@
 import logging
 from flask.views import MethodView
 from flask_smorest import Blueprint
-from .rest_model import NodeSchema, ThreadNetworkSetupSchema
+from .rest_model import NodeSchema
 from server.managers.thread_manager import thread_manager_service
+from server.common.box_status import box_sleeping
+from server.common.authentication import token_required
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,8 @@ bp = Blueprint("thread", __name__, url_prefix="/thread")
 class ThreadNodesApi(MethodView):
     """API to retrieve thread configured nodes"""
 
+    @token_required
+    @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
         responses={400: "BAD_REQUEST", 404: "NOT_FOUND"},
