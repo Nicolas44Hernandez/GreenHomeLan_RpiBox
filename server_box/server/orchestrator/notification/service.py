@@ -54,7 +54,7 @@ class OrchestratorNotification:
             server_cloud_notify_connected_nodes_path
         )
         self.server_cloud_ports = server_cloud_ports
-        self.api_token = ClientsRemoteAuth.generate_token(client_id="cloud_server")
+        self.api_token = ClientsRemoteAuth.generate_token(client_id="cloud_server", exp_hours=24)
 
 
     def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):

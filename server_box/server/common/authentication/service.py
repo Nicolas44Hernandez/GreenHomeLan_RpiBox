@@ -16,13 +16,13 @@ class ClientsRemoteAuth():
         cls.secret_key = secret_key
 
     @classmethod
-    def generate_token(cls, client_id:str):
+    def generate_token(cls, client_id:str, exp_hours: int = 5):
         """Generate jwt token"""
 
         token = jwt.encode({
             'sub': client_id,
             'iat':datetime.utcnow(),
-            'exp': datetime.utcnow() + timedelta(hours=5)},
+            'exp': datetime.utcnow() + timedelta(hours=exp_hours)},
             ClientsRemoteAuth.secret_key,
             algorithm="HS256",
         )
