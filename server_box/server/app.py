@@ -25,9 +25,6 @@ from .rest_api.energy_recommendations_controler import (
     bp as energy_recommendations_controler_bp,
 )
 from .rest_api.mqtt_test_controler import bp as mqtt_test_bp
-from .remote_rest_api.remote_wifi_controler import bp as remote_wifi_controler_bp
-from .remote_rest_api.remote_electrical_panel_controler import bp as remote_electrical_panel_controler_bp
-from .remote_rest_api.remote_use_situations_controler import bp as remote_use_situations_controler_bp
 from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
@@ -65,8 +62,6 @@ def create_app(
     register_orchestrator(app)
     # Register blueprints for REST API
     register_blueprints(app)
-    # Register remote blueprints for REST API
-    register_remote_blueprints(app)
     logger.info("App ready!!")
 
     return app
@@ -131,11 +126,3 @@ def register_blueprints(app: Flask):
     api.register_blueprint(commands_controler_bp)
     api.register_blueprint(energy_recommendations_controler_bp)
     api.register_blueprint(mqtt_test_bp)
-
-
-def register_remote_blueprints(app: Flask):
-    """Store App remote APIs blueprints."""
-    # Register REST remote blueprints
-    api.register_blueprint(remote_wifi_controler_bp)
-    api.register_blueprint(remote_electrical_panel_controler_bp)
-    api.register_blueprint(remote_use_situations_controler_bp)
