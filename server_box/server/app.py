@@ -39,7 +39,10 @@ def create_app(
 
     # Create app Flask
     app = Flask("Server Box")
-    cors = CORS(app)
+
+    CORS(app, origins='*',
+        headers=['Content-Type', 'Authorization'],
+        expose_headers='Authorization')
 
     # Get configuration files
     app_config = path.join(config_dir, "server-box-config.yml")
