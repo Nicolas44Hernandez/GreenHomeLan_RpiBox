@@ -2,19 +2,14 @@ import logging
 import requests
 import threading
 import socket
-import json
-from requests.exceptions import ConnectionError, InvalidURL
 from typing import Iterable
 from datetime import datetime
 from server.managers.wifi_bands_ssh_manager.model import WifiBandStatus, WifiStatus
 from server.managers.wifi_bands_ssh_manager import BANDS
-from server.managers.electrical_panel_manager import electrical_panel_manager_service
 from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 from server.managers.alimelo_manager import AlimeloRessources
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
-from server.common import ServerBoxException
-from server.common.authentication import ClientsRemoteAuth
 from server.orchestrator.live_objects import live_objects_service
 
 
@@ -32,7 +27,6 @@ class OrchestratorNotification:
     server_cloud_notify_connected_nodes_path: str
     rpi_cloud_ip_addr: str
     server_cloud_ports: Iterable[int]
-    api_token: str
 
     def init_notification_module(
         self,
@@ -54,7 +48,6 @@ class OrchestratorNotification:
             server_cloud_notify_connected_nodes_path
         )
         self.server_cloud_ports = server_cloud_ports
-        self.api_token = ClientsRemoteAuth.generate_token(client_id="cloud_server", exp_hours=24)
 
 
     def notify_wifi_status(self, bands_status: Iterable[WifiBandStatus]):
@@ -183,7 +176,6 @@ class OrchestratorNotification:
                 post_url = f"http://{self.rpi_cloud_ip_addr}:{port}/{self.server_cloud_notify_status_path}"
                 data = {
                     "orquestrator_base_url": orquestrator_base_url,
-                    "token": self.api_token,
                     "wifi_status": wifi_status,
                     "band_2GHz_status": band_status_2GHz,
                     "band_5GHz_status": band_status_5GHz,
