@@ -31,9 +31,7 @@ class WifiStatusApi(MethodView):
             raise ServerBoxException(ErrorCode.SSH_CONNECTION_ERROR)
         return {"status": status}
 
-    #TODO: reactivate
-    #
-    # @box_sleeping
+    @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(WifiStatusSchema, location="query")
     @bp.response(status_code=200, schema=WifiStatusSchema)
