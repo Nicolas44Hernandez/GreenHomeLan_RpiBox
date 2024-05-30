@@ -29,10 +29,14 @@ class BoxStatusManager:
                 orchestrator_use_situations_service.get_current_use_situation()
             )
 
+            logger.info(f"WHEN CHECKING IF BOX IS SLEEPING - use situation: {current_use_situation}")
+
             # If use situation is sleem switch it
             if current_use_situation == "DEEP_SLEEP":
+                logger.info("Box is sleeping")
                 return True
             else:
+                logger.info("Box is not sleeping")
                 return False
         except:
             logger.error("Error getting current use situation")
