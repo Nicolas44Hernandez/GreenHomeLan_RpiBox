@@ -1,12 +1,10 @@
 """ REST controller for wifi bands management ressource """
-from ast import Str
 import logging
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from .rest_model import WifiStatusSchema, MacAdressListSchema
 from server.common.box_status import box_sleeping
-from server.common.authentication import token_required
 from server.common import ServerBoxException, ErrorCode
 
 
@@ -19,7 +17,6 @@ bp = Blueprint("wifi", __name__, url_prefix="/wifi")
 @bp.route("/")
 class WifiStatusApi(MethodView):
     """API to retrieve wifi general status"""
-    @token_required
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
@@ -35,7 +32,7 @@ class WifiStatusApi(MethodView):
         return {"status": status}
 
     #TODO: reactivate
-    # @token_required
+    #
     # @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(WifiStatusSchema, location="query")
@@ -58,7 +55,7 @@ class WifiStatusApi(MethodView):
 class WifiBandsStatusApi(MethodView):
     """API to retrieve wifi band status"""
 
-    @token_required
+
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
@@ -75,7 +72,7 @@ class WifiBandsStatusApi(MethodView):
 
         return {"status": status}
 
-    @token_required
+
     @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(WifiStatusSchema, location="query")
@@ -98,7 +95,7 @@ class WifiBandsStatusApi(MethodView):
 class WifiConnectedStationsApi(MethodView):
     """API to connected stations list"""
 
-    @token_required
+
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
@@ -120,7 +117,6 @@ class WifiConnectedStationsApi(MethodView):
 class WifiConnectedStationsApi(MethodView):
     """API to connected stations list for a band"""
 
-    @token_required
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],

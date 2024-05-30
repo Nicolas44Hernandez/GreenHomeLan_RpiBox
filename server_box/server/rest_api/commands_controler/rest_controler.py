@@ -6,7 +6,6 @@ from flask_smorest import Blueprint
 from server.orchestrator.commands import orchestrator_commands_service
 from .rest_model import CommandsListSchema, CommandsQuerySchema
 from server.common.box_status import box_sleeping
-from server.common.authentication import token_required
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,6 @@ bp = Blueprint("commands", __name__, url_prefix="/commands")
 class CommandsListApi(MethodView):
     """API to retrieve the available commands"""
 
-    @token_required
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
@@ -35,7 +33,6 @@ class CommandsListApi(MethodView):
 class CurrentCommandsListApi(MethodView):
     """API to retrieve the current commands"""
 
-    @token_required
     @box_sleeping
     @bp.doc(
         security=[{"tokenAuth": []}],
@@ -48,7 +45,6 @@ class CurrentCommandsListApi(MethodView):
         commands = orchestrator_commands_service.get_current_commands()
         return {"commands": commands}
 
-    @token_required
     @box_sleeping
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(CommandsQuerySchema, location="query")
