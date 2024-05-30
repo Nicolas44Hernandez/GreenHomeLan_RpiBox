@@ -35,8 +35,8 @@ class BoxStatusManager:
             else:
                 return False
         except:
-            logger.error("Error in box wakeup (use situation setting)")
-            return False
+            logger.error("Error getting current use situation")
+            return True
 
 
     def send_keep_alive(self) -> bool:
