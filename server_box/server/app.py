@@ -14,7 +14,7 @@ from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
 from .managers.electrical_panel_manager import electrical_panel_manager_service
-
+from .rest_remote_api import bp as remote_controler_bp
 from .rest_api.wifi_controler import bp as wifi_controler_bp
 from .rest_api.thread_controler import bp as thread_controler_bp
 from .rest_api.alimelo_controler import bp as alimelo_controler_bp
@@ -65,6 +65,9 @@ def create_app(
     register_orchestrator(app)
     # Register blueprints for REST API
     register_blueprints(app)
+    # Register remote blueprints for REST API
+    register_remote_blueprints(app)
+
     logger.info("App ready!!")
 
     return app
@@ -129,3 +132,9 @@ def register_blueprints(app: Flask):
     api.register_blueprint(commands_controler_bp)
     api.register_blueprint(energy_recommendations_controler_bp)
     api.register_blueprint(mqtt_test_bp)
+
+
+def register_remote_blueprints(app: Flask):
+    """Store App APIs remote blueprints."""
+    # Register REST blueprints
+    api.register_blueprint(remote_controler_bp)

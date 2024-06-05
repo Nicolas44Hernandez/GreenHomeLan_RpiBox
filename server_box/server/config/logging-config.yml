@@ -97,7 +97,7 @@ loggers:
 
   server.remote_rest_api:
       level: INFO
-      handlers: [api_rest]
+      handlers: [console]
       propagate: no
 
   server.orchestrator.service:
