@@ -26,7 +26,7 @@ class UseSituationsApi(MethodView):
     @bp.response(status_code=200, schema=UseSituationSchema)
     def get(self):
         """Get current use situation"""
-        logger.info(f"GET use_situations/current")
+        logger.info(f"GET remote/use_situations/current")
         current_use_situation = orchestrator_use_situations_service.get_current_use_situation()
         return {"use_situation": current_use_situation}
 
@@ -39,7 +39,7 @@ class UseSituationsApi(MethodView):
         """
         Set current use situation
         """
-        logger.info(f"POST use_situations/current")
+        logger.info(f"POST remote/use_situations/current")
         use_situation = args["use_situation"]
         logger.info(f"use situation: {use_situation}")
         orchestrator_use_situations_service.set_use_situation(use_situation=use_situation)
