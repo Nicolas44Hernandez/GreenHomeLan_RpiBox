@@ -13,7 +13,7 @@ bp = Blueprint("remote", __name__, url_prefix="/remote")
 """ The api blueprint. Should be registered in app main api object """
 
 
-@bp.route("/use_situation/current")
+@bp.route("/use_situations/current")
 class UseSituationsApi(MethodView):
     """API to retrieve and change current use situation"""
 
