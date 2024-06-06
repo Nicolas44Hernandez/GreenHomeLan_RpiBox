@@ -178,6 +178,11 @@ loggers:
     handlers: [alimelo]
     propagate: no
 
+  server.managers.cameras_manager:
+    level: INFO
+    handlers: [console]
+    propagate: no
+
   server.interfaces.thread_dongle_interface:
     level: DEBUG
     handlers: [thread]

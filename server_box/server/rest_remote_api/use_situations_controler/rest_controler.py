@@ -1,19 +1,18 @@
-""" REST controller for orchestrator remote APIs """
+""" REST controller for orchestrator remote use situations management"""
 import logging
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.orchestrator.use_situations import orchestrator_use_situations_service
-from .rest_model import UseSituationSchema
+from server.rest_api.use_situations_controler.rest_model import UseSituationSchema
 from server.common.box_status import box_sleeping
 from server.common.authentication import token_required
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint("remote", __name__, url_prefix="/remote")
+bp = Blueprint(" Remote use situations", __name__, url_prefix="/remote/use_situations")
 """ The api blueprint. Should be registered in app main api object """
 
-
-@bp.route("/use_situations/current")
+@bp.route("/current")
 class UseSituationsApi(MethodView):
     """API to retrieve and change current use situation"""
 
