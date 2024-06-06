@@ -8,3 +8,8 @@ class CameraSchema(Schema):
 
     id = Integer(required=True, allow_none=False, data_key='_id')
     url = String(required=True, allow_none=False)
+
+class RegisterSchema(Schema):
+    """REST ressource for register schema"""
+
+    key = String(required=True, allow_none=False)

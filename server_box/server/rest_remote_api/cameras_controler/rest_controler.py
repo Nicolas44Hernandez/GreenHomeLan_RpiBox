@@ -3,7 +3,7 @@ import logging
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from server.managers.cameras_manager import cameras_manager_service
-from .rest_model import CameraSchema
+from .rest_model import CameraSchema, RegisterSchema
 from server.common.box_status import box_sleeping
 from server.common.authentication import token_required
 
@@ -35,7 +35,7 @@ class RegisterCameraApi(MethodView):
 
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
     @bp.arguments(CameraSchema)
-    @bp.response(status_code=200)
+    @bp.response(status_code=200, schema=RegisterSchema)
     def post(self, args: CameraSchema):
         """
         Register camera
@@ -46,3 +46,4 @@ class RegisterCameraApi(MethodView):
         logger.info(f"Registering camera    id:{cam_id} url:{cam_url}")
 
         cameras_manager_service.register_camera(cam_id, cam_url)
+        return {"key": cameras_manager_service.get_secret_key()}
