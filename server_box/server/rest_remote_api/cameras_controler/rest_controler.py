@@ -31,9 +31,10 @@ class CamerasListApi(MethodView):
 @bp.route("/register")
 class RegisterCameraApi(MethodView):
     """API to register a camera"""
+    # TODO: modify API to get args in body
 
     @bp.doc(security=[{"tokenAuth": []}], responses={400: "BAD_REQUEST"})
-    @bp.arguments(CameraSchema, location="query")
+    @bp.arguments(CameraSchema)
     @bp.response(status_code=200)
     def post(self, args: CameraSchema):
         """
