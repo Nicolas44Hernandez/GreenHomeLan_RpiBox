@@ -125,7 +125,7 @@ class ThreadManager:
         if not self.thread_dongle_interface.write_message_to_dongle(msg_power_strip):
             logger.error(f"Error sending status to dongle")
 
-    def power_strip_relays_to_str(power_strip_relay_statuses: RelaysStatus):
+    def power_strip_relays_to_str(self, power_strip_relay_statuses: RelaysStatus):
         """Convert relays status to str to send message to thread dongle"""
         # Get power strip statuses
         r1_status = 'X'
