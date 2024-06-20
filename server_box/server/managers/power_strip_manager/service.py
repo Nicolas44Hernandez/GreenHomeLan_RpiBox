@@ -57,7 +57,7 @@ class PowerStripManager:
 
         for relay_status in self.relays_status.relay_statuses:
             if relay_status.relay_number == relay_number:
-                relay_status.status == new_status
+                relay_status.status = new_status
                 return relay_status
         raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
 
