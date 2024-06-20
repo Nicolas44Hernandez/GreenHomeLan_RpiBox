@@ -34,7 +34,7 @@ class PowerStripManager:
     def get_single_relay_status(self, relay_number: int):
         """get single relay status"""
 
-        if relay_number not in range(0, 4):
+        if relay_number not in range(1, 5):
             raise ServerBoxException(ErrorCode.INVALID_RELAY_NUMBER)
 
         if self.relays_status is None:
