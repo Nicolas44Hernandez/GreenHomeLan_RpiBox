@@ -75,10 +75,11 @@ class ThreadManager:
         wifi_status: bool,
         use_situation: str,
         relay_statuses: RelaysStatus,
+        power_strip_relays_statuses: RelaysStatus,
     ):
         """Update wifi and presence status in dongle"""
         logger.info(
-            f"Updating status in dongle  wifi_status:{wifi_status}  use_situation:{use_situation}  relay_statuses: {relay_statuses}"
+            f"Updating status in dongle  wifi_status:{wifi_status}  use_situation:{use_situation}  pannel_relay_statuses: {relay_statuses}  power_strip: {power_strip_relays_statuses}"
         )
 
         # Get electricity status
@@ -93,11 +94,14 @@ class ThreadManager:
         # Get presence status from us
         presence = "PRESENCE" in use_situation
 
+        # Get power strip status
+        msg_power_strip = self.power_strip_relays_to_str(power_strip_relays_statuses)
+
         # Build message
         msg_wifi = "wifi:1" if wifi_status else "wifi:0"
         msg_prs = "prs:1" if presence else "prs:0"
         msg_ele = "ele:1" if electrycity_status else "ele:0"
-        message = msg_wifi + msg_prs + msg_ele
+        message = msg_wifi + msg_prs + msg_ele + msg_power_strip
         logger.info(f"MSG: {message}")
         if not self.thread_dongle_interface.write_message_to_dongle(message):
             logger.error(f"Error sending status to dongle")
@@ -114,6 +118,15 @@ class ThreadManager:
         if power_strip_relay_statuses is None:
             raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
 
+        # Format relays status to str
+        msg_power_strip = self.power_strip_relays_to_str(power_strip_relay_statuses)
+
+        logger.info(f"MSG: {msg_power_strip}")
+        if not self.thread_dongle_interface.write_message_to_dongle(msg_power_strip):
+            logger.error(f"Error sending status to dongle")
+
+    def power_strip_relays_to_str(power_strip_relay_statuses: RelaysStatus):
+        """Convert relays status to str to send message to thread dongle"""
         # Get power strip statuses
         r1_status = 'X'
         r2_status = 'X'
@@ -135,12 +148,7 @@ class ThreadManager:
                 continue
 
         # Concatenate message to send
-        msg_power_strip = f"outlet:{r1_status}{r2_status}{r3_status}{r4_status}"
-
-        logger.info(f"MSG: {msg_power_strip}")
-        if not self.thread_dongle_interface.write_message_to_dongle(msg_power_strip):
-            logger.error(f"Error sending status to dongle")
-
+        return f"outlet:{r1_status}{r2_status}{r3_status}{r4_status}"
 
 thread_manager_service: ThreadManager = ThreadManager()
 """ Thread manager service singleton"""

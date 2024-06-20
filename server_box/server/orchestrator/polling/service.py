@@ -11,6 +11,7 @@ from server.orchestrator.energy_limitations import (
 from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.thread_manager import thread_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
+from server.managers.power_strip_manager import power_strip_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service, AlimeloRessources
 from server.managers.mqtt_manager import mqtt_manager_service
 
@@ -80,6 +81,9 @@ class OrchestratorPolling:
                 electrical_panel_manager_service.get_relays_last_received_status()
             )
 
+            # Get power strip status
+            power_strip_relays_statuses = power_strip_manager_service.get_relays_status()
+
             # Get energy limitations
             energy_limitations = (
                 orchestrator_energy_limitations_service.get_current_energy_limitations()
@@ -105,6 +109,7 @@ class OrchestratorPolling:
                 wifi_status=wifi_status.status,
                 use_situation=current_use_situation,
                 relay_statuses=relay_statuses,
+                power_strip_relays_statuses=power_strip_relays_statuses,
             )
 
             logger.info(f"Polling wifi done")
