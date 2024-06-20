@@ -58,6 +58,8 @@ class PowerStripManager:
         for relay_status in self.relays_status.relay_statuses:
             if relay_status.relay_number == relay_number:
                 relay_status.status = new_status
+                # Notify new status to thread dongle
+                thread_manager_service.update_power_strip_status_in_dongle(power_strip_relay_statuses=self.relays_status)
                 return relay_status
         raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
 
