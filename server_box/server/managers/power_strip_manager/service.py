@@ -45,6 +45,22 @@ class PowerStripManager:
                 return relay_status
         raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
 
+
+    def set_single_relay_status(self, relay_number: int, new_status: bool):
+        """set single relay status"""
+
+        if relay_number not in range(1, 5):
+            raise ServerBoxException(ErrorCode.INVALID_RELAY_NUMBER)
+
+        if self.relays_status is None:
+            raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
+
+        for relay_status in self.relays_status.relay_statuses:
+            if relay_status.relay_number == relay_number:
+                relay_status.status == new_status
+                return relay_status
+        raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
+
     def set_relays_statuses(self, relays_status: RelaysStatus):
         """Set relays status"""
         logger.info(f"Setting relays status to:")

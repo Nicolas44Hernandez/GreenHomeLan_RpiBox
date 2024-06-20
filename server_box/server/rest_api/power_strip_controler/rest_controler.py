@@ -85,3 +85,18 @@ class WifiBandsStatusApi(MethodView):
         # Call electrical panel manager service to get relay status
         status = power_strip_manager_service.get_single_relay_status(relay_number=int(relay))
         return status
+
+    @box_sleeping
+    @bp.doc(responses={400: "BAD_REQUEST"})
+    @bp.arguments(SingleRelayStatusSchema, location="query")
+    @bp.response(status_code=200, schema=SingleRelayStatusSchema)
+    def post(self, args: SingleRelayStatusSchema):
+        """Set single relay status"""
+
+        logger.info(f"POST power_strip/")
+        logger.info(f"relay status {args}")
+
+        # Call power strip manager service to publish relays status command
+        relay_status = power_strip_manager_service.set_single_relay_status(relay_number=args["relay_number"],new_status=args["status"])
+
+        return relay_status
