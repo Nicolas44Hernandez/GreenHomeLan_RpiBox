@@ -69,7 +69,7 @@ class PowerStripStatusApi(MethodView):
 
 
 @bp.route("/<relay>")
-class WifiBandsStatusApi(MethodView):
+class SingleRelayGetStatusApi(MethodView):
     """API to retrieve single relay status"""
 
     @box_sleeping
@@ -86,6 +86,10 @@ class WifiBandsStatusApi(MethodView):
         status = power_strip_manager_service.get_single_relay_status(relay_number=int(relay))
         return status
 
+
+@bp.route("/single")
+class SingleRelaySetStatusApi(MethodView):
+    """API to retrieve single relay status"""
     @box_sleeping
     @bp.doc(responses={400: "BAD_REQUEST"})
     @bp.arguments(SingleRelayStatusSchema, location="query")
