@@ -4,6 +4,7 @@ from datetime import datetime
 from timeloop import Timeloop
 from server.managers.wifi_bands_ssh_manager import wifi_bands_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
+from server.managers.power_strip_manager import power_strip_manager_service
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
 from server.orchestrator.energy_limitations import (
     orchestrator_energy_limitations_service,
@@ -80,6 +81,13 @@ class OrchestratorUseSituations:
             ]
         )
 
+        # Set use situation Power strip statis
+        self.set_use_situation_power_strip_status(
+            self.use_situations_dict[self.current_use_situation][energy_limitation][
+                "POWER_STRIP"
+            ]
+        )
+
     def set_use_situation_wifi_status(self, wifi_bands_status: dict):
         """Set wifi status"""
         for band in wifi_bands_status:
@@ -119,6 +127,32 @@ class OrchestratorUseSituations:
         electrical_panel_manager_service.publish_mqtt_relays_status_command(
             relays_statuses
         )
+
+    def set_use_situation_power_strip_status(self, power_strip_status: dict):
+        """Set electrical panel status"""
+        # Build RelayStatus instance
+        relays_status = []
+        for outlet_number in range(1,5):
+            if outlet_number in power_strip_status:
+                outlet_status = power_strip_status[outlet_number]
+            else:
+                outlet_status = False
+            logger.info(f"Setting power strip outlet {outlet_number} to {outlet_status}")
+            relays_status.append(
+                SingleRelayStatus(
+                    relay_number=outlet_number,
+                    status=outlet_status,
+                    powered=False,
+                ),
+            )
+
+        relays_statuses = RelaysStatus(
+            relay_statuses=relays_status, command=True, timestamp=datetime.now()
+        )
+        logger.info(f"{relays_statuses.to_json()}")
+
+        # Call Power strip manager service to set relays status
+        power_strip_manager_service.set_relays_statuses(relays_status=relays_statuses)
 
     def get_current_use_situation(self):
         """Get current use situation"""
