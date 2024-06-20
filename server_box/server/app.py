@@ -15,19 +15,21 @@ from server.managers.thread_manager import thread_manager_service
 from server.managers.alimelo_manager import alimelo_manager_service
 from server.managers.cameras_manager import cameras_manager_service
 from server.managers.electrical_panel_manager import electrical_panel_manager_service
+from server.managers.power_strip_manager import power_strip_manager_service
 from .rest_remote_api.use_situations_controler import bp as remote_use_situations_controler_bp
 from .rest_remote_api.cameras_controler import bp as remote_cameras_controler_bp
 from .rest_api.wifi_controler import bp as wifi_controler_bp
 from .rest_api.thread_controler import bp as thread_controler_bp
 from .rest_api.alimelo_controler import bp as alimelo_controler_bp
 from .rest_api.electrical_panel_controler import bp as electrical_panel_controler_bp
+from .rest_api.power_strip_controler import bp as power_strip_controler_bp
 from .rest_api.use_situations_controler import bp as use_situations_controler_bp
 from .rest_api.commands_controler import bp as commands_controler_bp
 from .rest_api.energy_recommendations_controler import (
     bp as energy_recommendations_controler_bp,
 )
 from .rest_api.mqtt_test_controler import bp as mqtt_test_bp
-from .orchestrator import orchestrator_service
+#from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
 
@@ -64,7 +66,7 @@ def create_app(
     # Register auth params
     register_auth_params(secret_key=app.config["SECRET_KEY"])
     # register orchestrator
-    register_orchestrator(app)
+    #register_orchestrator(app)
     # Register blueprints for REST API
     register_blueprints(app)
     # Register remote blueprints for REST API
@@ -108,15 +110,17 @@ def register_extensions(app: Flask):
     thread_manager_service.init_app(app=app)
     # Electrical panel manager service
     electrical_panel_manager_service.init_app(app=app)
+    # Electrical panel manager service
+    power_strip_manager_service.init_app(app=app)
     # Alimelo manager extension
     alimelo_manager_service.init_app(app=app)
     # Cameras manager extension
     cameras_manager_service.init_app(app=app)
 
 
-def register_orchestrator(app: Flask):
-    """Initialize Orchestrator"""
-    orchestrator_service.init_app(app=app)
+# def register_orchestrator(app: Flask):
+#     """Initialize Orchestrator"""
+#     orchestrator_service.init_app(app=app)
 
 
 def register_auth_params(secret_key: str):
@@ -132,6 +136,7 @@ def register_blueprints(app: Flask):
     api.register_blueprint(thread_controler_bp)
     api.register_blueprint(alimelo_controler_bp)
     api.register_blueprint(electrical_panel_controler_bp)
+    api.register_blueprint(power_strip_controler_bp)
     api.register_blueprint(use_situations_controler_bp)
     api.register_blueprint(commands_controler_bp)
     api.register_blueprint(energy_recommendations_controler_bp)

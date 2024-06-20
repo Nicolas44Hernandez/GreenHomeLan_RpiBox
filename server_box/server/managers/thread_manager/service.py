@@ -4,6 +4,7 @@ from flask import Flask
 from timeloop import Timeloop
 from server.interfaces.thread_dongle_interface import ThreadInterface
 from server.interfaces.mqtt_interface import SingleRelayStatus, RelaysStatus
+from server.common import ServerBoxException, ErrorCode
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,45 @@ class ThreadManager:
         message = msg_wifi + msg_prs + msg_ele
         logger.info(f"MSG: {message}")
         if not self.thread_dongle_interface.write_message_to_dongle(message):
+            logger.error(f"Error sending status to dongle")
+
+    def update_power_strip_status_in_dongle(
+        self,
+        power_strip_relay_statuses: RelaysStatus,
+    ):
+        """Update wifi and presence status in dongle"""
+        logger.info(
+            f"Updating power strip status in dongle  power_strip_relay_statuses: {power_strip_relay_statuses}"
+        )
+
+        if power_strip_relay_statuses is None:
+            raise ServerBoxException(ErrorCode.RELAYS_STATUS_NOT_RECEIVED)
+
+        # Get power strip statuses
+        r1_status = 'X'
+        r2_status = 'X'
+        r3_status = 'X'
+        r4_status = 'X'
+
+        for relay_status in power_strip_relay_statuses.relay_statuses:
+            if relay_status.relay_number == 1:
+                r1_status = '1' if relay_status.status else '0'
+                continue
+            if relay_status.relay_number == 2:
+                r2_status = '1' if relay_status.status else '0'
+                continue
+            if relay_status.relay_number == 3:
+                r3_status = '1' if relay_status.status else '0'
+                continue
+            if relay_status.relay_number == 4:
+                r4_status = '1' if relay_status.status else '0'
+                continue
+
+        # Concatenate message to send
+        msg_power_strip = f"outlet:{r1_status}{r2_status}{r3_status}{r4_status}"
+
+        logger.info(f"MSG: {msg_power_strip}")
+        if not self.thread_dongle_interface.write_message_to_dongle(msg_power_strip):
             logger.error(f"Error sending status to dongle")
 
 

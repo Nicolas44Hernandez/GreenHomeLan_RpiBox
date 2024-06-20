@@ -52,6 +52,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 1
 
+  power_strip:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: logs/power_strip.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 1
+
   thread:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -87,75 +94,80 @@ root:
 loggers:
   server.app:
     level: INFO
-    handlers: [app]
+    handlers: [console]
     propagate: no
 
   server.rest_api:
       level: INFO
-      handlers: [api_rest]
+      handlers: [console]
       propagate: no
 
   server.remote_rest_api:
       level: INFO
-      handlers: [api_rest]
+      handlers: [console]
       propagate: no
 
   server.orchestrator.service:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
     propagate: no
 
   server.orchestrator.energy_limitations:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
 
   server.orchestrator.box_status:
     level: INFO
-    handlers: [orchestrator]
+    handlers: [console]
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [live_objects]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [mqtt]
+    handlers: [console]
     propagate: no
 
   server.managers.mqtt_liveobjects_manager:
     level: INFO
-    handlers: [live_objects]
+    handlers: [console]
     propagate: no
 
   server.managers.electrical_panel_manager:
     level: INFO
-    handlers: [electrical_panel]
+    handlers: [console]
+    propagate: no
+
+  server.managers.power_strip_manager:
+    level: INFO
+    handlers: [console]
     propagate: no
 
   server.managers.thread:
@@ -165,17 +177,17 @@ loggers:
 
   server.managers.wifi_bands_ssh_manager:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.managers.wifi_bands_telnet_manager:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [alimelo]
+    handlers: [console]
     propagate: no
 
   server.managers.cameras_manager:
@@ -190,22 +202,22 @@ loggers:
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [mqtt]
+    handlers: [console]
     propagate: no
 
   server.interfaces.mqtt_liveobjects_interface:
     level: INFO
-    handlers: [live_objects]
+    handlers: [console]
     propagate: no
 
   server.interfaces.box_interface_ssh:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.interfaces.box_interface_telnet:
     level: INFO
-    handlers: [wifi]
+    handlers: [console]
     propagate: no
 
   server.interfaces.alimelo_interface:

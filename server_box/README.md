@@ -196,7 +196,7 @@ Log files defined in configuration file located in *server_box/server/config/log
 
 ```bash
 mkdir logs
-touch logs/app.log logs/orchestrator.log logs/api-rest.log logs/mqtt.log logs/electrical_panel.log logs/thread.log logs/wifi.log logs/alimelo.log logs/telnet.log logs/live_objects.log
+touch logs/app.log logs/orchestrator.log logs/api-rest.log logs/mqtt.log logs/electrical_panel.log logs/power_strip.log logs/thread.log logs/wifi.log logs/alimelo.log logs/telnet.log logs/live_objects.log
 ```
 
 Pour lancer l'application flask, depuis Server_Box
