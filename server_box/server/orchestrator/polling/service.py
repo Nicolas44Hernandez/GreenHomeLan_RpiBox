@@ -102,6 +102,7 @@ class OrchestratorPolling:
                 alimelo_ressources=alimelo_manager_service.alimelo_ressources,
                 relay_statuses=relay_statuses,
                 energy_limitations=energy_limitations,
+                power_strip_relays_status=power_strip_relays_statuses,
             )
 
             # Notify current wifi and presence status to thread dongle

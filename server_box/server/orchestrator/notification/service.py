@@ -90,6 +90,7 @@ class OrchestratorNotification:
         alimelo_ressources: AlimeloRessources,
         relay_statuses: RelaysStatus,
         energy_limitations: str,
+        power_strip_relays_status: RelaysStatus,
     ):
         """Notify current wifi status and use situation to cloud server"""
 
@@ -160,6 +161,23 @@ class OrchestratorNotification:
                         po2_status = relay_status.status
                         po2_powered = relay_status.powered
 
+            # Get power strip relays outlet status
+            power_strip_r1_status = False
+            power_strip_r2_status = False
+            power_strip_r3_status = False
+            power_strip_r4_status = False
+
+            if power_strip_relays_status is not None:
+                for relay_status in power_strip_relays_status.relay_statuses:
+                    if relay_status.relay_number == 1:
+                        power_strip_r1_status = relay_status.status
+                    if relay_status.relay_number == 2:
+                        power_strip_r2_status = relay_status.status
+                    if relay_status.relay_number == 3:
+                        power_strip_r3_status = relay_status.status
+                    if relay_status.relay_number == 4:
+                        power_strip_r4_status = relay_status.status
+
             # Get Orchestrator ip address
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -197,6 +215,10 @@ class OrchestratorNotification:
                     "po1_powered": po1_powered,
                     "po2_status": po2_status,
                     "po2_powered": po2_powered,
+                    "power_strip_relay1_status": power_strip_r1_status,
+                    "power_strip_relay2_status": power_strip_r2_status,
+                    "power_strip_relay3_status": power_strip_r3_status,
+                    "power_strip_relay4_status": power_strip_r4_status,
                 }
 
                 self.http_post_in_dedicated_thread(url=post_url, data=data)
