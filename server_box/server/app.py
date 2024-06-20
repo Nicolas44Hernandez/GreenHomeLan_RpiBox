@@ -29,7 +29,7 @@ from .rest_api.energy_recommendations_controler import (
     bp as energy_recommendations_controler_bp,
 )
 from .rest_api.mqtt_test_controler import bp as mqtt_test_bp
-#from .orchestrator import orchestrator_service
+from .orchestrator import orchestrator_service
 from .extension import api
 from .common import ServerBoxException, handle_server_box_exception
 
@@ -66,7 +66,7 @@ def create_app(
     # Register auth params
     register_auth_params(secret_key=app.config["SECRET_KEY"])
     # register orchestrator
-    #register_orchestrator(app)
+    register_orchestrator(app)
     # Register blueprints for REST API
     register_blueprints(app)
     # Register remote blueprints for REST API
@@ -118,9 +118,9 @@ def register_extensions(app: Flask):
     cameras_manager_service.init_app(app=app)
 
 
-# def register_orchestrator(app: Flask):
-#     """Initialize Orchestrator"""
-#     orchestrator_service.init_app(app=app)
+def register_orchestrator(app: Flask):
+    """Initialize Orchestrator"""
+    orchestrator_service.init_app(app=app)
 
 
 def register_auth_params(secret_key: str):
