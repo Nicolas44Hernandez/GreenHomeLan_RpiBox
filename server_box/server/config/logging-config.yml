@@ -94,80 +94,80 @@ root:
 loggers:
   server.app:
     level: INFO
-    handlers: [console]
+    handlers: [app]
     propagate: no
 
   server.rest_api:
       level: INFO
-      handlers: [console]
+      handlers: [api_rest]
       propagate: no
 
   server.remote_rest_api:
       level: INFO
-      handlers: [console]
+      handlers: [api_rest]
       propagate: no
 
   server.orchestrator.service:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.notification:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.commands:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.polling:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.requests:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.use_situations:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.orchestrator.energy_limitations:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
 
   server.orchestrator.box_status:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
 
   server.orchestrator.live_objects:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.managers.mqtt_manager:
     level: INFO
-    handlers: [console]
+    handlers: [mqtt]
     propagate: no
 
   server.managers.mqtt_liveobjects_manager:
     level: INFO
-    handlers: [console]
+    handlers: [mqtt]
     propagate: no
 
   server.managers.electrical_panel_manager:
     level: INFO
-    handlers: [console]
+    handlers: [electrical_panel]
     propagate: no
 
   server.managers.power_strip_manager:
     level: INFO
-    handlers: [console]
+    handlers: [power_strip]
     propagate: no
 
   server.managers.thread:
@@ -177,22 +177,22 @@ loggers:
 
   server.managers.wifi_bands_ssh_manager:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.managers.wifi_bands_telnet_manager:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.managers.alimelo_manager:
     level: DEBUG
-    handlers: [console]
+    handlers: [alimelo]
     propagate: no
 
   server.managers.cameras_manager:
     level: INFO
-    handlers: [console]
+    handlers: [orchestrator]
     propagate: no
 
   server.interfaces.thread_dongle_interface:
@@ -202,22 +202,22 @@ loggers:
 
   server.interfaces.mqtt_interface:
     level: INFO
-    handlers: [console]
+    handlers: [mqtt]
     propagate: no
 
   server.interfaces.mqtt_liveobjects_interface:
     level: INFO
-    handlers: [console]
+    handlers: [mqtt]
     propagate: no
 
   server.interfaces.box_interface_ssh:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.interfaces.box_interface_telnet:
     level: INFO
-    handlers: [console]
+    handlers: [wifi]
     propagate: no
 
   server.interfaces.alimelo_interface:
